@@ -1,0 +1,89 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Authentification {
+    +id : INT {PK}
+    +loginname : VARCHAR(40)
+    +password : VARCHAR(255)
+}
+
+class Users {
+    +userid : INT {PK}
+    +loginid : INT {FK}
+    +name : VARCHAR(80)
+    +email : VARCHAR(80)
+    +city : VARCHAR(100)
+    +street : VARCHAR(150)
+    +houseNumber : VARCHAR(20)
+    +postalCode : VARCHAR(20)
+    +phone : VARCHAR(20)
+    +mobile : VARCHAR(20)
+}
+
+class Anrede {
+    +id : INT {PK}
+    +text : VARCHAR(20)
+}
+
+class Companies {
+    +companyId : INT {PK}
+    +name : VARCHAR(200)
+    +city : VARCHAR(100)
+    +street : VARCHAR(150)
+    +houseNumber : VARCHAR(20)
+    +postalCode : VARCHAR(20)
+    +isrecruter : BOOLEAN
+    +ref : INT {FK}
+}
+
+class Contacts {
+    +contactId : INT {PK}
+    +name : VARCHAR(80)
+    +anrede : INT {FK}
+    +email : VARCHAR(80)
+    +phone : VARCHAR(20)
+    +mobile : VARCHAR(20)
+    +ref : INT {FK}
+}
+
+class States {
+    +stateid : INT {PK}
+    +text : VARCHAR(40)
+}
+
+class Resumes {
+    +resumeid : INT {PK}
+    +userid : INT {FK}
+    +companyid : INT {FK}
+    +parentcompanyid : INT {FK}
+    +stateid : INT {FK}
+    +ref : INT {FK}
+    +created : DATE
+    +position : VARCHAR(80)
+    +link : VARCHAR(80)
+    +comment : VARCHAR(500)
+}
+
+class History {
+    +historyid : INT {PK}
+    +resumeid : INT {FK}
+    +date : DATE
+    +stateid : INT {FK}
+}
+
+Users "1" --> "1" Authentification : loginid
+Users "1" --> "0..*" Companies : ref
+Users "1" --> "0..*" Contacts : ref
+Users "1" --> "0..*" Resumes : userid
+
+Anrede "1" --> "0..*" Contacts : anrede
+
+Companies "1" --> "0..*" Resumes : companyid
+Companies "1" --> "0..*" Resumes : parentcompanyid
+
+States "1" --> "0..*" Resumes : stateid
+States "1" --> "0..*" History : stateid
+
+Resumes "1" --> "0..*" History : resumeid
+
+@enduml

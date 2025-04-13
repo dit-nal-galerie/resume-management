@@ -1,0 +1,487 @@
+import mysql, { OkPacket, ResultSetHeader, RowDataPacket }  from 'mysql2';
+
+import bcrypt from 'bcrypt';
+import { Request, Response } from 'express';
+import { User } from '../../interfaces/User';
+import { Resume } from '../../interfaces/Resume';
+import config from './config';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { ParsedQs } from 'qs';
+
+class ResumeManagementAPI {
+  getUserData(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): void | Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  private db: mysql.Connection;
+
+  constructor() {
+    this.db = mysql.createConnection({
+      host: config.DB_HOST,
+      user: config.DB_USER,
+      password: config.DB_PASSWORD,
+      database: config.DB_NAME,
+    });
+  }
+async createAccount(loginname: string, password: string): Promise<number | null> {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const query = 'INSERT INTO authentification (loginname, password) VALUES (?, ?)';
+    
+    return new Promise((resolve, reject) => {
+      this.db.query(query, [loginname, hashedPassword], (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve((result as OkPacket).insertId);
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Ошибка при хэшировании пароля:", error);
+    return null;
+  }
+}
+
+async createUser(req: Request, res: Response): Promise<void> {
+  const {
+    loginname,
+    password,
+    name,
+    email,
+    anrede,
+    city,
+    street,
+    houseNumber,
+    postalCode,
+    phone,
+    mobile,
+  }: User = req.body;
+
+  if (!loginname || !password || !email  ) {
+    res.status(400).send('Все обязательные поля должны быть заполнены.');
+    return;
+  }
+
+  const checkQuery = `
+    SELECT COUNT(*) AS count FROM authentification WHERE loginname = ? 
+    UNION ALL 
+    SELECT COUNT(*) AS count FROM users WHERE email = ?`;
+
+  this.db.query(checkQuery, [loginname, email], async (err, results) => {
+    if (err) {
+      res.status(500).send('Ошибка на сервере.');
+      return;
+    }
+
+    if (results[0].count > 0 || results[1].count > 0) {
+      res.status(409).send('Пользователь с такими данными уже существует.');
+      return;
+    }
+
+    try {
+      const loginid = await this.createAccount(loginname, password);
+      if (!loginid) {
+        res.status(500).send('Ошибка при создании учетной записи.');
+        return;
+      }
+
+      const userQuery = `
+        INSERT INTO users (loginid, name, email, anrede, city, street, houseNumber, postalCode, phone, mobile)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+      this.db.query(userQuery, [loginid, name, email, anrede, city, street, houseNumber, postalCode, phone, mobile], (userErr) => {
+        if (userErr) {
+          res.status(500).send('Ошибка при создании пользователя.'+userErr.message);
+          return;
+        }
+        res.status(201).send('Пользователь успешно создан.');
+      });
+
+    } catch (error) {
+      res.status(500).send('Ошибка при обработке запроса.');
+    }
+  });
+}
+  // Остальные методы API (пример)
+  async login(req: Request, res: Response): Promise<void> {
+    const { loginname, password } = req.body;
+    const queryAuth = "SELECT id, password FROM authentification WHERE loginname = ?";
+  
+    this.db.query(queryAuth, [loginname], async (err, authResults) => {
+      if (err) {
+        console.error("Fehler beim Abrufen der Login-Daten:", err);
+        res.status(500).send("Serverfehler.");
+        return;
+      }
+  
+      const authRows = authResults as RowDataPacket[];
+  
+      if (authRows.length === 0) {
+        res.status(404).json({ message: "Benutzer nicht gefunden." });
+        return;
+      }
+  
+      const hashedPassword = authRows[0].password;
+      const isPasswordValid = await bcrypt.compare(password, hashedPassword);
+  
+      if (!isPasswordValid) {
+        res.status(401).json({ message: "Falsches Passwort." });
+        return;
+      }
+  
+      const loginid = authRows[0].id;
+  /*
+  export interface User {
+    loginid: number;
+    loginname: string;
+    password?: string;
+    password2?: string; // Используется только на фронтенде
+    name: string;
+    email: string;
+    anrede: number;
+    city: string;
+    street: string;
+    houseNumber: string;
+    postalCode: string;
+    phone?: string;
+    mobile?: string;
+    
+  }
+  */
+      // 🔹 Nutzerinformationen aus der `users`-Tabelle abrufen
+      const queryUser = `
+      SELECT a.loginname, u.loginid, u.name, u.email, u.anrede, u.city, u.street, u.houseNumber, u.postalCode, u.phone, u.mobile 
+      FROM users u
+      JOIN authentification  a ON u.loginid = a.id
+      WHERE u.loginid = ?`;
+    
+  
+      this.db.query(queryUser, [loginid], (userErr, userResults) => {
+        if (userErr) {
+          console.error("Fehler beim Abrufen der Benutzerinformationen:", userErr);
+          res.status(500).send("Fehler beim Laden der Nutzerdaten.");
+          return;
+        }
+  
+        const userRows = userResults as RowDataPacket[];
+  
+        if (userRows.length === 0) {
+          res.status(404).json({ message: "Benutzerinformationen nicht gefunden." });
+          return;
+        }
+  
+        // ✅ Erfolgreicher Login → Senden der vollständigen Benutzerinformationen
+        res.json(userRows[0]);
+      });
+    });
+  }
+
+  // Метод для обновления данных пользователя
+  async updateUserData(req: Request, res: Response): Promise<void> {
+    const { userid } = req.params;
+    const { name, email, city, street, houseNumber, postalCode, phone, mobile } = req.body;
+
+    if (!userid || !name || !email || !city || !street || !houseNumber || !postalCode) {
+      res.status(400).send('Все обязательные поля должны быть заполнены.');
+      return;
+    }
+
+    const checkQuery = 'SELECT COUNT(*) AS count FROM users WHERE userid = ?';
+    this.db.query(checkQuery, [userid], (err, results) => {
+      if (err) {
+        res.status(500).send('Ошибка на сервере.');
+        return;
+      }
+
+      const rows = results as RowDataPacket[];
+      if (rows[0]?.count === 0) {
+        res.status(404).send('Пользователь не найден.');
+        return;
+      }
+
+      const updateQuery = `
+        UPDATE users 
+        SET name = ?, email = ?, city = ?, street = ?, houseNumber = ?, postalCode = ?, phone = ?, mobile = ?
+        WHERE userid = ?`;
+      this.db.query(
+        updateQuery,
+        [name, email, city, street, houseNumber, postalCode, phone, mobile, userid],
+        (updateErr) => {
+          if (updateErr) {
+            res.status(500).send('Ошибка при обновлении данных пользователя.');
+            return;
+          }
+          res.status(200).send('Данные пользователя успешно обновлены.');
+        }
+      );
+    });
+  }
+
+  // Метод для получения резюме и пользователей
+  async getResumesWithUsers(req: Request, res: Response): Promise<void> {
+    const { userid } = req.query; // Erwartet userid aus Request
+  
+    // Falls kein userid vorhanden ist, Fehler zurückgeben
+    if (!userid) {
+      res.status(400).send("Fehlende Nutzer-ID.");
+      return;
+    }
+  
+    const query = `
+      SELECT 
+          r.resumeid AS resume_id, 
+          r.position, 
+          r.created, 
+          COALESCE(
+              (SELECT s.text FROM history h
+               JOIN states s ON h.stateid = s.stateid
+               WHERE h.resumeid = r.resumeid
+               ORDER BY h.date DESC LIMIT 1),
+              'Kein Status'
+          ) AS status,  -- Letzter Status aus history
+          c1.name AS company_name,  -- Firmenname für companyid
+          c2.name AS parent_company_name  -- Firmenname für parentcompanyid
+      FROM resumes r
+      JOIN companies c1 ON r.companyid = c1.companyId
+      JOIN companies c2 ON r.parentcompanyid = c2.companyId
+      WHERE r.ref = ?;  -- Filter für eingeloggten Nutzer
+    `;
+  
+    // Query ausführen mit prepared statement
+    this.db.query(query, [userid], (err, results) => {
+      if (err) {
+        console.error("Fehler beim Abrufen der Bewerbungen:", err);
+        res.status(500).send("Serverfehler.");
+        return;
+      }
+  
+      res.json(results);
+    });
+  }
+
+  // Метод для добавления нового контакта
+  async addContact(req: Request, res: Response): Promise<void> {
+    const { name, anrede, ref, email } = req.body;
+
+    if (!name || !anrede || !ref || !email) {
+      res.status(400).send('Все обязательные поля должны быть заполнены.');
+      return;
+    }
+
+    const query = 'INSERT INTO contacts (name, anrede, ref, email) VALUES (?, ?, ?, ?)';
+    this.db.query(query, [name, anrede, ref, email], (err) => {
+      if (err) {
+        res.status(500).send('Ошибка при добавлении контакта.');
+        return;
+      }
+
+      res.status(201).send('Контакт успешно добавлен.');
+    });
+  }
+
+  // Метод для добавления компании
+  async addCompany(req: Request, res: Response): Promise<void> {
+    const { name, adress, ref } = req.body;
+
+    if (!name || !adress || !ref) {
+      res.status(400).send('Все обязательные поля должны быть заполнены.');
+      return;
+    }
+
+    const query = 'INSERT INTO companies (name, adress, ref) VALUES (?, ?, ?)';
+    this.db.query(query, [name, adress, ref], (err) => {
+      if (err) {
+        res.status(500).send('Ошибка при добавлении компании.');
+        return;
+      }
+
+      res.status(201).send('Компания успешно добавлена.');
+    });
+  }
+
+  // Метод для добавления истории
+  async addHistory(req: Request, res: Response): Promise<void> {
+    const { resume_id, description } = req.body;
+
+    if (!resume_id || !description) {
+      res.status(400).send('Все обязательные поля должны быть заполнены.');
+      return;
+    }
+
+    const query = 'INSERT INTO history (resume_id, description) VALUES (?, ?)';
+    this.db.query(query, [resume_id, description], (err) => {
+      if (err) {
+        res.status(500).send('Ошибка при добавлении истории.');
+        return;
+      }
+
+      res.status(201).send('История успешно добавлена.');
+    });
+  }
+
+  // Метод для обновления резюме
+  async updateResume(req: Request, res: Response): Promise<void> {
+    const resume: Resume = req.body;
+    console.log("🔹 Empfangenes Resume-Objekt:", resume);
+  
+    if (!resume.userid) {
+      res.status(400).send("Resume-ID und User-ID sind erforderlich.");
+      return;
+    }
+  
+    if (resume.resumeid === 0) {
+      // 🔹 Neue Bewerbung erstellen
+      const insertResumeQuery = `
+        INSERT INTO resumes (ref, position, stateid, link, comment, companyid, parentcompanyid, created) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`;
+  
+      this.db.query(
+        insertResumeQuery,
+        [
+          resume.userid,
+          resume.position,
+          resume.stateid,
+          resume.link,
+          resume.comment,
+          resume.companyid === 0 ? null : resume.companyid,
+          resume.parentcompanyid === 0 ? null : resume.parentcompanyid
+        ],
+        (err, result) => {
+          if (err) {
+            console.error("❌ Fehler beim Erstellen der Bewerbung:", err.message);
+            res.status(500).send(`Fehler beim Erstellen der Bewerbung: ${err.message}`);
+            return;
+          }
+  
+          if ("insertId" in result) {
+            const newResumeId = (result as ResultSetHeader).insertId;
+  
+            // 🔹 Erste Statusänderung in `history` speichern
+            const insertHistoryQuery = `
+              INSERT INTO history (resumeid, date, stateid) 
+              VALUES (?, NOW(), ?)`;
+  
+            this.db.query(insertHistoryQuery, [newResumeId, resume.stateid], (historyErr) => {
+              if (historyErr) {
+                console.error("❌ Fehler beim Speichern in History:", historyErr.message);
+                res.status(500).send(`Fehler beim Speichern in History: ${historyErr.message}`);
+                return;
+              }
+  
+              res.status(201).send("✅ Neue Bewerbung erfolgreich gespeichert.");
+            });
+          } else {
+            res.status(500).send("❌ Fehler: Konnte keine neue Resume-ID ermitteln.");
+          }
+        }
+      );
+    } else {
+      // 🔹 Bestehende Bewerbung aktualisieren
+      const updateQuery = `
+        UPDATE resumes 
+        SET position = ?, stateid = ?, link = ?, comment = ?, companyid = ?, parentcompanyid = ? 
+        WHERE resumeid = ? AND userid = ?`;
+  
+      console.log("🔹 Ausgeführte SQL-Query:", updateQuery);
+      console.log("🔹 Parameter:", resume.position, resume.stateid, resume.link, resume.comment, resume.companyid, resume.parentcompanyid, resume.resumeid, resume.userid);
+  
+      this.db.query(
+        updateQuery,
+        [
+          resume.position,
+          resume.stateid,
+          resume.link,
+          resume.comment,
+        // resume.companyid === null || resume.companyid === 0 ? null : resume.companyid,
+         // resume.parentcompanyid === 0 ? null : resume.parentcompanyid,
+         null, null,
+          resume.resumeid,
+          resume.userid
+        ],
+        (err) => {
+          if (err) {
+            console.error("❌ Fehler beim Aktualisieren der Bewerbung:", err.message);
+            res.status(500).send(`Fehler beim Aktualisieren der Bewerbung: ${err.message}`);
+            return;
+          }
+  
+          res.status(200).send("✅ Bewerbung erfolgreich aktualisiert.");
+        }
+      );
+    }
+  }
+
+  // Метод для получения списка обращений (Anrede)
+  async getAnrede(req: Request, res: Response): Promise<void> {
+    const query = 'SELECT * FROM anrede';
+    this.db.query(query, (err, results) => {
+      if (err) {
+        res.status(500).send('Ошибка на сервере.');
+        return;
+      }
+
+      res.json(results);
+    });
+  }
+
+  async getResumeById(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+  
+    if (!id) {
+      res.status(400).send("Fehlende Resume-ID.");
+      return;
+    }
+  
+    // Wenn ID == 0 → Leere Bewerbung zurückgeben
+    if (id === "0") {
+      res.json({
+        resume_id: 0,
+        position: "",
+        created: new Date().toISOString().slice(0, 10), // Aktuelles Datum
+        stateid: null,
+        comment: "",
+        companyid: 0,
+        parentcompanyid: 0,
+      });
+      return;
+    }
+  
+    const query = `
+      SELECT r.*
+      FROM resumes r
+      WHERE r.resumeid = ?;
+    `;
+  
+    this.db.query(query, [id], (err, results) => {
+      if (err) {
+        console.error("Fehler beim Abrufen der Bewerbung:", err);
+        res.status(500).send("Serverfehler.");
+        return;
+      }
+  
+      if (!Array.isArray(results) || results.length === 0) {
+        res.status(404).send("Keine Bewerbung gefunden.");
+        return;
+      }
+  
+      res.json(results[0]);
+    });
+  }
+
+  async getStates(req: Request, res: Response): Promise<void> {
+    const query = "SELECT stateid, text FROM states ORDER BY stateid ASC";
+  
+    this.db.query(query, (err, results) => {
+      if (err) {
+        console.error("Fehler beim Abrufen der Status:", err);
+        res.status(500).send("Serverfehler.");
+        return;
+      }
+  
+      res.json(results);
+    });
+  }
+  
+}
+
+export default ResumeManagementAPI;

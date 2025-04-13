@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flexbox</title>
+
+  </head>
+  <body>
+    <style>
+      .container {
+      display: flex;
+        flex-direction: row;
+        height: 50px;
+        width: 50px;
+        border: solid 1px black;
+     
+      }
+
+      .box {
+        text-align: center;
+        vertical-align: middle;
+      }
+  /*
+      .flex-child {
+        background-color: cadetblue;
+        color: white;
+        
+       
+        text-align: center;
+        vertical-align: middle;
+        line-height: 50px;
+      }*/
+      .el1 {
+        flex:1
+      }
+      .el2 {
+        flex:1;
+        align-self: center;
+      }
+      .el3 {
+        flex:1;
+        align-self: flex-end;
+      }
+     
+    </style>
+    
+    <div class="container">
+      <div class="box el1">*</div>
+      <div class="box el2">*</div>
+      <div class="box el3">* </div>
+    </div>
+   
+  </body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "backend",
+  "private": true,
+  "main": "src/server.ts",
+  "dependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.14",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "typescript": "^5.8.2"
+  }
+}
