@@ -1,26 +1,29 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
 import Login from './components/Login';
 import Profile from './components/Profile';
-import Resumes from './components/Resumes';
-import NewUser from './components/Resumes';
+import ResumeList from './components/ResumeList';
+import NewUser from './components/ResumeList';
 import RestoreUser from './components/restoreUser'; 
-import Resume from './components/Resume';
+import ResumeEdit from './components/resume/ResumeEdit';
+
 
 
 const App = () => (
-  <Router>
+  
+  <BrowserRouter>
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/resumes" element={<Resumes />} />
+      <Route path="/resumes" element={<ResumeList />} />
       <Route path="/newUser" element={<NewUser />} />
       <Route path="/restore" element={<RestoreUser />} /> 
-      <Route path="/resume/:resumeId" element={<Resume />} />
-
+      <Route path="/resume/:resumeId" element={<ResumeEdit />} />
+      
     </Routes>
-  </Router>
+  </BrowserRouter>
 );
 
 export default App;

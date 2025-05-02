@@ -1,137 +1,134 @@
-import React, { useState, useRef } from 'react';
-import { Form, Button, InputGroup, Alert, Container, Row, Col } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-
-import { login } from '../services/api'; // Подключение функции логина из api.js
-import { User } from '../../../interfaces/User';
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../services/api";
+import { User } from "../../../interfaces/User";
 
 const Login: React.FC = () => {
-  const [loginname, setLoginname] = useState('');
-  const [password, setPassword] = useState('');
-  const [serverError, setServerError] = useState<string | null>(null); // Ошибки сервера
-  const [validated, setValidated] = useState(false);
+  const [loginname, setLoginname] = useState("");
+  const [password, setPassword] = useState("");
+  const [serverError, setServerError] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ loginname?: string; password?: string }>({});
-  const navigate = useNavigate(); // Инициализация useNavigate
-  const loginInputRef = useRef<HTMLInputElement>(null); // Референс для установки фокуса на поле loginname
+  const navigate = useNavigate();
+  const loginInputRef = useRef<HTMLInputElement>(null);
 
   const handleRegister = () => {
-    navigate('/profile'); // Перенаправление на страницу Profile
+    localStorage.removeItem("user");
+    navigate("/profile");
   };
 
   const handleRestorePassword = () => {
-    navigate('/restore'); // Перенаправление на страницу восстановления пароля
+    navigate("/restore");
   };
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Stoppt das Standard-Formularverhalten
-  
-    const form = event.currentTarget;
-  
-    // 🔹 Validierungsprüfung für die Form
-    if (!form.checkValidity()) {
-      event.stopPropagation();
-      setValidated(true);
+    event.preventDefault();
+
+    if (!loginname || !password) {
+      setErrors({
+        loginname: !loginname ? "Bitte geben Sie Ihren Benutzernamen ein." : undefined,
+        password: !password ? "Bitte geben Sie Ihr Passwort ein." : undefined,
+      });
       return;
     }
-  
+
     try {
-      // 🔹 Login-API-Aufruf
       const userData: User = await login(loginname, password);
-  
+
       if (userData) {
-        // ✅ Erfolgreiches Login → Speichert kompletten Benutzer in `localStorage`
         setServerError(null);
         localStorage.setItem("user", JSON.stringify(userData));
-  
-        navigate("/resumes"); // Weiterleitung zur Bewerbungsseite
+        navigate("/resumes");
       } else {
-        // ❌ Fehlerhafte Anmeldung → Zeigt Fehler
         setServerError("Ungültiger Login oder Passwort.");
-        setErrors({ loginname: "Überprüfe den Login", password: "Überprüfe das Passwort" });
+        setErrors({ loginname: "Überprüfen Sie den Benutzernamen.", password: "Überprüfen Sie das Passwort." });
         loginInputRef.current?.focus();
       }
     } catch (error) {
-      // ❌ Fehlerbehandlung für API-Probleme
-      setServerError("Serverfehler. Bitte später erneut versuchen.");
+      setServerError("Serverfehler. Bitte versuchen Sie es später erneut.");
       loginInputRef.current?.focus();
     }
   };
 
   const handleBlur = () => {
-    setErrors({}); // Убираем сообщения об ошибках при уходе фокуса
+    setErrors({});
   };
 
   return (
-    <Container className="mt-5">
-      <Row className="justify-content-center">
-        <Col md={6}>
-          <h2 className="text-center mb-4">Войти в систему</h2>
-          <Form noValidate validated={validated} onSubmit={handleLogin}>
-            {/* Поле логина */}
-            <Form.Group controlId="formLoginName" className="mb-3">
-              <Form.Label>Имя пользователя</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  required
-                  type="text"
-                  placeholder="Введите ваш логин"
-                  value={loginname}
-                  onChange={(e) => setLoginname(e.target.value)}
-                  onBlur={handleBlur}
-                  isInvalid={!!errors.loginname}
-                  ref={loginInputRef} // Связывание поля с ref
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.loginname || 'Пожалуйста, введите имя пользователя.'}
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-2xl font-semibold text-center mb-6">Anmelden</h2>
+        <form onSubmit={handleLogin} className="space-y-4">
+          {/* Benutzername */}
+          <div>
+            <label htmlFor="loginname" className="block text-gray-700 font-medium mb-1">
+              Benutzername
+            </label>
+            <input
+              id="loginname"
+              type="text"
+              className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${
+                errors.loginname ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+              }`}
+              placeholder="Benutzername eingeben"
+              value={loginname}
+              onChange={(e) => setLoginname(e.target.value)}
+              onBlur={handleBlur}
+              ref={loginInputRef}
+            />
+            {errors.loginname && <p className="text-red-500 text-sm mt-1">{errors.loginname}</p>}
+          </div>
 
-            {/* Поле пароля */}
-            <Form.Group controlId="formPassword" className="mb-3">
-              <Form.Label>Пароль</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  required
-                  type="password"
-                  placeholder="Введите ваш пароль"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onBlur={handleBlur}
-                  isInvalid={!!errors.password}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.password || 'Пожалуйста, введите пароль.'}
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+          {/* Passwort */}
+          <div>
+            <label htmlFor="password" className="block text-gray-700 font-medium mb-1">
+              Passwort
+            </label>
+            <input
+              id="password"
+              type="password"
+              className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${
+                errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+              }`}
+              placeholder="Passwort eingeben"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onBlur={handleBlur}
+            />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+          </div>
 
-            {/* Ошибки сервера */}
-            {serverError && (
-              <Alert variant="danger" className="mt-3">
-                {serverError}
-              </Alert>
-            )}
+          {/* Serverfehler */}
+          {serverError && <p className="text-red-500 text-center mt-2">{serverError}</p>}
 
-            {/* Кнопки */}
-            <div className="d-flex justify-content-between">
-              <Button type="submit" variant="primary">
-                Войти
-              </Button>
-              <Button variant="secondary" type="button" onClick={handleRegister}>
-                Регистрация
-              </Button>
-            </div>
+          {/* Buttons */}
+          <div className="flex justify-between items-center mt-4">
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              Anmelden
+            </button>
+            <button
+              type="button"
+              onClick={handleRegister}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+            >
+              Registrieren
+            </button>
+          </div>
 
-            <div className="mt-3 text-center">
-              <Button variant="link" type="button" onClick={handleRestorePassword}>
-                Восстановить пароль
-              </Button>
-            </div>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+          <div className="text-center mt-4">
+            <button
+              type="button"
+              onClick={handleRestorePassword}
+              className="text-blue-500 hover:underline focus:outline-none"
+            > 
+              Passwort vergessen?
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

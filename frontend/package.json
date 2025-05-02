@@ -6,7 +6,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "tailwind:build": "npx tailwindcss -i ./src/styles.css -o ./src/output.css --watch"
   },
   "browserslist": {
     "production": [
@@ -19,5 +20,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4"
+  },
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.10"
   }
 }

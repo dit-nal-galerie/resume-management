@@ -2,7 +2,7 @@ export interface User {
     loginid: number;
     loginname: string;
     password?: string;
-    password2?: string; // Используется только на фронтенде
+    password2?: string; 
     name: string;
     email: string;
     anrede: number;

@@ -47,40 +47,52 @@ CREATE TABLE companies (
 );
 
 -- Таблица контактов
-CREATE TABLE contacts (
-    contactId INT AUTO_INCREMENT PRIMARY KEY, -- Уникальный идентификатор контакта
-    name VARCHAR(80) NOT NULL, -- Имя
-    anrede INT NOT NULL, -- Обращение
-    email VARCHAR(80) NOT NULL, -- Email контакта
-    phone VARCHAR(20), -- Телефон
-    mobile VARCHAR(20), -- Мобильный телефон
-    ref INT NOT NULL, -- Связь с пользователем
-    FOREIGN KEY (anrede) REFERENCES anrede(id),
-    FOREIGN KEY (ref) REFERENCES authentification(id)
-);
+
 
 -- Таблица состояний
 CREATE TABLE states (
      stateid INT PRIMARY KEY NOT NULL, -- Уникальный идентификатор
     text VARCHAR(40) NOT NULL -- Название состояния
 );
-
+CREATE TABLE contacts (
+    contactid INT AUTO_INCREMENT PRIMARY KEY, -- Eindeutige ID für den Kontakt
+    vorname VARCHAR(40) NOT NULL, -- Vorname des Kontakts
+    name VARCHAR(40) NOT NULL, -- Nachname des Kontakts
+    email VARCHAR(80) NOT NULL UNIQUE, -- E-Mail-Adresse (eindeutig)
+    anrede INT NOT NULL, -- Verweis auf Tabelle `anrede`
+    title VARCHAR(40), -- Titel (z. B. Dr., Prof.)
+    zusatzname VARCHAR(40), -- Zusatzname (falls vorhanden)
+    phone VARCHAR(20), -- Telefonnummer des Kontakts
+    mobile VARCHAR(20), -- Mobilnummer des Kontakts
+    company INT NOT NULL, -- Sekundärschlüssel für `companies`
+    ref INT NOT NULL, -- Referenz zu `users.loginid`
+    
+    -- Fremdschlüssel für Integrität
+    FOREIGN KEY (anrede) REFERENCES anrede(id) ON DELETE CASCADE,
+    FOREIGN KEY (company) REFERENCES companies(companyId) ON DELETE CASCADE,
+    FOREIGN KEY (ref) REFERENCES users (loginid) ON DELETE CASCADE
+);
 -- Таблица резюме
 CREATE TABLE resumes (
-    resumeid INT AUTO_INCREMENT PRIMARY KEY, -- Уникальный идентификатор резюме
-    companyid INT NOT NULL, -- Связь с компанией
-    parentcompanyid INT NOT NULL, -- Связь с материнской компанией
-    stateid INT NOT NULL, -- Связь со статусом
-    ref INT NOT NULL, -- Дополнительная связь с пользователем
-    created DATE NOT NULL, -- Дата создания
-    position VARCHAR(80) NOT NULL, -- Должность
-    link VARCHAR(80), -- Ссылка на ресурс
-    comment VARCHAR(500), -- Комментарий
-   
-    FOREIGN KEY (companyid) REFERENCES companies(companyId),
-    FOREIGN KEY (parentcompanyid) REFERENCES companies(companyId),
-    FOREIGN KEY (stateid) REFERENCES states(stateid),
-    FOREIGN KEY (ref) REFERENCES authentification(id)
+    resumeId INT AUTO_INCREMENT PRIMARY KEY, -- Primärschlüssel
+    ref INT NOT NULL, -- Fremdschlüssel (Benutzer-ID)
+    position VARCHAR(255) NOT NULL, -- Position
+    stateId INT NOT NULL, -- Fremdschlüssel (Status-ID)
+    link VARCHAR(255), -- Link zur Bewerbung
+    comment TEXT, -- Kommentar
+    companyId INT, -- Fremdschlüssel (Firma)
+    parentCompanyId INT, -- Fremdschlüssel (übergeordnete Firma)
+    created DATETIME DEFAULT CURRENT_TIMESTAMP, -- Erstellungsdatum
+    contactCompanyId INT, -- Fremdschlüssel zu contacts (Firma)
+    contactParentCompanyId INT, -- Fremdschlüssel zu contacts (übergeordnete Firma)
+    
+    -- Fremdschlüssel-Constraints
+    CONSTRAINT FK_UserRef FOREIGN KEY (ref) REFERENCES users(userId),
+    CONSTRAINT FK_State FOREIGN KEY (stateId) REFERENCES states(stateId),
+    CONSTRAINT FK_Company FOREIGN KEY (companyId) REFERENCES companies(companyId),
+    CONSTRAINT FK_ParentCompany FOREIGN KEY (parentCompanyId) REFERENCES companies(companyId),
+    CONSTRAINT FK_ContactCompany FOREIGN KEY (contactCompanyId) REFERENCES contacts(contactId),
+    CONSTRAINT FK_ContactParentCompany FOREIGN KEY (contactParentCompanyId) REFERENCES contacts(contactId)
 );
 
 -- Таблица истории изменений
@@ -106,3 +118,4 @@ INSERT INTO states (stateid, text) VALUES
 (30, 'Zu Besprechung eingeladen'),
 (40, 'Abgesagt'),
 (50, 'Angebot erhalten');
+

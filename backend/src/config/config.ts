@@ -13,7 +13,7 @@ interface Config {
 // Функция для загрузки конфигурации
 function loadConfig(): Config {
   const env = process.env.NODE_ENV || 'dev'; // Если NODE_ENV не задан, использовать "dev"
-  const configPath = path.join(__dirname, `../${env}.json`);
+  const configPath = path.join(__dirname, `../../${env}.json`);
 
   try {
     const configFile = fs.readFileSync(configPath, 'utf-8');
