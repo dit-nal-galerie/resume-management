@@ -173,6 +173,7 @@ export const getStates = async (): Promise<{ stateid: number; text: string }[]> 
 
 import { Contact } from "../../../interfaces/Contact";
 import { Company } from '../../../interfaces/Company';
+import { HistoryEntry } from '../../../interfaces/histori';
 
 export const createOrUpdateContact = async (contact: Contact): Promise<void> => {
   // Setzt `contactid` auf 0, falls er nicht vorhanden ist (neuer Kontakt)
@@ -214,4 +215,19 @@ export const getContacts = async (loginId: number, companyId: number): Promise<C
   }
 
   return await response.json();
+};
+
+export const getHistoryByResumeId = async (resumeId: number, refId: number): Promise<HistoryEntry[]> => {
+    const url = `${API_URL}/getHistoryByResumeId?resumeId=${resumeId}&refId=${refId}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch history: ${response.status}`);
+    }
+    return response.json();
 };

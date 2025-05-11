@@ -23,10 +23,9 @@ export const addHistory = (db: Connection, req: Request, res: Response): void =>
 };
 
 export const getHistoryByResumeId = (db: Connection, req: Request, res: Response): void => {
-  const { resumeid } = req.params;
-  const { refId } = req.query;
-
-  if (!resumeid || !refId) {
+  const { refId, resumeId } = req.query;
+console.log("getHistoryByResumeId", refId, resumeId);
+  if (!resumeId || !refId) {
     res.status(400).json({ message: "Resume-ID und Benutzer-ID sind erforderlich." });
     return;
   }
@@ -35,7 +34,7 @@ export const getHistoryByResumeId = (db: Connection, req: Request, res: Response
     SELECT resumeId FROM resumes WHERE resumeId = ? AND ref = ?
   `;
 
-  db.query(validateQuery, [resumeid, refId], (err, validationResult: RowDataPacket[]) => {
+  db.query(validateQuery, [resumeId, refId], (err, validationResult: RowDataPacket[]) => {
     if (err) {
       console.error("Fehler beim Prüfen der Bewerbung:", err);
       res.status(500).json({ message: "Fehler beim Prüfen der Bewerbung." });
@@ -54,8 +53,8 @@ export const getHistoryByResumeId = (db: Connection, req: Request, res: Response
       WHERE h.resumeid = ?
       ORDER BY h.date DESC
     `;
-
-    db.query(historyQuery, [resumeid], (err, results: RowDataPacket[]) => {
+console.log("historyQuery", historyQuery,"resumeid", resumeId);
+    db.query(historyQuery, [resumeId], (err, results: RowDataPacket[]) => {
       if (err) {
         console.error("Fehler beim Abrufen der Historie:", err);
         res.status(500).json({ message: "Fehler beim Abrufen der Historie." });

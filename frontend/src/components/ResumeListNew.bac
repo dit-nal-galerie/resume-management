@@ -4,9 +4,9 @@ import { Resume } from "../../../interfaces/Resume";
 import { loadUserFromStorage } from "../utils/storage";
 import { User } from "../../../interfaces/User";
 import { useNavigate } from "react-router-dom";
-import { HistoryModal } from "./resume/HistoryModal";
+//import { HistoryModal } from "./resume/HistoryModal";
 
-
+/*
 const storedUser: User = loadUserFromStorage();
 
 const ResumeList: React.FC = () => {
@@ -76,28 +76,29 @@ const ResumeList: React.FC = () => {
               <button className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded-md">
                 Status ändern
               </button>
-             {resume&&resume.resumeId>0 && (<button
+              <button
                 onClick={() => openHistoryModal(resume)}
                 className="bg-gray-600 hover:bg-gray-800 text-white px-3 py-1 rounded-md"
               >
                 Historie
-              </button> )}
+              </button>
             </div>
           </div>
         ))}
       </div>
 
      
-      {isModalOpen && selectedResume&& (
-      <HistoryModal
       
+      <HistoryModa
+        isOpen={isModalOpen}
         onClose={closeHistoryModal} // Verwenden Sie die neue closeHistoryModal Funktion
-        resumeId={selectedResume.resumeId  } // Verwenden Sie selectedResume
+        resumeId={selectedResume?.resumeId || 0} // Verwenden Sie selectedResume
         loginId={storedUser.loginid}
-        resumeTitle={selectedResume?.position || ""} // Verwenden Sie selectedResume
-      />)}
+        resumeTitle={selectedResume?.position || ""}
+      />
     </div>
   );
 };
 
 export default ResumeList;
+*/
