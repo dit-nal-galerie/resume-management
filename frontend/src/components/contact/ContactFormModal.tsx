@@ -10,25 +10,19 @@ interface Anrede {
 
 interface ContactFormModalProps {
   isOpen: boolean;
-  contact?: Contact;
+  contact: Contact;
   onSave: (contact: Contact) => void;
   onClose: () => void;
 }
 
 const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, onSave, onClose }) => {
-  const [formData, setFormData] = useState<Contact>({
-    anrede: contact?.anrede ?? 0,
-    title: contact?.title ?? '',
-    vorname: contact?.vorname ?? '',
-    zusatzname: contact?.zusatzname ?? '',
-    name: contact?.name ?? '',
-    email: contact?.email ?? '',
-    phone: contact?.phone ?? '',
-    mobile: contact?.mobile ?? '',
-    contactid: contact?.contactid ?? 0,
-    company: contact?.company?? 0,
-    ref: contact?.ref ?? 0
-  });
+ 
+  const [contactData, setContactData] = useState<Contact>(contact);
+     const handleChange1 = (field: keyof Contact, value: string | boolean) => {
+      setContactData(prev => ({ ...prev, [field]: value }));
+     };
+
+
   const [anreden, setAnreden] = useState<Anrede[]>([]);
 
   // Laden der Anrede-Optionen beim Mount
@@ -44,22 +38,28 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
     fetchAnreden();
   }, []);
 
-  // Kontaktdaten aktualisieren, wenn sich der prop-Kontakt ändert
+  // Aktualisieren des Zustands, wenn sich der `contact`-Prop ändert
   useEffect(() => {
-    if (contact) {
-      setFormData(contact);
+    if (isOpen) {
+      setContactData(contact);
     }
-  }, [contact]);
+  }, [isOpen, contact]);
 
   // Allgemeiner Change-Handler für Text-Inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setContactData(prev => ({ ...prev, [name]: value }));
+    
+  
+  };
+  const handleClose = () => {
+    setContactData(contact); // original zurücksetzen
+    onClose();
   };
 
   // Speichern der Daten (aufgerufen beim Klick auf "Speichern")
   const handleSave = () => {
-    onSave(formData);
+    onSave(contactData);
     onClose();
   };
 
@@ -69,24 +69,24 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
         <h2 className="text-xl font-semibold mb-4">Kontakt bearbeiten</h2>
+        <form className="space-y-4">
         {/* Formularfelder */}
         <div className="grid grid-cols-2 gap-4">
-          {/* Linke Spalte: Name */}
+          {/* Linke Spalte */}
           <div>
             <div className="mb-4">
               <label className="block text-sm">Anrede</label>
               <select
-                name="anredeId"
-                value={formData.anrede ?? ''}
+                name="anrede"
+                value={contactData.anrede ?? '0'}
                 onChange={(e) =>
-                  setFormData(prev => ({ ...prev, anredeId: e.target.value ? Number(e.target.value) : null }))
+                  setContactData(prev => ({ ...prev, anrede: e.target.value ? Number(e.target.value) : 0 }))
                 }
                 className="w-full px-3 py-2 border rounded-lg"
               >
-                <option value="">-- Bitte wählen --</option>
                 {anreden.map(a => (
                   <option key={a.id} value={a.id}>
-                    {a.text}
+                    {a.text || '-- Bitte wählen --'}
                   </option>
                 ))}
               </select>
@@ -95,15 +95,12 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
               <label className="block text-sm">Titel</label>
               <input
                 title="Titel"
-               
-              
-               placeholder="Titel eingeben"
+                placeholder="Titel eingeben"
                 type="text"
                 name="title"
-                value={formData.title}
+                value={contactData.title}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg"
-                
               />
             </div>
             <div className="mb-4">
@@ -111,7 +108,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
               <input
                 type="text"
                 name="vorname"
-                value={formData.vorname}
+                value={contactData.vorname}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg"
                 title="Vorname"
@@ -124,7 +121,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
               <input
                 type="text"
                 name="zusatzname"
-                value={formData.zusatzname}
+                value={contactData.zusatzname}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg"
                 title="Zusatzname"
@@ -136,8 +133,9 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
               <input
                 type="text"
                 name="name"
-                value={formData.name}
+                value={contactData.name}
                 onChange={handleChange}
+              
                 className="w-full px-3 py-2 border rounded-lg"
                 title="Name"
                 placeholder="Name eingeben"
@@ -145,7 +143,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
               />
             </div>
           </div>
-          {/* Rechte Spalte: Kontakt */}
+          {/* Rechte Spalte */}
           <div>
             <div className="mb-4">
               <label className="block text-sm">E-Mail</label>
@@ -153,7 +151,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
                 title="email"
                 type="email"
                 name="email"
-                value={formData.email}
+                value={contactData.email}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg"
                 required
@@ -164,7 +162,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
               <input
                 type="tel"
                 name="phone"
-                value={formData.phone}
+                value={contactData.phone}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg"
                 title="Telefonnummer"
@@ -176,7 +174,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
               <input
                 type="tel"
                 name="mobile"
-                value={formData.mobile}
+                value={contactData.mobile}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg"
                 title="Mobilnummer"
@@ -190,7 +188,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
           <button
             type="button"
             className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg mr-2"
-            onClick={onClose}
+            onClick={handleClose}
           >
             Abbrechen
           </button>
@@ -202,9 +200,12 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
             Speichern
           </button>
         </div>
+        </form>
       </div>
     </div>
   );
 };
 
 export default ContactFormModal;
+
+

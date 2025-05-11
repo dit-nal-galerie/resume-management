@@ -50,21 +50,28 @@ const closeModal =() =>{
 }
 // 2. Открывает модалку выбора контакта из существующих
 const handleSaveContact = (updated: Contact) => {
-  setResumeData(rd => rd ? ({ ...rd, [modalSectionContact==="contactCompany"?"contactCompany":"contactCompamyParent"]: updated }) : rd);
+  console.log("handleSaveContact",modalSectionContact==="contactCompany"?"contactCompany":"contactRecrutingCompany" )
+  if(updated) {
+    updated.ref = storedUser.loginid;
+    updated.anrede = updated.anrede || 0; 
+    const t = modalSectionContact==="contactCompany"?"company":"recrutingCompany";
+    updated.company  = resumeData?.[t]?.companyId || 0; 
+  }
+  setResumeData(rd => rd ? ({ ...rd, [modalSectionContact==="contactCompany"?"contactCompany":"contactRecrutingCompany"]: updated }) : rd);
+console.log("handleSaveContact",updated, modalSectionContact, resumeData?.contactCompany, resumeData?.contactRecrutingCompany);
 };
 const openSelectContact = async (section: ModalSectionContact) => {
   setModalType('selectContact');
   setModalSectionContact(section);
 
   // Получаем ID связанной компании
-  const compId = resumeData?.[section === 'contactCompany' ? 'company' : 'parentCompany']?.companyId;
+  const compId = resumeData?.[section === 'contactCompany' ? 'company' : 'recrutingCompany']?.companyId;
   if (!compId) {
     alert('Zuerst Firma auswählen!');
     return;
   }
 
-  // Загружаем список всех контактов этой компании
-  //loginId: number, companyId: number
+
   const list = await getContacts( storedUser.loginid, compId );
   setContacts(list);
 
@@ -72,7 +79,7 @@ const openSelectContact = async (section: ModalSectionContact) => {
 };
 
 const handleRemoveContact = (section: ModalSectionContact) => {
-  const key = section === 'contactCompany' ? 'contactCompany' : 'contactParentCompany';
+  const key = section === "contactCompany" ? 'contactCompany' : 'contactRecrutingCompany';
   const contact =resumeData&& resumeData[key];
   if (!contact?.contactid) return;
 
@@ -88,14 +95,14 @@ const handleRemoveContact = (section: ModalSectionContact) => {
   );
 };
 // Handlers:
-const handleOpenEdit = (section: 'company'|'parentCompany') => {
+const handleOpenEdit = (section: ModalSectionCompany) => {
   setModalType('edit');
   setModalSectionCompany(section);
   setModalOpen(true);
 };
-const handleOpenSelect = async (section: 'company'|'parentCompany') => {
+const handleOpenSelect = async (section: 'company'|'recrutingCompany') => {
 //  const list = await getCompanies({ isrecruter: false });
-const list = await getCompanies(storedUser.loginid, section==='parentCompany');
+const list = await getCompanies(storedUser.loginid, section==='recrutingCompany');
   setCompanies(list);
   setModalType('select');
   setModalSectionCompany(section);
@@ -103,13 +110,13 @@ const list = await getCompanies(storedUser.loginid, section==='parentCompany');
 };
 const handleSaveCompany = (comp: Company) => {
   if(!modalSectionCompany) return;
-   comp.isRecruter =modalSectionCompany==='parentCompany'
+   comp.isRecruter =modalSectionCompany==='recrutingCompany'
    comp.companyId=comp.companyId||0;
   setResumeData(rd => rd ? { ...rd, [modalSectionCompany]: comp } : rd);
   setModalOpen(false);
 };
 
-const handleRemoveCompany = (section: 'company' | 'parentCompany') => {
+const handleRemoveCompany = (section: ModalSectionCompany) => {
   setResumeData(rd => rd ? { ...rd, [section]: null } : rd);
 };
 const handleSelectCompany = (comp: Company) => {
@@ -138,9 +145,9 @@ const handleSelectCompany = (comp: Company) => {
         comment: '',
         created: new Date().toISOString().split('T')[0],
         company: null,
-        parentCompany: null,
+        recrutingCompany: null,
         contactCompany: null,
-        contactParentCompany: null,
+        contactRecrutingCompany: null, 
       });
     }
   }, [resumeId]);
@@ -171,11 +178,26 @@ const handleSelectCompany = (comp: Company) => {
     navigate('/resumes');
   };
 
+  const handleView = () => {
+    const t =JSON.stringify(resumeData?.contactCompany, null, 2)+
+'\n'+JSON.stringify(resumeData?.contactRecrutingCompany, null, 2);
+   alert(t);
+  };
   if (!resumeData) {
     return <div className="text-center mt-10">Lade Daten...</div>;
   }
 
-console.log(modalOpen , modalType, modalSectionCompany, modalSectionContact);
+  if (errorMessage) {
+    return <div className="text-red-500 text-center mt-10">{errorMessage}</div>;
+  }
+if(modalOpen && modalType === 'editContact') {
+  console.log('modalSectionContact', modalSectionContact, resumeData[modalSectionCompany === 'company' ? 'contactCompany' : 'contactRecrutingCompany']|| "kein kontact");
+}
+const getCurrentContact = () =>
+  modalSectionContact === 'contactCompany' ? resumeData?.contactCompany : resumeData?.contactRecrutingCompany;
+
+const getCurrentCompanyId = () =>
+  modalSectionContact === 'contactCompany' ? resumeData?.company?.companyId : resumeData?.recrutingCompany?.companyId;
   return (
     <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
       <h2 className="text-2xl font-semibold mb-6 text-gray-800">
@@ -263,23 +285,22 @@ console.log(modalOpen , modalType, modalSectionCompany, modalSectionContact);
 
      <CompanySection
   title="Recruter"
-  name={resumeData.parentCompany?.name || null}
-  onEdit={() => handleOpenEdit('parentCompany')}
-  onSelect={() => handleOpenSelect('parentCompany')}
-  onRemove={() => handleRemoveCompany('parentCompany')}
-  onCreate={() => handleOpenEdit('parentCompany')}
+  name={resumeData.recrutingCompany?.name || null}
+  onEdit={() => handleOpenEdit('recrutingCompany')}
+  onSelect={() => handleOpenSelect('recrutingCompany')}
+  onRemove={() => handleRemoveCompany('recrutingCompany')}
+  onCreate={() => handleOpenEdit('recrutingCompany')}
 />
 
 
       <ContactSection
   title="Kontaktperson Recruter"
-  name={resumeData.contactParentCompany?.name || null}
-  contactId={resumeData.contactParentCompany?.contactid}
-  companyId={resumeData.parentCompany?.companyId}
-  onEdit={() => openEditContact('contactParentCompany')}
-  onSelect={() => openSelectContact('contactParentCompany')}
-  onRemove={() => handleRemoveContact('contactParentCompany')}
-  onCreate={() => openEditContact('contactParentCompany')}
+  contact={resumeData.contactRecrutingCompany}
+  companyId={resumeData.recrutingCompany?.companyId}
+  onEdit={() => openEditContact('contactRecrutingCompany')}
+  onSelect={() => openSelectContact('contactRecrutingCompany')}
+  onRemove={() => handleRemoveContact('contactRecrutingCompany')}
+  onCreate={() => openEditContact('contactRecrutingCompany')}
 />
 
   
@@ -296,8 +317,7 @@ console.log(modalOpen , modalType, modalSectionCompany, modalSectionContact);
 
       <ContactSection
   title="Kontaktperson"
-  name={resumeData.contactCompany?.name || null}
-  contactId={resumeData.contactCompany?.contactid}
+  contact={resumeData.contactCompany}
   companyId={resumeData.company?.companyId}
   onEdit={() => openEditContact('contactCompany')}
   onSelect={() => openSelectContact('contactCompany')}
@@ -330,44 +350,27 @@ console.log(modalOpen , modalType, modalSectionCompany, modalSectionContact);
 
 
 <ContactFormModal
-      contact={resumeData[modalSectionCompany === 'company' ? 'contactCompany' : 'contactParentCompany'] || {
-        contactid: 0,
-        vorname: '',
-        name: '',
-        email: '',
-        anrede: 0,
-        title: '',
-        zusatzname: '',
-        phone: '',
-        mobile: '',
-        company: resumeData[modalSectionCompany === 'company' ? 'company' : 'parentCompany']?.companyId || 0,
-        ref: resumeData.ref,
-      }}
-      onSave={(updated: Contact) => handleSaveContact(updated)}
+   contact={getCurrentContact() || {
+    contactid: 0,
+    vorname: '',
+    name: '',
+    email: '',
+    anrede: 0,
+    title: '',
+    zusatzname: '',
+    phone: '',
+    mobile: '',
+    company: getCurrentCompanyId() || 0,
+    ref: resumeData.ref,
+  }}
+      onSave={handleSaveContact}
+     
       isOpen={modalOpen && modalType === 'editContact'}
   onClose={() => setModalOpen(false)}
     />
 
  
-   <ContactFormModal
-      contact={resumeData[modalSectionCompany === 'company' ? 'contactCompany' : 'contactParentCompany'] || {
-        contactid: 0,
-        vorname: '',
-        name: '',
-        email: '',
-        anrede: 0,
-        title: '',
-        zusatzname: '',
-        phone: '',
-        mobile: '',
-        company: resumeData[modalSectionCompany === 'company' ? 'company' : 'parentCompany']?.companyId || 0,
-        ref: resumeData.ref,
-      }}
-      // Removed onChange as it is not a valid prop
-      onSave={(updated: Contact) => handleSaveContact(updated)}
-      isOpen={modalOpen && modalType === 'editContact'}
-  onClose={() => setModalOpen(false)}
-    />
+ 
     
       {errorMessage && (
         <div className="mb-4 text-red-600 font-medium">{errorMessage}</div>
@@ -386,6 +389,12 @@ console.log(modalOpen , modalType, modalSectionCompany, modalSectionContact);
           onClick={handleBack}
         >
           Zurück zur Liste
+        </button>
+        <button
+          className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-md"
+          onClick={handleView}
+        >
+         View
         </button>
       </div>
     </div>

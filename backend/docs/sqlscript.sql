@@ -31,7 +31,11 @@ CREATE TABLE users (
 ); 
 
 
-
+-- Таблица состояний
+CREATE TABLE states (
+     stateid INT PRIMARY KEY NOT NULL, -- Уникальный идентификатор
+    text VARCHAR(40) NOT NULL -- Название состояния
+);
 
 -- Таблица компаний
 CREATE TABLE companies (
@@ -47,18 +51,11 @@ CREATE TABLE companies (
 );
 
 -- Таблица контактов
-
-
--- Таблица состояний
-CREATE TABLE states (
-     stateid INT PRIMARY KEY NOT NULL, -- Уникальный идентификатор
-    text VARCHAR(40) NOT NULL -- Название состояния
-);
 CREATE TABLE contacts (
     contactid INT AUTO_INCREMENT PRIMARY KEY, -- Eindeutige ID für den Kontakt
-    vorname VARCHAR(40) NOT NULL, -- Vorname des Kontakts
+    vorname VARCHAR(40) , -- Vorname des Kontakts
     name VARCHAR(40) NOT NULL, -- Nachname des Kontakts
-    email VARCHAR(80) NOT NULL UNIQUE, -- E-Mail-Adresse (eindeutig)
+    email VARCHAR(80) , -- E-Mail-Adresse (eindeutig)
     anrede INT NOT NULL, -- Verweis auf Tabelle `anrede`
     title VARCHAR(40), -- Titel (z. B. Dr., Prof.)
     zusatzname VARCHAR(40), -- Zusatzname (falls vorhanden)
@@ -80,19 +77,19 @@ CREATE TABLE resumes (
     stateId INT NOT NULL, -- Fremdschlüssel (Status-ID)
     link VARCHAR(255), -- Link zur Bewerbung
     comment TEXT, -- Kommentar
-    companyId INT, -- Fremdschlüssel (Firma)
-    parentCompanyId INT, -- Fremdschlüssel (übergeordnete Firma)
+    companyId INT NULL, -- Fremdschlüssel (Firma), NULL erlaubt
+    parentCompanyId INT NULL, -- Fremdschlüssel (übergeordnete Firma), NULL erlaubt
     created DATETIME DEFAULT CURRENT_TIMESTAMP, -- Erstellungsdatum
-    contactCompanyId INT, -- Fremdschlüssel zu contacts (Firma)
-    contactParentCompanyId INT, -- Fremdschlüssel zu contacts (übergeordnete Firma)
+    contactCompanyId INT NULL, -- Fremdschlüssel zu contacts (Firma), NULL erlaubt
+    contactParentCompanyId INT NULL, -- Fremdschlüssel zu contacts (übergeordnete Firma), NULL erlaubt
     
     -- Fremdschlüssel-Constraints
-    CONSTRAINT FK_UserRef FOREIGN KEY (ref) REFERENCES users(userId),
-    CONSTRAINT FK_State FOREIGN KEY (stateId) REFERENCES states(stateId),
-    CONSTRAINT FK_Company FOREIGN KEY (companyId) REFERENCES companies(companyId),
-    CONSTRAINT FK_ParentCompany FOREIGN KEY (parentCompanyId) REFERENCES companies(companyId),
-    CONSTRAINT FK_ContactCompany FOREIGN KEY (contactCompanyId) REFERENCES contacts(contactId),
-    CONSTRAINT FK_ContactParentCompany FOREIGN KEY (contactParentCompanyId) REFERENCES contacts(contactId)
+    CONSTRAINT FK_UserRef FOREIGN KEY (ref) REFERENCES users(userid) ON DELETE CASCADE,
+    CONSTRAINT FK_State FOREIGN KEY (stateId) REFERENCES states(stateid) ON DELETE CASCADE,
+    CONSTRAINT FK_Company FOREIGN KEY (companyId) REFERENCES companies(companyId) ON DELETE SET NULL,
+    CONSTRAINT FK_ParentCompany FOREIGN KEY (parentCompanyId) REFERENCES companies(companyId) ON DELETE SET NULL,
+    CONSTRAINT FK_ContactCompany FOREIGN KEY (contactCompanyId) REFERENCES contacts(contactid) ON DELETE SET NULL,
+    CONSTRAINT FK_ContactParentCompany FOREIGN KEY (contactParentCompanyId) REFERENCES contacts(contactid) ON DELETE SET NULL
 );
 
 -- Таблица истории изменений

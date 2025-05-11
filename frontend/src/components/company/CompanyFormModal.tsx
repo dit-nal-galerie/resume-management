@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../Modal';
+
 import { Company } from '../../../../interfaces/Company';
 
 interface CompanyFormModalProps {

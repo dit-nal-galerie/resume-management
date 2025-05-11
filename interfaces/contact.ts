@@ -11,3 +11,10 @@ export interface Contact {
     company: number; 
     ref: number; 
   }
+  
+  export interface Anrede {
+    id: number;
+    text: string;
+  }
+
+  

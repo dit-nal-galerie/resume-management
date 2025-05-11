@@ -10,8 +10,8 @@ export interface Resume {
   link: string; 
   comment: string;
   company: Company | null; 
-  parentCompany: Company | null; 
+  recrutingCompany: Company | null; 
   created: string; 
   contactCompany: Contact | null; 
-  contactParentCompany: Contact | null; 
+  contactRecrutingCompany: Contact | null; 
 }

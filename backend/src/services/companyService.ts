@@ -34,7 +34,7 @@ export const getCompanies = (db: Connection, req: Request, res: Response): void 
     FROM companies 
     WHERE ref = ? AND isRecruter = ?
   `;
-  console.log("query" , query, "Parameters:", [loginId, isRecruter === "true"]);
+  //console.log("query" , query, "Parameters:", [loginId, isRecruter === "true"]);
   db.query(query, [loginId, isRecruter === "true"], (err, results) => {
   
     if (err) {

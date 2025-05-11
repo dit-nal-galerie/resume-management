@@ -13,7 +13,7 @@ const Login: React.FC = () => {
 
   const handleRegister = () => {
     localStorage.removeItem("user");
-    navigate("/profile");
+    navigate("/profile?loginid=0");
   };
 
   const handleRestorePassword = () => {

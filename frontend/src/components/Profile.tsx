@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { getUserData, updateUserData, createUser, getAnrede } from '../services/api';
 import { User } from '../../../interfaces/User';
 import LoginForm from './LoginForm';
@@ -8,22 +7,23 @@ import ProfileForm from './ProfileForm';
 import { loadUserFromStorage } from '../utils/storage';
 
 const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
-  const storedUser = loadUserFromStorage(); // Загружаем данные из localStorage
-  loginId = loginId || storedUser?.loginid; // Если loginId не передан, используем из localStorage
+  const storedUser = loadUserFromStorage();
+  loginId = loginId || storedUser?.loginid || 0;
+
   const [formData, setFormData] = useState<User>({
-    loginid: storedUser.loginid || 0,
-    loginname: storedUser.loginname || '',
-    password: storedUser.password || '',
-    password2: storedUser.password2 || '',
-    name: storedUser.name || '',
-    email: storedUser.email || '',
-    anrede:storedUser.anrede || 0,
-    city: storedUser.city || '',
-    street: storedUser.street || '',
-    houseNumber: storedUser.houseNumber || '',
-    postalCode: storedUser.postalCode || '',
-    phone: storedUser.phone || '',
-    mobile:storedUser.mobile || '',
+    loginid: storedUser?.loginid || loginId,
+    loginname: storedUser?.loginname || '',
+    password: storedUser?.password || '',
+    password2: storedUser?.password2 || '',
+    name: storedUser?.name || '',
+    email: storedUser?.email || '',
+    anrede: storedUser?.anrede || 0,
+    city: storedUser?.city || '',
+    street: storedUser?.street || '',
+    houseNumber: storedUser?.houseNumber || '',
+    postalCode: storedUser?.postalCode || '',
+    phone: storedUser?.phone || '',
+    mobile: storedUser?.mobile || '',
   });
 
   const [errors, setErrors] = useState<string[]>([]);
@@ -33,20 +33,18 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
 
   useEffect(() => {
     const storedUser = loadUserFromStorage();
-    if (!storedUser) {
-      setErrors(['Вы не авторизованы']);
+    if (!storedUser && !loginId) {
+      setErrors(['Sie sind nicht angemeldet.']);
       setIsLoading(false);
       return;
     }
 
     const fetchData = async () => {
       try {
-    
-        // Загружаем список anrede
         const anredeData = await getAnrede();
         setAnredeOptions(anredeData);
       } catch (error) {
-        setErrors(['Ошибка при загрузке данных']);
+        setErrors(['Fehler beim Laden der Daten.']);
       } finally {
         setIsLoading(false);
       }
@@ -66,7 +64,6 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
 
   const handleSave = async () => {
     const validationErrors: string[] = [];
-
     const isNewUser = !loginId;
 
     if (isNewUser && !formData.loginname.trim()) {
@@ -112,51 +109,57 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
   };
 
   if (isLoading) {
-    return <p>Загрузка...</p>;
+    return <p className="text-center mt-10">Загрузка...</p>;
   }
 
   return (
-    <Container className="mt-5">
-      <Row className="justify-content-center">
-        <Col md={6}>
-          <h2 className="text-center mb-4">{loginId ? 'Редактирование профиля' : 'Создание профиля'}</h2>
-          {errors.length > 0 && (
-            <Alert variant="danger">
-              {errors.map((error, index) => (
-                <p key={index}>{error}</p>
-              ))}
-            </Alert>
-          )}
-          <Form>
-            {/* Используем компонент LoginForm */}
-            <LoginForm
-              loginname={formData.loginname}
-              password={formData.password ?? ''}
-              password2={formData.password2 ?? ''}
-              onChange={handleFieldChange}
-              readonlyLoginname={!!loginId}
-              showPassword2={!loginId}
-            />
+    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
+      <h2 className="text-2xl font-semibold text-center mb-6">
+        {loginId ? 'Редактирование профиля' : 'Создание профиля'}
+      </h2>
 
-            {/* Используем компонент ProfileForm */}
-            <ProfileForm
-              formData={formData}
-              anredeOptions={anredeOptions}
-              onChange={handleFieldChange}
-            />
+      {errors.length > 0 && (
+        <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mb-4">
+          {errors.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))}
+        </div>
+      )}
 
-            <div className="d-flex justify-content-between mt-4">
-              <Button variant="primary" onClick={handleSave}>
-                {loginId ? 'Сохранить' : 'Создать'}
-              </Button>
-              <Button variant="secondary" onClick={handleBack}>
-                Назад
-              </Button>
-            </div>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+      <form className="space-y-6">
+        <LoginForm
+          loginname={formData.loginname}
+          password={formData.password ?? ''}
+          password2={formData.password2 ?? ''}
+          onChange={handleFieldChange}
+          readonlyLoginname={!!loginId}
+          showPassword2={!loginId}
+        />
+
+        <ProfileForm
+          formData={formData}
+          anredeOptions={anredeOptions}
+          onChange={handleFieldChange}
+        />
+
+        <div className="flex justify-between pt-4">
+          <button
+            type="button"
+            className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-md"
+            onClick={handleSave}
+          >
+            {loginId ? 'Сохранить' : 'Создать'}
+          </button>
+          <button
+            type="button"
+            className="bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-md"
+            onClick={handleBack}
+          >
+            Назад
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

@@ -42,7 +42,7 @@ const ResumeList: React.FC = () => {
           <div key={resume.resumeId} className="p-4 bg-gray-100 rounded-lg shadow-md relative">
             <h3 className="text-lg font-semibold">{resume.position}</h3>
             <p className="text-gray-600">Firma: {resume.company?.name}</p>
-            <p className="text-gray-600">Mutterfirma: {resume.parentCompany?.name}</p>
+            <p className="text-gray-600">Recruting: {resume.recrutingCompany?.name}</p>
             <p className="text-gray-600">Status: {resume.stateText}</p>
             <p className="text-gray-500 text-sm">Erstellt am: {resume.created}</p>
 

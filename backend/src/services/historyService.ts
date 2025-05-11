@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Connection } from 'mysql2';
+import { Connection, RowDataPacket } from 'mysql2';
+import { HistoryEntry } from '../../../interfaces/histori';
 
 export const addHistory = (db: Connection, req: Request, res: Response): void => {
   const { resume_id, description } = req.body;
@@ -22,21 +23,51 @@ export const addHistory = (db: Connection, req: Request, res: Response): void =>
 };
 
 export const getHistoryByResumeId = (db: Connection, req: Request, res: Response): void => {
-  const { resume_id } = req.params;
+  const { resumeid } = req.params;
+  const { refId } = req.query;
 
-  if (!resume_id) {
-    res.status(400).send('Resume-ID ist erforderlich.');
+  if (!resumeid || !refId) {
+    res.status(400).json({ message: "Resume-ID und Benutzer-ID sind erforderlich." });
     return;
   }
 
-  const query = 'SELECT * FROM history WHERE resume_id = ? ORDER BY created_at DESC';
-  db.query(query, [resume_id], (err, results) => {
+  const validateQuery = `
+    SELECT resumeId FROM resumes WHERE resumeId = ? AND ref = ?
+  `;
+
+  db.query(validateQuery, [resumeid, refId], (err, validationResult: RowDataPacket[]) => {
     if (err) {
-      console.error('Fehler beim Abrufen der Historie:', err);
-      res.status(500).send('Fehler beim Abrufen der Historie.');
+      console.error("Fehler beim Prüfen der Bewerbung:", err);
+      res.status(500).json({ message: "Fehler beim Prüfen der Bewerbung." });
       return;
     }
 
-    res.json(results);
+    if (!Array.isArray(validationResult) || validationResult.length === 0) {
+      res.status(403).json({ message: "Keine Berechtigung oder Bewerbung nicht gefunden." });
+      return;
+    }
+
+    const historyQuery = `
+      SELECT h.date AS date, s.text AS status
+      FROM history h
+      JOIN states s ON h.stateid = s.stateid
+      WHERE h.resumeid = ?
+      ORDER BY h.date DESC
+    `;
+
+    db.query(historyQuery, [resumeid], (err, results: RowDataPacket[]) => {
+      if (err) {
+        console.error("Fehler beim Abrufen der Historie:", err);
+        res.status(500).json({ message: "Fehler beim Abrufen der Historie." });
+        return;
+      }
+
+      const historyEntries: HistoryEntry[] = results.map(row => ({
+        date: row.date,
+        status: row.status,
+      }));
+
+      res.json(historyEntries);
+    });
   });
 };

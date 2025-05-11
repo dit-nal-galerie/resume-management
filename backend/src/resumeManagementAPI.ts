@@ -5,14 +5,18 @@ import config from './config/config';
 // Importiere die ausgelagerten Services
 import { createUser, login, getAnrede } from './services/userService';
 import { createOrUpdateContact, getContacts } from './services/contactService';
-import { getResumesWithUsers, getStates, updateOrCreateResume, getResumeById } from './services/resumeService';
+import { getResumesWithUsers, getStates } from './services/resumeService';
 import { addCompany, getCompanies } from './services/companyService';
 import { addHistory, getHistoryByResumeId } from './services/historyService';
+import {  updateOrCreateResume } from './services/saveResume';
+
+import mysqlPromise, { Pool as PromisePool, PoolConnection as PromisePoolConnection } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
+import { getResumeById } from './services/getResume';
 
 class ResumeManagementAPI {
   [x: string]: any;
   private db: mysql.Connection;
-
+  private dbPool: PromisePool;
   constructor() {
     this.db = mysql.createConnection({
       host: config.DB_HOST,
@@ -20,6 +24,16 @@ class ResumeManagementAPI {
       password: config.DB_PASSWORD,
       database: config.DB_NAME,
     });
+
+    this.dbPool = mysqlPromise.createPool({
+      host: config.DB_HOST,
+      user: config.DB_USER,
+      password: config.DB_PASSWORD,
+      database: config.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0
+  });
   }
 
   async createUser(req: Request, res: Response): Promise<void> {
@@ -33,12 +47,12 @@ class ResumeManagementAPI {
   }
 
   async updateOrCreateResume(req: Request, res: Response): Promise<void> {
-    await updateOrCreateResume(this.db, req, res);
+    await updateOrCreateResume(this.dbPool, req, res);
   }
   async getResumeById(req: Request, res: Response): Promise<void> {
-    console.log("🔹123 Aufruf von getResumeById mit ID:", req.params);
-    await getResumeById(this.db, req, res);
+    await getResumeById(this.dbPool, req, res);
   }
+
   async getResumesWithUsers(req: Request, res: Response): Promise<void> {
     await getResumesWithUsers(this.db, req, res);
   }

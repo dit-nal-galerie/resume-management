@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors'; // Importiere CORS
 import ResumeManagementAPI from './resumeManagementAPI'; // Importiere die API-Klasse
 
-const app = express();
+export const app = express();
 const PORT = 3001;
 app.use(cors());
 // Middleware für JSON-Anfragen
@@ -35,8 +35,9 @@ app.post('/updateOrCreateResume', (req: Request, res: Response) => api.updateOrC
 app.get('/resume/:resumeId', (req: Request, res: Response) => api.getResumeById(req, res));
 app.get('/contacts', (req: Request, res: Response) => api.getContacts(req, res));
 app.get('/getResumeById/:resumeId', (req: Request, res: Response) => {
-  console.log("apiAufruf von getResumeById mit ID:", 
-    req.params.resumeId);api.getResumeById(req, res)});
+  //console.log("apiAufruf von getResumeById mit ID:", req.params.resumeId);
+  api.getResumeById(req, res)
+});
 
 // Starte den Server
 app.listen(PORT, () => {
