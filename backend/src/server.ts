@@ -38,6 +38,11 @@ app.get('/getResumeById/:resumeId', (req: Request, res: Response) => api.getResu
 app.post('/changeResumeStatus', (req: Request, res: Response) =>   api.changeResumeStatus(req, res));
 app.post('/changeAccessData', (req: Request, res: Response) =>   api.changeAccessData(req, res));
 
+// Новые маршруты для восстановления пароля
+app.post('/request-password-reset', (req: Request, res: Response) => api.requestPasswordReset(req, res));
+app.get('/validate-token', (req: Request, res: Response) => api.checkPasswordResetToken(req, res));
+app.post('/reset-password', (req: Request, res: Response) => api.resetPassword(req, res));
+
 // Starte den Server
 app.listen(PORT, () => {
   console.log(`Server läuft auf Port ${PORT}`);

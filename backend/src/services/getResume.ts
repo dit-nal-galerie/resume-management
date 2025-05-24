@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 // Importiere Pool und Typen von mysql2/promise
-import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
+import { Pool, PoolConnection } from 'mysql2/promise';
+import { RowDataPacket } from 'mysql2/promise';
 import { Resume } from '../../../interfaces/Resume';
 import { Company } from '../../../interfaces/Company';
 import { Contact } from '../../../interfaces/Contact';

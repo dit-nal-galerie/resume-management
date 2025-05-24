@@ -37,31 +37,25 @@ interface ApiResponse {
  */
 export const requestPasswordReset = async (loginname: string, email: string): Promise<ApiResponse> => {
   try {
-    // В реальном приложении здесь будет запрос к API
-    // const response = await fetch('/api/request-password-reset', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ loginname, email }),
-    // });
-    // const data = await response.json();
-    // return data;
-
-    // Имитация задержки сети
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const response = await fetch(`${API_URL}/request-password-reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ loginname, email }),
+    });
     
-    // Имитация успешного ответа
-    return {
-      success: true,
-      message: "E-Mail mit Anweisungen wurde gesendet"
-    };
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("API error:", errorText);
+      return {
+        success: false,
+        error: "Serverfehler. Bitte versuchen Sie es später erneut."
+      };
+    }
     
-    // Для тестирования ошибки можно использовать:
-    // return {
-    //   success: false,
-    //   error: "Benutzer mit dieser E-Mail-Adresse wurde nicht gefunden"
-    // };
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("API error:", error);
     return {
@@ -79,31 +73,25 @@ export const requestPasswordReset = async (loginname: string, email: string): Pr
  */
 export const resetPassword = async (token: string, newPassword: string): Promise<ApiResponse> => {
   try {
-    // В реальном приложении здесь будет запрос к API
-    // const response = await fetch('/api/reset-password', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ token, newPassword }),
-    // });
-    // const data = await response.json();
-    // return data;
-
-    // Имитация задержки сети
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const response = await fetch(`${API_URL}/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token, newPassword }),
+    });
     
-    // Имитация успешного ответа
-    return {
-      success: true,
-      message: "Passwort wurde erfolgreich zurückgesetzt"
-    };
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("API error:", errorText);
+      return {
+        success: false,
+        error: "Serverfehler. Bitte versuchen Sie es später erneut."
+      };
+    }
     
-    // Для тестирования ошибки можно использовать:
-    // return {
-    //   success: false,
-    //   error: "Ungültiger Token oder abgelaufener Link"
-    // };
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("API error:", error);
     return {
@@ -120,19 +108,6 @@ export const resetPassword = async (token: string, newPassword: string): Promise
  */
 export const validateToken = async (token: string): Promise<ApiResponse> => {
   try {
-    // В реальном приложении здесь будет запрос к API
-    // const response = await fetch(`/api/validate-token?token=${token}`, {
-    //   method: 'GET',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   }
-    // });
-    // const data = await response.json();
-    // return data;
-
-    // Имитация задержки сети
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     // Проверка на пустой токен
     if (!token) {
       return {
@@ -141,11 +116,24 @@ export const validateToken = async (token: string): Promise<ApiResponse> => {
       };
     }
     
-    // Имитация успешной проверки токена
-    return {
-      success: true,
-      message: "Token ist gültig"
-    };
+    const response = await fetch(`${API_URL}/validate-token?token=${token}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("API error:", errorText);
+      return {
+        success: false,
+        error: "Fehler bei der Tokenüberprüfung"
+      };
+    }
+    
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("API error:", error);
     return {
@@ -433,4 +421,3 @@ export const updateAccessData = async (data: {
     };
   }
 };
-

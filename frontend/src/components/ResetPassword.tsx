@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { resetPassword, validateToken } from "../services/api";
 
 const ResetPassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -9,39 +10,42 @@ const ResetPassword: React.FC = () => {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isValidatingToken, setIsValidatingToken] = useState(true);
   
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Извлечение токена из URL при загрузке компонента
+  // Извлечение токена из URL и проверка его валидности при загрузке компонента
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tokenFromUrl = searchParams.get("token");
     
     if (!tokenFromUrl) {
       setServerError("Ungültiger oder fehlender Token. Bitte fordern Sie einen neuen Link an.");
-    } else {
-      setToken(tokenFromUrl);
+      setIsValidatingToken(false);
+      return;
     }
-  }, [location]);
-
-  // Функция для отправки запроса на сброс пароля
-  const resetPassword = async (token: string, newPassword: string) => {
-    // Здесь будет реализация API-запроса
-    // Пока используем заглушку, которая имитирует успешный ответ
     
-    // Имитация задержки сети
-    return new Promise<boolean>((resolve) => {
-      setTimeout(() => {
-        // Имитация успешного ответа
-        resolve(true);
+    // Проверка валидности токена
+    const checkToken = async () => {
+      try {
+        setIsValidatingToken(true);
+        const result = await validateToken(tokenFromUrl);
         
-        // Для тестирования ошибки можно использовать:
-        // resolve(false);
-        // или throw new Error("Сетевая ошибка");
-      }, 1000);
-    });
-  };
+        if (result.success) {
+          setToken(tokenFromUrl);
+        } else {
+          setServerError(result.error || "Ungültiger oder abgelaufener Token. Bitte fordern Sie einen neuen Link an.");
+        }
+      } catch (error) {
+        setServerError("Serverfehler bei der Tokenüberprüfung. Bitte versuchen Sie es später erneut.");
+      } finally {
+        setIsValidatingToken(false);
+      }
+    };
+    
+    checkToken();
+  }, [location]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -82,14 +86,14 @@ const ResetPassword: React.FC = () => {
       setIsLoading(true);
       const result = await resetPassword(token, newPassword);
       
-      if (result) {
+      if (result.success) {
         setIsSuccess(true);
         // Автоматический редирект на страницу логина через 3 секунды
         setTimeout(() => {
           navigate("/login");
         }, 3000);
       } else {
-        setServerError("Fehler beim Zurücksetzen des Passworts. Bitte versuchen Sie es erneut.");
+        setServerError(result.error || "Fehler beim Zurücksetzen des Passworts. Bitte versuchen Sie es erneut.");
       }
     } catch (error) {
       setServerError("Serverfehler. Bitte versuchen Sie es später erneut.");
@@ -108,7 +112,12 @@ const ResetPassword: React.FC = () => {
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
         <h2 className="text-2xl font-semibold text-center mb-6">Passwort zurücksetzen</h2>
         
-        {isSuccess ? (
+        {isValidatingToken ? (
+          <div className="text-center py-4">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+            <p>Token wird überprüft...</p>
+          </div>
+        ) : isSuccess ? (
           <div className="text-center">
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
               <p>Ihr Passwort wurde erfolgreich zurückgesetzt!</p>
@@ -145,7 +154,7 @@ const ResetPassword: React.FC = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 onBlur={handleBlur}
-                disabled={isLoading}
+                disabled={isLoading || !token}
               />
               {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
             </div>
@@ -165,7 +174,7 @@ const ResetPassword: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 onBlur={handleBlur}
-                disabled={isLoading}
+                disabled={isLoading || !token}
               />
               {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
@@ -175,7 +184,7 @@ const ResetPassword: React.FC = () => {
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-full ${
-                  isLoading ? "opacity-70 cursor-not-allowed" : ""
+                  isLoading || !token ? "opacity-70 cursor-not-allowed" : ""
                 }`}
                 disabled={isLoading || !token}
               >

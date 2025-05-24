@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Connection, Pool, RowDataPacket } from 'mysql2';
+import { Connection } from 'mysql2'; // Для обычного соединения с callback
+import {  RowDataPacket } from 'mysql2/promise'; // Для Promise API
 import { HistoryEntry } from '../../../interfaces/histori';
 
 export const addHistory = (db: Connection, req: Request, res: Response): void => {

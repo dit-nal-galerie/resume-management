@@ -2,6 +2,16 @@
 CREATE DATABASE IF NOT EXISTS bewerbungs CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE bewerbungs;
 
+CREATE TABLE  password_reset_tokens (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  token VARCHAR(64 ) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP NOT NULL,
+  is_used BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (user_id) REFERENCES authentification(id) ON DELETE CASCADE,
+  UNIQUE KEY (token)
+)
 -- Таблица аутентификации пользователей
 
 CREATE TABLE authentification (

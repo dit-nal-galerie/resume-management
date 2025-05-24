@@ -9,13 +9,14 @@ import { getResumesWithUsers, getStates } from './services/resumeService';
 import { addCompany, getCompanies } from './services/companyService';
 import { addHistory,  getHistoryByResumeId } from './services/historyService';
 import {  updateOrCreateResume } from './services/saveResume';
+import { requestPasswordReset, checkPasswordResetToken, resetPassword, ensurePasswordResetTableExists } from './services/passwordResetService';
 
 import mysqlPromise, { Pool as PromisePool, PoolConnection as PromisePoolConnection } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
 import { changeResumeStatus, getResumeById } from './services/getResume';
 
 class ResumeManagementAPI {
   [x: string]: any;
-  private db: mysql.Connection;
+  private db: any;
   private dbPool: PromisePool;
   constructor() {
     this.db = mysql.createConnection({
@@ -33,7 +34,19 @@ class ResumeManagementAPI {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0
-  });
+    });
+    
+    // Проверка и создание таблицы для токенов восстановления пароля
+    this.initPasswordResetTable();
+  }
+
+  // Инициализация таблицы для токенов восстановления пароля
+  private async initPasswordResetTable(): Promise<void> {
+    try {
+      await ensurePasswordResetTableExists(this.dbPool);
+    } catch (error) {
+      console.error('Fehler bei der Initialisierung der Passwort-Reset-Tabelle:', error);
+    }
   }
 
   async createOrUpdateUser(req: Request, res: Response): Promise<void> {
@@ -83,12 +96,25 @@ class ResumeManagementAPI {
   async getContacts(req: Request, res: Response): Promise<void> {
     getContacts(this.db, req, res);
   }
-async changeResumeStatus ( req: Request, res: Response) {
-   await changeResumeStatus(this.dbPool, req, res);
-}
-async changeAccessData ( req: Request, res: Response) {
-   await changeAccessData(this.dbPool, req, res);
-}
+  async changeResumeStatus(req: Request, res: Response) {
+    await changeResumeStatus(this.dbPool, req, res);
+  }
+  async changeAccessData(req: Request, res: Response) {
+    await changeAccessData(this.dbPool, req, res);
+  }
+
+  // Новые методы для восстановления пароля
+  async requestPasswordReset(req: Request, res: Response): Promise<void> {
+    await requestPasswordReset(this.dbPool, req, res);
+  }
+
+  async checkPasswordResetToken(req: Request, res: Response): Promise<void> {
+    await checkPasswordResetToken(this.dbPool, req, res);
+  }
+
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    await resetPassword(this.dbPool, req, res);
+  }
 }
 
 export default ResumeManagementAPI;
