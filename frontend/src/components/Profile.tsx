@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserData, updateUserData, createUser, getAnrede } from '../services/api';
+import { getUserData, updateUserData, createOrUpdateUser, getAnrede } from '../services/api';
 import { User } from '../../../interfaces/User';
 import LoginForm from './LoginForm';
 import ProfileForm from './ProfileForm';
@@ -58,6 +58,7 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
       ...prevState,
       [field]: value,
     }));
+    console.log('FormData:', { [field]: value });
   };
 
   const validateEmail = (email: string) => /^[^@]+@[^@]+\.[^@]+$/.test(email);
@@ -96,7 +97,7 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
         await updateUserData(loginId, formData);
         navigate('/resumes');
       } else {
-        await createUser(formData);
+        await createOrUpdateUser(formData);
         navigate('/login');
       }
     } catch (error) {
@@ -155,7 +156,7 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
             className="bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-md"
             onClick={handleBack}
           >
-            Назад
+            Zurück
           </button>
         </div>
       </form>

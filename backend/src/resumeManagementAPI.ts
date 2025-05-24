@@ -3,15 +3,15 @@ import mysql from 'mysql2';
 import config from './config/config';
 
 // Importiere die ausgelagerten Services
-import { createUser, login, getAnrede } from './services/userService';
+import { createOrUpdateUser, login, getAnrede, changeAccessData } from './services/userService';
 import { createOrUpdateContact, getContacts } from './services/contactService';
 import { getResumesWithUsers, getStates } from './services/resumeService';
 import { addCompany, getCompanies } from './services/companyService';
-import { addHistory, getHistoryByResumeId } from './services/historyService';
+import { addHistory,  getHistoryByResumeId } from './services/historyService';
 import {  updateOrCreateResume } from './services/saveResume';
 
 import mysqlPromise, { Pool as PromisePool, PoolConnection as PromisePoolConnection } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
-import { getResumeById } from './services/getResume';
+import { changeResumeStatus, getResumeById } from './services/getResume';
 
 class ResumeManagementAPI {
   [x: string]: any;
@@ -36,8 +36,8 @@ class ResumeManagementAPI {
   });
   }
 
-  async createUser(req: Request, res: Response): Promise<void> {
-    await createUser(this.db, req, res);
+  async createOrUpdateUser(req: Request, res: Response): Promise<void> {
+    await createOrUpdateUser(this.db, req, res);
   }
   async login(req: Request, res: Response): Promise<void> {
     await login(this.db, req, res);
@@ -83,7 +83,12 @@ class ResumeManagementAPI {
   async getContacts(req: Request, res: Response): Promise<void> {
     getContacts(this.db, req, res);
   }
-
+async changeResumeStatus ( req: Request, res: Response) {
+   await changeResumeStatus(this.dbPool, req, res);
+}
+async changeAccessData ( req: Request, res: Response) {
+   await changeAccessData(this.dbPool, req, res);
+}
 }
 
 export default ResumeManagementAPI;

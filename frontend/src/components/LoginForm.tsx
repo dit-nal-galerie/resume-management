@@ -5,10 +5,11 @@ interface LoginFormProps {
   loginname: string;
   password: string;
   password2?: string;
-  onChange: (field: keyof User, value: string | number) => void;
+  onChange: (field: 'loginname' | 'password' | 'password2', value: string) => void;
   readonlyLoginname?: boolean;
   showPassword2?: boolean;
 }
+
 // handleFieldChange = (field: keyof User, value: string | number)
 const LoginForm: React.FC<LoginFormProps> = ({
   loginname,

@@ -159,7 +159,49 @@ export const getResumeById = async (dbPool: Pool, req: Request, res: Response): 
         }
     }
 };
+export const changeResumeStatus = async (db: Pool, req: Request, res: Response) => {
+  const { resumeId, userId, stateId, date } = req.body;
 
+  if (!resumeId || !userId || !stateId || !date) {
+    return res.status(400).send("Fehlende Daten.");
+  }
+
+  try {
+    const [rows] = await db.query(
+      "SELECT ref, stateid FROM resumes WHERE resumeId = ?",
+      [resumeId]
+    );
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return res.status(404).send("Bewerbung nicht gefunden.");
+    }
+
+    const resume = rows[0] as { ref: number; stateid: number };
+
+    if (resume.ref !== userId) {
+      return res.status(403).send("Keine Berechtigung.");
+    }
+
+    if (resume.stateid === stateId) {
+      return res.status(400).send("Status ist bereits gesetzt.");
+    }
+
+    await db.query(
+      "UPDATE resumes SET stateid = ? WHERE resumeId = ?",
+      [stateId, resumeId]
+    );
+
+    await db.query(
+      "INSERT INTO history (resumeid, stateid, date) VALUES (?, ?, ?)",
+      [resumeId, stateId, date]
+    );
+
+    return res.status(200).send("Status erfolgreich geändert.");
+  } catch (err) {
+    console.error("Fehler:", err);
+    return res.status(500).send("Interner Serverfehler.");
+  }
+};
 // Diese Funktion kann dann in Ihrer Klasse/Ihrem Controller verwendet werden:
 /*
 class ResumeController {

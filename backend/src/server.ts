@@ -21,7 +21,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 const api = new ResumeManagementAPI();
 
 // Definiere die Routen
-app.post('/createUser', (req: Request, res: Response) => api.createUser(req, res));
+app.post('/createOrUpdateUser', (req: Request, res: Response) => api.createOrUpdateUser(req, res));
 app.post('/addContact', (req: Request, res: Response) => api.createOrUpdateContact(req, res));
 app.get('/getResumesWithUsers', (req: Request, res: Response) => api.getResumesWithUsers(req, res));
 app.post('/addCompany', (req: Request, res: Response) => api.addCompany(req, res));
@@ -34,10 +34,9 @@ app.get('/getStates', (req: Request, res: Response) => api.getStates(req, res));
 app.post('/updateOrCreateResume', (req: Request, res: Response) => api.updateOrCreateResume(req, res));
 app.get('/resume/:resumeId', (req: Request, res: Response) => api.getResumeById(req, res));
 app.get('/contacts', (req: Request, res: Response) => api.getContacts(req, res));
-app.get('/getResumeById/:resumeId', (req: Request, res: Response) => {
-  //console.log("apiAufruf von getResumeById mit ID:", req.params.resumeId);
-  api.getResumeById(req, res)
-});
+app.get('/getResumeById/:resumeId', (req: Request, res: Response) => api.getResumeById(req, res));
+app.post('/changeResumeStatus', (req: Request, res: Response) =>   api.changeResumeStatus(req, res));
+app.post('/changeAccessData', (req: Request, res: Response) =>   api.changeAccessData(req, res));
 
 // Starte den Server
 app.listen(PORT, () => {

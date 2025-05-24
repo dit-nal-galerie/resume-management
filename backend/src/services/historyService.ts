@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Connection, RowDataPacket } from 'mysql2';
+import { Connection, Pool, RowDataPacket } from 'mysql2';
 import { HistoryEntry } from '../../../interfaces/histori';
 
 export const addHistory = (db: Connection, req: Request, res: Response): void => {
@@ -51,7 +51,7 @@ console.log("getHistoryByResumeId", refId, resumeId);
       FROM history h
       JOIN states s ON h.stateid = s.stateid
       WHERE h.resumeid = ?
-      ORDER BY h.date DESC
+      ORDER BY h.date ASC
     `;
 console.log("historyQuery", historyQuery,"resumeid", resumeId);
     db.query(historyQuery, [resumeId], (err, results: RowDataPacket[]) => {

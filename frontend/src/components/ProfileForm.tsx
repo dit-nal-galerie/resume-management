@@ -13,6 +13,7 @@ interface ProfileFormProps {
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onChange }) => {
+  console.log('ProfileForm', formData.anrede, anredeOptions);  
   return (
     <div className="space-y-4">
       <div>

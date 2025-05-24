@@ -16,6 +16,7 @@ import { Contact } from '../../../../interfaces/Contact';
 import ContactFormModal from '../contact/ContactFormModal';
 
 import { ModalSectionCompany, ModalSectionContact, ModalType } from './ResumeEditModals.types';
+import { HistoryModal } from './HistoryModal';
 const ResumeEdit: React.FC = () => {
   const navigate = useNavigate();
   const { resumeId } = useParams<{ resumeId: string }>();
@@ -42,7 +43,7 @@ const openEditContact = (section: ModalSectionContact) => {
   setModalOpen(true);
   console.log(modalOpen , modalType, modalSectionCompany, modalSectionContact)
 };
-
+const [isModalOpen, setIsModalOpen] = useState(false); 
 const closeModal =() =>{
   setModalType(null);
   setModalSectionContact(null);
@@ -124,6 +125,15 @@ const handleSelectCompany = (comp: Company) => {
   setResumeData(rd => rd ? { ...rd, [modalSectionCompany]: comp } : rd);
   setModalOpen(false);
 };
+
+  const closeHistoryModal = () => {
+    setIsModalOpen(false); // Hinzugefügt
+
+  };
+   const openHistoryModal = () => {
+      
+      setIsModalOpen(true); // Geändert
+    };
 
   useEffect(() => {
     getStates()
@@ -347,8 +357,6 @@ const getCurrentCompanyId = () =>
   companies={companies}
   onSelect={handleSelectCompany}
 />
-
-
 <ContactFormModal
    contact={getCurrentContact() || {
     contactid: 0,
@@ -368,7 +376,15 @@ const getCurrentCompanyId = () =>
       isOpen={modalOpen && modalType === 'editContact'}
   onClose={() => setModalOpen(false)}
     />
-
+{isModalOpen && resumeData&& (
+      <HistoryModal
+      isOpen ={isModalOpen}
+        onClose={closeHistoryModal} // Verwenden Sie die neue closeHistoryModal Funktion
+        resumeId={resumeData.resumeId  } // Verwenden Sie selectedResume
+        refId={storedUser.loginid}
+        resumeTitle={resumeData?.position || ""} 
+        currentStateId={-1} // Verwenden Sie selectedResume
+      />)}
  
  
     
@@ -396,6 +412,13 @@ const getCurrentCompanyId = () =>
         >
          View
         </button>
+
+         {resumeData&&resumeData.resumeId>0 && (<button
+                onClick={() => openHistoryModal()}
+                className="bg-gray-600 hover:bg-gray-800 text-white px-3 py-1 rounded-md"
+              >
+                Historie
+              </button> )}
       </div>
     </div>
   );

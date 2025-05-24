@@ -5,33 +5,49 @@ import { loadUserFromStorage } from "../utils/storage";
 import { User } from "../../../interfaces/User";
 import { useNavigate } from "react-router-dom";
 import { HistoryModal } from "./resume/HistoryModal";
+import { StatusModal } from "./resume/StatusModal";
+import { Menu, MenuButton } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 
 const storedUser: User = loadUserFromStorage();
 
 const ResumeList: React.FC = () => {
-  const [userLoginName, setUserLoginName] = useState("");
+  const [userLoginName, setUserLoginName] = useState(storedUser.name ||storedUser.loginname);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // Umbenannt, um klarer zu sein
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
+ const [isModalStatusOpen, setIisModalStatusOpen] = useState(false);
+
+ const [refresh, setRefresh] = useState(false);
+
+const refreshResumes = () => {
+  const userId = storedUser?.loginid;
+  if (userId) {
+    getResumesWithUsers(userId)
+      .then((data) => setResumes(data))
+      .catch((err) => console.error("Fehler beim Laden der Bewerbungen:", err));
+  }
+};
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const userId = storedUser?.loginid;
-    if (userId) {
-      setUserLoginName(storedUser.name || storedUser.loginname);
-      getResumesWithUsers(userId)
-        .then((data) => setResumes(data))
-        .catch((err) =>
-          console.error("Fehler beim Laden der Bewerbungen:", err)
-        );
-    }
-  }, []);
+useEffect(() => {
+   console.log("🔁 Resumes neu laden...");
+  refreshResumes();
+}, [refresh]);
 
   const openHistoryModal = (resume: Resume) => {
     setSelectedResume(resume);
     setIsModalOpen(true); // Geändert
+  };
+const handleStatusChanged = () => {
+  setRefresh((prev) => !prev); // Toggle -> löst useEffect aus
+};
+  const openStatusModal = (resume: Resume) => {
+    setSelectedResume(resume);
+    console.log("openStatusModal", resume, "status", resume.stateId);
+    setIisModalStatusOpen(true); // Geändert
   };
 
   const closeHistoryModal = () => {
@@ -42,15 +58,72 @@ const ResumeList: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
      
-      <div className="sticky top-0 bg-gray-800 text-white p-4 rounded-lg flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Bewerbungen - {userLoginName}</h2>
-        <button
-          onClick={() => navigate("/resume/0")}
-          className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-        >
-          Neue Bewerbung
-        </button>
+<div className="sticky top-0 bg-gray-800 text-white p-4 rounded-lg flex justify-between items-center">
+  <h2 className="text-xl font-semibold">Bewerbungen – {userLoginName}</h2>
+
+  <Menu as="div" className="relative inline-block text-left">
+    <MenuButton className="inline-flex justify-center w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm font-medium">
+      Menü
+      <ChevronDownIcon className="w-5 h-5 ml-2 -mr-1" aria-hidden="true" />
+    </MenuButton >
+
+    <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+      <div className="py-1">
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              onClick={() => navigate("/resume/0")}
+              className={`${
+                active ? "bg-gray-100" : ""
+              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
+            >
+              Neue Bewerbung
+            </button>
+          )}
+        </Menu.Item>
+
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              onClick={() => navigate("/profile")}
+              className={`${
+                active ? "bg-gray-100" : ""
+              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
+            >
+              Profil editieren
+            </button>
+          )}
+        </Menu.Item>
+
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              onClick={() => navigate("/changeaccess")} // passe Route für Zugangsdaten an
+              className={`${
+                active ? "bg-gray-100" : ""
+              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
+            >
+              Zugangsdaten ändern
+            </button>
+          )}
+        </Menu.Item>
+
+        <Menu.Item>
+          {({ active }) => (
+            <button
+              onClick={() => navigate("/about")} // passe Route für „Über“ an
+              className={`${
+                active ? "bg-gray-100" : ""
+              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
+            >
+              Über
+            </button>
+          )}
+        </Menu.Item>
       </div>
+    </Menu.Items>
+  </Menu>
+</div>
 
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -73,7 +146,10 @@ const ResumeList: React.FC = () => {
               >
                 Anschauen/Ändern
               </button>
-              <button className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded-md">
+              <button
+                onClick={() => openStatusModal(resume)}
+                className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded-md"
+              >
                 Status ändern
               </button>
              {resume&&resume.resumeId>0 && (<button
@@ -86,16 +162,30 @@ const ResumeList: React.FC = () => {
           </div>
         ))}
       </div>
-
-     
       {isModalOpen && selectedResume&& (
       <HistoryModal
-      
+      isOpen= {isModalOpen} // Verwenden Sie den Zustand isModalOpen,
         onClose={closeHistoryModal} // Verwenden Sie die neue closeHistoryModal Funktion
         resumeId={selectedResume.resumeId  } // Verwenden Sie selectedResume
-        loginId={storedUser.loginid}
-        resumeTitle={selectedResume?.position || ""} // Verwenden Sie selectedResume
+        refId={storedUser.loginid}
+        resumeTitle={selectedResume.position || ""} // Verwenden Sie selectedResume
+         currentStateId={selectedResume.stateId || 0} // Verwenden Sie selectedResume;
       />)}
+
+            {/* StatusModal */}
+      {selectedResume &&isModalStatusOpen && (
+
+
+        <StatusModal
+  isOpen={true}
+   onClose={() => setIisModalStatusOpen(false)}
+  resumeId={selectedResume.resumeId}
+  refId={storedUser.loginid}
+  resumeTitle={selectedResume.position || ""}
+          currentStateId={selectedResume.stateId || 0}
+  onStatusChanged={handleStatusChanged}
+/>
+      )}
     </div>
   );
 };

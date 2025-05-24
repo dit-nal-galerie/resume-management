@@ -2,8 +2,8 @@ const API_URL = 'http://localhost:3001';
 import { User } from '../../../interfaces/User';
 import { Resume } from "../../../interfaces/Resume";
 // Функция для создания нового пользователя
-export const createUser = async (userData: User): Promise<string> => {
-  const response = await fetch(`${API_URL}/createUser`, {
+export const createOrUpdateUser = async (userData: User): Promise<string> => {
+  const response = await fetch(`${API_URL}/createOrUpdateUser`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -19,6 +19,143 @@ export const createUser = async (userData: User): Promise<string> => {
 
   return await response.text();
 };
+
+// API сервис для работы с запросами восстановления пароля
+
+// Интерфейс для ответа API
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+/**
+ * Функция для запроса восстановления пароля
+ * @param loginname Имя пользователя
+ * @param email Email пользователя
+ * @returns Promise с результатом операции
+ */
+export const requestPasswordReset = async (loginname: string, email: string): Promise<ApiResponse> => {
+  try {
+    // В реальном приложении здесь будет запрос к API
+    // const response = await fetch('/api/request-password-reset', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ loginname, email }),
+    // });
+    // const data = await response.json();
+    // return data;
+
+    // Имитация задержки сети
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Имитация успешного ответа
+    return {
+      success: true,
+      message: "E-Mail mit Anweisungen wurde gesendet"
+    };
+    
+    // Для тестирования ошибки можно использовать:
+    // return {
+    //   success: false,
+    //   error: "Benutzer mit dieser E-Mail-Adresse wurde nicht gefunden"
+    // };
+  } catch (error) {
+    console.error("API error:", error);
+    return {
+      success: false,
+      error: "Serverfehler. Bitte versuchen Sie es später erneut."
+    };
+  }
+};
+
+/**
+ * Функция для отправки запроса на сброс пароля
+ * @param token Токен для сброса пароля
+ * @param newPassword Новый пароль пользователя
+ * @returns Promise с результатом операции
+ */
+export const resetPassword = async (token: string, newPassword: string): Promise<ApiResponse> => {
+  try {
+    // В реальном приложении здесь будет запрос к API
+    // const response = await fetch('/api/reset-password', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ token, newPassword }),
+    // });
+    // const data = await response.json();
+    // return data;
+
+    // Имитация задержки сети
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Имитация успешного ответа
+    return {
+      success: true,
+      message: "Passwort wurde erfolgreich zurückgesetzt"
+    };
+    
+    // Для тестирования ошибки можно использовать:
+    // return {
+    //   success: false,
+    //   error: "Ungültiger Token oder abgelaufener Link"
+    // };
+  } catch (error) {
+    console.error("API error:", error);
+    return {
+      success: false,
+      error: "Serverfehler. Bitte versuchen Sie es später erneut."
+    };
+  }
+};
+
+/**
+ * Функция для проверки валидности токена
+ * @param token Токен для проверки
+ * @returns Promise с результатом проверки
+ */
+export const validateToken = async (token: string): Promise<ApiResponse> => {
+  try {
+    // В реальном приложении здесь будет запрос к API
+    // const response = await fetch(`/api/validate-token?token=${token}`, {
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   }
+    // });
+    // const data = await response.json();
+    // return data;
+
+    // Имитация задержки сети
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Проверка на пустой токен
+    if (!token) {
+      return {
+        success: false,
+        error: "Token ist erforderlich"
+      };
+    }
+    
+    // Имитация успешной проверки токена
+    return {
+      success: true,
+      message: "Token ist gültig"
+    };
+  } catch (error) {
+    console.error("API error:", error);
+    return {
+      success: false,
+      error: "Fehler bei der Tokenüberprüfung"
+    };
+  }
+};
+
+
 
 // Функция для логина пользователя
 export const login = async (loginname: string, password: string) => {
@@ -83,8 +220,8 @@ export const updateUserData = async (loginId:number, userData: User): Promise<st
     requestBody.password = userData.password;
   }
 
-  const response = await fetch(`${API_URL}/updateUserData`, {
-    method: "PUT",
+  const response = await fetch(`${API_URL}/createOrUpdateUser`, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(requestBody),
   });
@@ -231,3 +368,69 @@ export const getHistoryByResumeId = async (resumeId: number, refId: number): Pro
     }
     return response.json();
 };
+export const changeResumeStatus = async (
+  resumeId: number,
+  userId: number,
+  stateId: number,
+  date: string
+): Promise<void> => {
+    const url = `${API_URL}/changeResumeStatus`;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ resumeId, userId, stateId, date }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Fehler beim Ändern des Status");
+  }
+};
+
+interface UpdateAccessDataResponse {
+  success?: boolean;
+  message?: string;
+  user?: User;
+}
+
+export const updateAccessData = async (data: {
+  userId: number;
+  loginname: string;
+  email: string;
+  oldPassword: string;
+  newPassword?: string;
+  password2?: string;
+  changePassword: boolean;
+}): Promise<UpdateAccessDataResponse> => {
+  const url = `${API_URL}/changeAccessData`;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: result.message || "Fehler beim Speichern",
+      };
+    }
+
+    return {
+      success: true,
+      message: result.message,
+      user: result.user, // vom Backend zurückgegeben
+    };
+  } catch (error) {
+    console.error("API-Fehler:", error);
+    return {
+      success: false,
+      message: "Serverfehler oder keine Verbindung: \n" + error,
+    };
+  }
+};
+
