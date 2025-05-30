@@ -1,5 +1,7 @@
 import React from 'react';
 import { User } from '../../../interfaces/User';
+import { useTranslation } from 'react-i18next';
+
 
 interface LoginFormProps {
   loginname: string;
@@ -19,11 +21,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
   readonlyLoginname = false,
   showPassword2 = false,
 }) => {
+    const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div>
         <label htmlFor="loginname" className="block text-sm font-medium text-gray-700">
-          Loginname
+          {t('profileEdit.loginname')}
         </label>
         <input
           type="text"
@@ -32,12 +35,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
           onChange={(e) => onChange('loginname', e.target.value)}
           readOnly={readonlyLoginname}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Loginname eingeben"
+          placeholder={t('login.usernamePlaceholder')}
         />
       </div>
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Passwort
+          {t('login.password')}
         </label>
         <input
           type="password"
@@ -45,13 +48,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
           value={password}
           onChange={(e) => onChange('password', e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Passwort eingeben"
+          placeholder={t('login.passwordPlaceholder')}
         />
       </div>
       {showPassword2 && (
         <div>
           <label htmlFor="password2" className="block text-sm font-medium text-gray-700">
-            Passwort wiederholen
+            {t('profileEdit.password2')}
           </label>
           <input
             type="password"
@@ -59,7 +62,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             value={password2}
             onChange={(e) => onChange('password2', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Passwort erneut eingeben"
+            placeholder={t('passwordReset.confirmPasswordPlaceholder')}
           />
         </div>
       )}

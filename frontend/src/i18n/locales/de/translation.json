@@ -1,0 +1,178 @@
+{
+  "common": {
+    "loading": "Wird bearbeitet...",
+    "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "back": "Zurück",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "submit": "Absenden",
+    "required": "Pflichtfeld"
+  },
+  "navigation": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "profile": "Profil",
+    "resumes": "Bewerbungen",
+    "logout": "Abmelden",
+    "backToLogin": "Zurück zur Anmeldeseite"
+  },
+  "login": {
+    "title": "Anmelden",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "loginButton": "Anmelden",
+    "registerButton": "Registrieren",
+    "forgotPassword": "Passwort vergessen?",
+    "usernameRequired": "Bitte geben Sie Ihren Benutzernamen ein.",
+    "passwordRequired": "Bitte geben Sie Ihr Passwort ein.",
+    "invalidCredentials": "Ungültiger Login oder Passwort.",
+    "checkUsername": "Überprüfen Sie den Benutzernamen.",
+    "checkPassword": "Überprüfen Sie das Passwort.",
+    "usernamePlaceholder": "Benutzername eingeben",
+    "passwordPlaceholder": "Passwort eingeben"
+  },
+  "passwordReset": {
+    "requestTitle": "Passwort zurücksetzen",
+    "resetTitle": "Passwort zurücksetzen",
+    "username": "Benutzername",
+    "email": "E-Mail-Adresse",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "sendResetLink": "Link zum Zurücksetzen senden",
+    "resetPassword": "Passwort zurücksetzen",
+    "usernameRequired": "Bitte geben Sie Ihren Benutzernamen ein.",
+    "emailRequired": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
+    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "passwordMinLength": "Das Passwort muss mindestens 2 Zeichen lang sein.",
+    "confirmPasswordRequired": "Bitte bestätigen Sie Ihr Passwort.",
+    "passwordsDoNotMatch": "Die Passwörter stimmen nicht überein.",
+    "resetSuccess": "Ihr Passwort wurde erfolgreich zurückgesetzt!",
+    "redirecting": "Sie werden zur Anmeldeseite weitergeleitet...",
+    "emailSent": "Wenn ein Konto mit diesen Daten existiert, haben wir eine E-Mail mit Anweisungen zum Zurücksetzen Ihres Passworts gesendet.",
+    "checkInbox": "Bitte überprüfen Sie Ihren Posteingang und folgen Sie den Anweisungen in der E-Mail.",
+    "invalidToken": "Ungültiger oder fehlender Token. Bitte fordern Sie einen neuen Link an.",
+    "usernamePlaceholder": "Benutzername eingeben",
+    "emailPlaceholder": "E-Mail-Adresse eingeben",
+    "newPasswordPlaceholder": "Neues Passwort eingeben",
+    "confirmPasswordPlaceholder": "Passwort bestätigen"
+  },
+  "profile": {
+    "title": "Profil",
+    "personalInfo": "Persönliche Informationen",
+    "contactInfo": "Kontaktinformationen",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "mobile": "Mobiltelefon",
+    "address": "Adresse",
+    "city": "Stadt",
+    "postalCode": "Postleitzahl",
+    "street": "Straße",
+    "houseNumber": "Hausnummer",
+    "saveSuccess": "Profil erfolgreich gespeichert",
+    "saveError": "Fehler beim Speichern des Profils"
+  },
+  "resume": {
+    "list": {
+      "title": "Bewerbungen",
+      "new": "Neue Bewerbung",
+      "status": "Status",
+      "date": "Datum",
+      "company": "Unternehmen",
+      "position": "Position",
+      "actions": "Aktionen",
+      "noResumes": "Keine Bewerbungen gefunden",
+      "view": "Ansehen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "deleteConfirm": "Sind Sie sicher, dass Sie diese Bewerbung löschen möchten?"
+    },
+    "edit": {
+      "title": "Bewerbung bearbeiten",
+      "newTitle": "Neue Bewerbung",
+      "company": "Unternehmen",
+      "position": "Position",
+      "description": "Beschreibung",
+      "status": "Status",
+      "date": "Datum",
+      "saveSuccess": "Bewerbung erfolgreich gespeichert",
+      "saveError": "Fehler beim Speichern der Bewerbung"
+    },
+    "history": {
+      "title": "Verlauf",
+      "date": "Datum",
+      "status": "Status",
+      "noHistory": "Kein Verlauf gefunden"
+    }, 
+     "history_new": {
+      "date": "Neues Datum",
+      "title": "Status ändern"
+    }
+    
+  },
+  "company": {
+    "select": {
+      "title": "Unternehmen auswählen",
+      "search": "Suchen",
+      "noResults": "Keine Ergebnisse gefunden",
+      "new": "Neues Unternehmen"
+    },
+    "form": {
+      "title": "Unternehmen",
+      "name": "Name",
+      "address": "Adresse",
+      "city": "Stadt",
+      "postalCode": "Postleitzahl",
+      "street": "Straße",
+      "houseNumber": "Hausnummer",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "website": "Website",
+      "saveSuccess": "Unternehmen erfolgreich gespeichert",
+      "saveError": "Fehler beim Speichern des Unternehmens"
+    }
+  },
+  "contact": {
+    "title": "Kontakte",
+    "name": "Name",
+    "position": "Position",
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "noContacts": "Keine Kontakte gefunden",
+    "add": "Kontakt hinzufügen",
+    "edit": "Kontakt bearbeiten",
+    "delete": "Kontakt löschen",
+    "deleteConfirm": "Sind Sie sicher, dass Sie diesen Kontakt löschen möchten?"
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich.",
+    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "minLength": "Dieses Feld muss mindestens {{count}} Zeichen lang sein.",
+    "maxLength": "Dieses Feld darf höchstens {{count}} Zeichen lang sein.",
+    "passwordMatch": "Die Passwörter stimmen nicht überein."
+  },
+  "profileEdit": {
+  "not_logged_in": "Sie sind nicht angemeldet.",
+  "edit_profile": "Profil bearbeiten",
+  "create_profile": "Profil erstellen",
+  "save": "Speichern",
+  "create": "Erstellen",
+  "back": "Zurück",
+  "loading": "Lade...",
+  "loginname_required": "Feld \"Loginname\" ist erforderlich.",
+  "password_required": "Feld \"Passwort\" ist erforderlich.",
+  "email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+  "password2_required": "Feld \"Passwort wiederholen\" ist erforderlich.",
+  "passwords_do_not_match": "Passwörter stimmen nicht überein.",
+  "save_error": "Fehler beim Speichern. Bitte versuchen Sie es später erneut.",
+  "loginname": "Loginname",
+  "password2": "Passwort wiederholen"
+}
+
+   
+  
+
+}

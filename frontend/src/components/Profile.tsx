@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getUserData, updateUserData, createOrUpdateUser, getAnrede } from '../services/api';
-import { User } from '../../../interfaces/User';
-import LoginForm from './LoginForm';
-import ProfileForm from './ProfileForm';
+import { User } from "../../../interfaces/User";
 import { loadUserFromStorage } from '../utils/storage';
+import LoginForm from "./LoginForm";
+import ProfileForm from "./ProfileForm";
 
 const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const storedUser = loadUserFromStorage();
   loginId = loginId || storedUser?.loginid || 0;
-
   const [formData, setFormData] = useState<User>({
     loginid: storedUser?.loginid || loginId,
     loginname: storedUser?.loginname || '',
@@ -26,33 +29,131 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
     mobile: storedUser?.mobile || '',
   });
 
-  const [errors, setErrors] = useState<string[]>([]);
-  const [anredeOptions, setAnredeOptions] = useState<{ id: number; text: string }[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const storedUser = loadUserFromStorage();
-    if (!storedUser && !loginId) {
-      setErrors(['Sie sind nicht angemeldet.']);
-      setIsLoading(false);
-      return;
+  // Получение ID пользователя из URL или localStorage
+  const getUserId = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const loginIdFromUrl = searchParams.get("loginid");
+
+    if (loginIdFromUrl) {
+      return parseInt(loginIdFromUrl);
     }
 
-    const fetchData = async () => {
+    const userJson = localStorage.getItem("user");
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      return user.loginid;
+    }
+
+    return null;
+  };
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const userId = getUserId();
       try {
-        const anredeData = await getAnrede();
-        setAnredeOptions(anredeData);
+        setIsLoading(true);
+        const profileData = await getUserData(userId);
+
+        if (profileData) {
+          setFormData(profileData[0]);
+        }
       } catch (error) {
-        setErrors(['Fehler beim Laden der Daten.']);
+        setServerError(t('common.serverError'));
       } finally {
         setIsLoading(false);
       }
+          const anredeData = await getAnrede();
+              setAnredeOptions(anredeData);
     };
 
-    fetchData();
-  }, [loginId]);
+    fetchProfile();
+  }, [navigate, location, t]);
 
+
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name) {
+      newErrors.name = t('validation.required');
+    }
+
+    if (!formData.email) {
+      newErrors.email = t('validation.required');
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = t('validation.email');
+    }
+
+    if (!formData.city) {
+      newErrors.city = t('validation.required');
+    }
+
+    if (!formData.postalCode) {
+      newErrors.postalCode = t('validation.required');
+    }
+
+    if (!formData.street) {
+      newErrors.street = t('validation.required');
+    }
+
+    if (!formData.houseNumber) {
+      newErrors.houseNumber = t('validation.required');
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const userId = getUserId();
+
+
+    try {
+      setIsLoading(true);
+      if (loginId) {
+        await updateUserData(loginId, formData);
+
+      } else {
+        await createOrUpdateUser(formData);
+
+      }
+
+      setIsLoading(true);
+      const result = await updateUserData(userId, formData);
+      console.log('Profile updated:', result);
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        if (loginId) {
+          navigate('/resumes');
+        } else {
+          navigate('/login');
+        }
+      }, 3000);
+
+    } catch (error) {
+      setServerError(t('common.serverError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+    const [anredeOptions, setAnredeOptions] = useState<{ id: number; text: string }[]>([]);
   const handleFieldChange = (field: keyof User, value: string | number): void => {
     setFormData((prevState) => ({
       ...prevState,
@@ -60,75 +161,25 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
     }));
     console.log('FormData:', { [field]: value });
   };
-
-  const validateEmail = (email: string) => /^[^@]+@[^@]+\.[^@]+$/.test(email);
-
-  const handleSave = async () => {
-    const validationErrors: string[] = [];
-    const isNewUser = !loginId;
-
-    if (isNewUser && !formData.loginname.trim()) {
-      validationErrors.push('Поле "Loginname" обязательно.');
-    }
-
-    if (!formData.password?.trim()) {
-      validationErrors.push('Поле "Passwort" обязательно.');
-    }
-
-    if (!formData.email?.trim() || !validateEmail(formData.email)) {
-      validationErrors.push('Поле "Email" должно быть валидным.');
-    }
-
-    if (isNewUser) {
-      if (!formData.password2?.trim()) {
-        validationErrors.push('Поле "Passwort wiederholen" обязательно.');
-      } else if (formData.password !== formData.password2) {
-        validationErrors.push('Пароли не совпадают.');
-      }
-    }
-
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    try {
-      if (loginId) {
-        await updateUserData(loginId, formData);
-        navigate('/resumes');
-      } else {
-        await createOrUpdateUser(formData);
-        navigate('/login');
-      }
-    } catch (error) {
-      setErrors([String(error) || 'Ошибка при сохранении данных. Попробуйте позже.']);
-    }
-  };
-
-  const handleBack = () => {
-    navigate(loginId ? '/resumes' : '/login');
-  };
-
-  if (isLoading) {
-    return <p className="text-center mt-10">Загрузка...</p>;
-  }
-
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-semibold text-center mb-6">
-        {loginId ? 'Редактирование профиля' : 'Создание профиля'}
-      </h2>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">{t('profile.title')}</h1>
 
-      {errors.length > 0 && (
-        <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mb-4">
-          {errors.map((error, index) => (
-            <p key={index}>{error}</p>
-          ))}
+      {isSuccess && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          {t('profile.saveSuccess')}
         </div>
       )}
 
-      <form className="space-y-6">
-        <LoginForm
+      {serverError && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {serverError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 space-y-6">
+        <h2 className="text-xl font-semibold mb-4">{t('profile.personalInfo')}</h2>
+  <LoginForm
           loginname={formData.loginname}
           password={formData.password ?? ''}
           password2={formData.password2 ?? ''}
@@ -143,20 +194,25 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
           onChange={handleFieldChange}
         />
 
-        <div className="flex justify-between pt-4">
+       
+
+        <div className="flex justify-between mt-6">
           <button
             type="button"
-            className="bg-blue-600 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-md"
-            onClick={handleSave}
+            onClick={() => navigate(loginId ? '/resumes' : '/login')}
+            className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+            disabled={isLoading}
           >
-            {loginId ? 'Сохранить' : 'Создать'}
+            {t('common.cancel')}
           </button>
+
           <button
-            type="button"
-            className="bg-gray-300 hover:bg-gray-400 text-black font-semibold px-4 py-2 rounded-md"
-            onClick={handleBack}
+            type="submit"
+            className={`bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+            disabled={isLoading}
           >
-            Zurück
+            {isLoading ? t('common.loading') : t('common.save')}
           </button>
         </div>
       </form>

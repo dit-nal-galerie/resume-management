@@ -27,26 +27,6 @@ const RESET_PASSWORD_URL = config.RESET_PASSWORD_URL || 'http://localhost:3000/r
  * Создает таблицу для токенов восстановления пароля, если она не существует
  * @param pool - Пул соединений с базой данных
  */
-export const ensurePasswordResetTableExists = async (pool: Pool): Promise<void> => {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS password_reset_tokens (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        token VARCHAR(64) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        expires_at TIMESTAMP NOT NULL,
-        is_used BOOLEAN DEFAULT FALSE,
-        FOREIGN KEY (user_id) REFERENCES authentification(id) ON DELETE CASCADE,
-        UNIQUE KEY (token)
-      )
-    `);
-    console.log('Таблица password_reset_tokens проверена/создана');
-  } catch (error) {
-    console.error('Ошибка при создании таблицы password_reset_tokens:', error);
-    throw error;
-  }
-};
 
 /**
  * Генерирует случайный токен указанной длины

@@ -9,7 +9,7 @@ import { getResumesWithUsers, getStates } from './services/resumeService';
 import { addCompany, getCompanies } from './services/companyService';
 import { addHistory,  getHistoryByResumeId } from './services/historyService';
 import {  updateOrCreateResume } from './services/saveResume';
-import { requestPasswordReset, checkPasswordResetToken, resetPassword, ensurePasswordResetTableExists } from './services/passwordResetService';
+import { requestPasswordReset, checkPasswordResetToken, resetPassword } from './services/passwordResetService';
 
 import mysqlPromise, { Pool as PromisePool, PoolConnection as PromisePoolConnection } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
 import { changeResumeStatus, getResumeById } from './services/getResume';
@@ -36,18 +36,10 @@ class ResumeManagementAPI {
       queueLimit: 0
     });
     
-    // Проверка и создание таблицы для токенов восстановления пароля
-    this.initPasswordResetTable();
+
   }
 
-  // Инициализация таблицы для токенов восстановления пароля
-  private async initPasswordResetTable(): Promise<void> {
-    try {
-      await ensurePasswordResetTableExists(this.dbPool);
-    } catch (error) {
-      console.error('Fehler bei der Initialisierung der Passwort-Reset-Tabelle:', error);
-    }
-  }
+
 
   async createOrUpdateUser(req: Request, res: Response): Promise<void> {
     await createOrUpdateUser(this.db, req, res);

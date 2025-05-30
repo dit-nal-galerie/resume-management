@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from '../../../interfaces/User';
+import { useTranslation } from 'react-i18next'; // <-- Hinzugefügt
 
 interface AnredeOption {
   id: number;
@@ -13,12 +14,13 @@ interface ProfileFormProps {
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onChange }) => {
-  console.log('ProfileForm', formData.anrede, anredeOptions);  
+  const { t } = useTranslation(); // <-- Hinzugefügt
+
   return (
     <div className="space-y-4">
       <div>
         <label htmlFor="anrede" className="block text-sm font-medium text-gray-700">
-          Anrede
+          {t('profile.title')}
         </label>
         <select
           id="anrede"
@@ -26,7 +28,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
           onChange={(e) => onChange('anrede', Number(e.target.value))}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
-          <option value="">Bitte wählen</option>
+          <option value="">{t('common.required')}</option>
           {anredeOptions.map((option) => (
             <option key={option.id} value={option.id}>
               {option.text}
@@ -36,7 +38,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
       </div>
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Name
+          {t('profile.name')}
         </label>
         <input
           type="text"
@@ -44,12 +46,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
           value={formData.name}
           onChange={(e) => onChange('name', e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Name eingeben"
+          placeholder={t('profile.name')}
         />
       </div>
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          E-Mail
+          {t('profile.email')}
         </label>
         <input
           type="email"
@@ -57,12 +59,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
           value={formData.email}
           onChange={(e) => onChange('email', e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="E-Mail eingeben"
+          placeholder={t('profile.email')}
         />
       </div>
       <div>
         <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-          Stadt
+          {t('profile.city')}
         </label>
         <input
           type="text"
@@ -70,13 +72,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
           value={formData.city}
           onChange={(e) => onChange('city', e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Stadt eingeben"
+          placeholder={t('profile.city')}
         />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="street" className="block text-sm font-medium text-gray-700">
-            Straße
+            {t('profile.street')}
           </label>
           <input
             type="text"
@@ -84,12 +86,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             value={formData.street}
             onChange={(e) => onChange('street', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Straße eingeben"
+            placeholder={t('profile.street')}
           />
         </div>
         <div>
           <label htmlFor="houseNumber" className="block text-sm font-medium text-gray-700">
-            Hausnummer
+            {t('profile.houseNumber')}
           </label>
           <input
             type="text"
@@ -97,13 +99,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             value={formData.houseNumber}
             onChange={(e) => onChange('houseNumber', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Hausnummer eingeben"
+            placeholder={t('profile.houseNumber')}
           />
         </div>
       </div>
       <div>
         <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">
-          Postleitzahl
+          {t('profile.postalCode')}
         </label>
         <input
           type="text"
@@ -111,12 +113,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
           value={formData.postalCode}
           onChange={(e) => onChange('postalCode', e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Postleitzahl eingeben"
+          placeholder={t('profile.postalCode')}
         />
       </div>
       <div>
         <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-          Telefon
+          {t('profile.phone')}
         </label>
         <input
           type="text"
@@ -124,12 +126,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
           value={formData.phone}
           onChange={(e) => onChange('phone', e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Telefonnummer eingeben"
+          placeholder={t('profile.phone')}
         />
       </div>
       <div>
         <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
-          Handy
+          {t('profile.mobile')}
         </label>
         <input
           type="text"
@@ -137,7 +139,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
           value={formData.mobile}
           onChange={(e) => onChange('mobile', e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Handynummer eingeben"
+          placeholder={t('profile.mobile')}
         />
       </div>
     </div>

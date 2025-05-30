@@ -10,9 +10,10 @@ import { Menu, MenuButton } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 
-const storedUser: User = loadUserFromStorage();
+
 
 const ResumeList: React.FC = () => {
+  const storedUser: User = loadUserFromStorage();
   const [userLoginName, setUserLoginName] = useState(storedUser.name ||storedUser.loginname);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // Umbenannt, um klarer zu sein
