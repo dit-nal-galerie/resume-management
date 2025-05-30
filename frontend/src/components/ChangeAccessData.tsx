@@ -48,7 +48,7 @@ const handleBack = () => {
 
 
   return (
-  <>
+ <form  className="max-w-md mx-auto p-6 bg-white rounded shadow space-y-4">
       <h2 className="text-xl font-bold">Zugangsdaten ändern</h2>
 
       {/* Loginname */}
@@ -121,6 +121,7 @@ const handleBack = () => {
               placeholder="Passwort wiederholen"
             />
           </div>
+          
         </>
       )}
 
@@ -155,7 +156,7 @@ const handleBack = () => {
             Zurück
           </button>
       </div>
-    </>
+   </form> 
   );
 };
 
