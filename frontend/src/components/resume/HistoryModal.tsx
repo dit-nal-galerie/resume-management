@@ -5,6 +5,7 @@ import { HistoryEntry } from '../../../../interfaces/histori';
 import DatePicker from 'react-datepicker';
 import { StatusModalProps } from './ResumeEditModals.types';
 import { useTranslation } from 'react-i18next';
+import { FormField, inputClasses } from '../ui/FormField';
 
 interface StateOption {
   stateid: number;
@@ -59,7 +60,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
       onClose();
     } catch (err) {
       console.error(t('resume.edit.saveError'), err);
-      alert(err instanceof Error ? err.message : t('common.error'));
+      alert(err instanceof Error ? t(err.message) : t('common.error'));
     }
   };
 
@@ -77,7 +78,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
             <table className="w-full border-t">
               <thead>
                 <tr>
-                  <th className="text-left py-2 border-b">{t('resume.list.status')}</th>
+                  <th className="text-left py-2 border-b">{t('common.status')}</th>
                   <th className="text-left py-2 border-b">{t('resume.history.date')}</th>
                 </tr>
               </thead>
@@ -93,24 +94,24 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
           )}
           {currentStateId > -1 && (
             <>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('resume.history.date')}</label>
+              <FormField label={t('resume.history.date')} htmlFor="history-date">
                 <DatePicker
+                  id="history-date"
                   selected={selectedDate}
                   onChange={(date) => setSelectedDate(date)}
-                  className="w-full border rounded-md p-2"
+                  className={inputClasses}
                   dateFormat="dd.MM.yyyy"
                 />
-              </div>
+              </FormField>
 
-              <div className="mb-6">
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">{t('resume.list.status')}</label>
+              <FormField label={t('common.status')} htmlFor="status">
                 <select
                   id="status"
                   name="status"
                   value={selectedState}
                   onChange={(e) => setSelectedState(Number(e.target.value))}
-                  className="w-full border rounded-md p-2"
+                  className={inputClasses}
+                  aria-label={t('common.status')}
                 >
                   {states.map((s) => (
                     <option key={s.stateid} value={s.stateid}>
@@ -118,7 +119,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
                     </option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             </>
           )}
           <div className="flex justify-end gap-2">
@@ -132,7 +133,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
               <button
                 onClick={handleChangeStatus}
                 className={`px-4 py-2 rounded text-white ${isChangeEnabled ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
-                }`}
+                  }`}
                 disabled={!isChangeEnabled}
               >
                 {t('resume.edit.title')}

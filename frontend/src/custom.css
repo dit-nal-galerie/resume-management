@@ -1,9 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
-    background-color: #f5f5f5; /* Цвет фона */
-  }
-  
-  .table {
-    font-size: 16px;
-    color: #333; /* Цвет текста в таблице */
-  }
-  
+  background-color: #f5f5f5;
+  /* Цвет фона */
+}
+
+.table {
+  font-size: 16px;
+  color: #333;
+  /* Цвет текста в таблице */
+}
+
+.custom-menu {
+  top: var(--menu-top, 0px);
+  left: var(--menu-left, 0px);
+  z-index: 9999;
+}

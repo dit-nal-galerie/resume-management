@@ -1,6 +1,10 @@
 import React from 'react';
 import { User } from '../../../interfaces/User';
 import { useTranslation } from 'react-i18next';
+import { FormField } from 'components/ui/FormField';
+
+
+// Wiederverwendbare FormField-Komponente
 
 
 interface LoginFormProps {
@@ -21,13 +25,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
   readonlyLoginname = false,
   showPassword2 = false,
 }) => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   return (
-    <div className="space-y-4">
-      <div>
-        <label htmlFor="loginname" className="block text-sm font-medium text-gray-700">
-          {t('profileEdit.loginname')}
-        </label>
+    <div className="max-w-3xl mx-auto p-8 bg-white rounded-xl shadow-lg border border-gray-100">
+
+      <FormField label={t('profileEdit.loginname')} htmlFor="loginname">
         <input
           type="text"
           id="loginname"
@@ -37,11 +39,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           placeholder={t('login.usernamePlaceholder')}
         />
-      </div>
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          {t('login.password')}
-        </label>
+      </FormField>
+      <FormField label={t('login.password')} htmlFor="password">
         <input
           type="password"
           id="password"
@@ -50,12 +49,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           placeholder={t('login.passwordPlaceholder')}
         />
-      </div>
+      </FormField>
       {showPassword2 && (
-        <div>
-          <label htmlFor="password2" className="block text-sm font-medium text-gray-700">
-            {t('profileEdit.password2')}
-          </label>
+        <FormField label={t('profileEdit.password2')} htmlFor="password2">
           <input
             type="password"
             id="password2"
@@ -64,7 +60,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             placeholder={t('passwordReset.confirmPasswordPlaceholder')}
           />
-        </div>
+        </FormField>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
-
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface CompanySectionProps {
   title: string;
@@ -19,26 +19,27 @@ const CompanySection: React.FC<CompanySectionProps> = ({
   onRemove,
   onCreate,
 }) => {
+  const { t } = useTranslation();
   const exists = name !== null;
 
   return (
     <div className="mb-4 p-4 bg-gray-200 rounded-lg">
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-gray-700">{name || "Nicht angegeben"}</p>
+      <p className="text-gray-700">{name || t("company.notSpecified")}</p>
       <div className="flex space-x-2 mt-2">
         {exists ? (
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-2 rounded-md"
             onClick={onEdit}
           >
-            Bearbeiten
+            {t("common.edit")}
           </button>
         ) : (
           <button
             className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-2 rounded-md"
             onClick={onCreate}
           >
-            Neu erstellen
+            {t("company.createNew")}
           </button>
         )}
 
@@ -46,7 +47,7 @@ const CompanySection: React.FC<CompanySectionProps> = ({
           className="bg-green-500 hover:bg-green-700 text-white px-3 py-2 rounded-md"
           onClick={onSelect}
         >
-          Auswahl
+          {t("company.select.select")}
         </button>
 
         {exists && onRemove && (
@@ -54,7 +55,7 @@ const CompanySection: React.FC<CompanySectionProps> = ({
             className="bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-md"
             onClick={onRemove}
           >
-            Entfernen
+            {t("common.delete")}
           </button>
         )}
       </div>

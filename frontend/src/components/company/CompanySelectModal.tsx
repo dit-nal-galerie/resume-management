@@ -1,7 +1,8 @@
 // components/CompanySelectModal.tsx
 import React from 'react';
-import Modal from '../Modal';
+
 import { Company } from '../../../../interfaces/Company';
+import Modal from 'components/ui/Modal';
 interface CompanySelectModalProps {
   isOpen: boolean;
   onClose: () => void;

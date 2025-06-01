@@ -4,7 +4,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { changeResumeStatus, getStates } from "../../services/api";
 import { StatusModalProps } from "./ResumeEditModals.types";
-
+import { useTranslation } from "react-i18next";
+import { FormField, inputClasses } from "../ui/FormField";
 
 interface StateOption {
   stateid: number;
@@ -17,34 +18,32 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   resumeId,
   refId,
   resumeTitle,
-  currentStateId, 
-  onStatusChanged
+  currentStateId,
+  onStatusChanged,
 }) => {
+  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [states, setStates] = useState<StateOption[]>([]);
   const [selectedState, setSelectedState] = useState<number>(currentStateId);
 
   useEffect(() => {
-
-      getStates().then(setStates).catch(console.error);
-      //setSelectedState(resumeTitle === "Neu" ? 1 : 2);
-      setSelectedDate(new Date());
-
+    getStates().then(setStates).catch(console.error);
+    setSelectedDate(new Date());
   }, [resumeId]);
-const handleChangeStatus = async () => {
-  if (!selectedDate) return alert("Bitte ein Datum wählen.");
 
-  try {
-    const formattedDate = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-    await changeResumeStatus(resumeId, refId, selectedState, formattedDate);
-    if (onStatusChanged) onStatusChanged();
-    onClose();
-  } catch (err) {
-    console.error("❌ Fehler beim Ändern des Status:", err);
-    alert(err instanceof Error ? err.message : "Unbekannter Fehler");
-  }
-};
+  const handleChangeStatus = async () => {
+    if (!selectedDate) return alert(t("statusModal.selectDate"));
 
+    try {
+      const formattedDate = selectedDate.toISOString().split("T")[0];
+      await changeResumeStatus(resumeId, refId, selectedState, formattedDate);
+      if (onStatusChanged) onStatusChanged();
+      onClose();
+    } catch (err) {
+      console.error("❌ Fehler beim Ändern des Status:", err);
+      alert(err instanceof Error ? t(err.message) : t("statusModal.unknownError"));
+    }
+  };
 
   const isChangeEnabled = selectedState !== currentStateId;
 
@@ -56,47 +55,49 @@ const handleChangeStatus = async () => {
         <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-10">
           <Dialog.Title className="text-xl font-semibold mb-4">{resumeTitle}</Dialog.Title>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Neues Datum</label>
+          <FormField label={t("statusModal.newDate")} htmlFor="status-date">
             <DatePicker
+              id="status-date"
               selected={selectedDate}
               onChange={(date) => setSelectedDate(date)}
-              className="w-full border rounded-md p-2"
+              className={inputClasses}
               dateFormat="dd.MM.yyyy"
             />
-          </div>
+          </FormField>
 
-          <div className="mb-6">
-           
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Neuer Status</label>
-            <select id="status" name="status"
+          <FormField label={t("statusModal.newStatus")} htmlFor="status">
+            <select
+              id="status"
+              name="status"
               value={selectedState}
               onChange={(e) => setSelectedState(Number(e.target.value))}
-              className="w-full border rounded-md p-2"
+              className={inputClasses}
+              aria-label={t("statusModal.newStatus")}
             >
               {states.map((s) => (
                 <option key={s.stateid} value={s.stateid}>
                   {s.text}
-                </option>   
+                </option>
               ))}
             </select>
-          </div>
+          </FormField>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 mt-4">
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              type="button"
             >
-              Abbrechen
+              {t("common.cancel")}
             </button>
             <button
               onClick={handleChangeStatus}
-              className={`px-4 py-2 rounded text-white ${
-                isChangeEnabled ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
-              }`}
+              className={`px-4 py-2 rounded text-white ${isChangeEnabled ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+                }`}
               disabled={!isChangeEnabled}
+              type="button"
             >
-              Status ändern
+              {t("statusModal.changeStatus")}
             </button>
           </div>
         </div>
