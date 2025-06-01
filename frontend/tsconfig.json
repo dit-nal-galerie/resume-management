@@ -18,9 +18,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+
+    "baseUrl": "src", 
+    "paths": {
+      "@interfaces/*": ["../../interfaces/*"] 
+    }
   },
   "include": [
-    "src", "../../interfaces/**/*.ts"
+    "src",
+    "../../interfaces/**/*.ts" // Behalten Sie dies, damit TypeScript die Dateien zur Typprüfung findet
   ]
 }
