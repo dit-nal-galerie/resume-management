@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import { getResumesWithUsers } from "../services/api";
-import { Resume } from "../../../interfaces/Resume";
-import { loadUserFromStorage } from "../utils/storage";
-import { User } from "../../../interfaces/User";
-import { useNavigate } from "react-router-dom";
-import { HistoryModal } from "./resume/HistoryModal";
-import { StatusModal } from "./resume/StatusModal";
-import { useTranslation } from "react-i18next";
-import PageHeader from "./ui/PageHeader";
-import { PageId } from "./ui/PageId";
-
+import React, { useState, useEffect, useRef } from 'react';
+import { getResumesWithUsers } from '../services/api';
+import { Resume } from '../../../interfaces/Resume';
+import { loadUserFromStorage } from '../utils/storage';
+import { User } from '../../../interfaces/User';
+import { useNavigate } from 'react-router-dom';
+import { HistoryModal } from './resume/HistoryModal';
+import { StatusModal } from './resume/StatusModal';
+import { useTranslation } from 'react-i18next';
+import PageHeader from './ui/PageHeader';
+import { PageId } from './ui/PageId';
 
 const ResumeList: React.FC = () => {
   const { t } = useTranslation();
@@ -25,7 +24,10 @@ const ResumeList: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
 
   const navigate = useNavigate();
 
@@ -34,7 +36,7 @@ const ResumeList: React.FC = () => {
     if (userId) {
       getResumesWithUsers(userId)
         .then((data) => setResumes(data))
-        .catch((err) => console.error(t("resumeList.loadError"), err));
+        .catch((err) => console.error(t('resumeList.loadError'), err));
     }
   }, [refresh, storedUser, t]);
 
@@ -52,8 +54,8 @@ const ResumeList: React.FC = () => {
       }
     };
     if (menuOpen) {
-      setTimeout(() => document.addEventListener("mousedown", handleClick), 0);
-      return () => document.removeEventListener("mousedown", handleClick);
+      setTimeout(() => document.addEventListener('mousedown', handleClick), 0);
+      return () => document.removeEventListener('mousedown', handleClick);
     }
   }, [menuOpen]);
   // Position menu below button
@@ -71,8 +73,8 @@ const ResumeList: React.FC = () => {
       if (menuOpen) setMenuOpen(false);
     };
     if (menuOpen) {
-      setTimeout(() => document.addEventListener("mousedown", handleClick), 0);
-      return () => document.removeEventListener("mousedown", handleClick);
+      setTimeout(() => document.addEventListener('mousedown', handleClick), 0);
+      return () => document.removeEventListener('mousedown', handleClick);
     }
   }, [menuOpen]);
 
@@ -90,51 +92,47 @@ const ResumeList: React.FC = () => {
     setSelectedResume(null);
   };
 
-
-  const pageTitle = `${t("resumeList.title")} - ${userLoginName}`;
+  const pageTitle = `${t('resumeList.title')} - ${userLoginName}`;
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
       <PageHeader pageTitle={pageTitle} pageId={PageId.ResumeList} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         {resumes.map((resume) => (
-          <div
-            key={resume.resumeId}
-            className="p-4 bg-gray-100 rounded-lg shadow-md relative"
-          >
+          <div key={resume.resumeId} className="relative rounded-lg bg-gray-100 p-4 shadow-md">
             <h3 className="text-lg font-semibold">{resume.position}</h3>
             <p className="text-gray-600">
-              {t("resumeList.company")}: {resume.company?.name}
+              {t('resumeList.company')}: {resume.company?.name}
             </p>
             <p className="text-gray-600">
-              {t("resumeList.recruiting")}: {resume.recrutingCompany?.name}
+              {t('resumeList.recruiting')}: {resume.recrutingCompany?.name}
             </p>
             <p className="text-gray-600">
-              {t("common.status")}: {resume.stateText}
+              {t('common.status')}: {resume.stateText}
             </p>
-            <p className="text-gray-500 text-sm">
-              {t("resumeList.createdAt")}: {resume.created}
+            <p className="text-sm text-gray-500">
+              {t('resumeList.createdAt')}: {resume.created}
             </p>
 
-            <div className="sticky bottom-0 flex space-x-2 mt-4">
+            <div className="sticky bottom-0 mt-4 flex space-x-2">
               <button
                 onClick={() => navigate(`/resume/${resume.resumeId}`)}
-                className="bg-green-500 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+                className="rounded-md bg-green-500 px-3 py-1 text-white hover:bg-green-700"
               >
-                {t("resumeList.viewEdit")}
+                {t('resumeList.viewEdit')}
               </button>
               <button
                 onClick={() => openStatusModal(resume)}
-                className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded-md"
+                className="rounded-md bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-700"
               >
-                {t("resumeList.changeStatus")}
+                {t('resumeList.changeStatus')}
               </button>
               {resume && resume.resumeId > 0 && (
                 <button
                   onClick={() => openHistoryModal(resume)}
-                  className="bg-gray-600 hover:bg-gray-800 text-white px-3 py-1 rounded-md"
+                  className="rounded-md bg-gray-600 px-3 py-1 text-white hover:bg-gray-800"
                 >
-                  {t("resumeList.history")}
+                  {t('resumeList.history')}
                 </button>
               )}
             </div>
@@ -147,7 +145,7 @@ const ResumeList: React.FC = () => {
           onClose={closeHistoryModal}
           resumeId={selectedResume.resumeId}
           refId={storedUser.loginid}
-          resumeTitle={selectedResume.position || ""}
+          resumeTitle={selectedResume.position || ''}
           currentStateId={selectedResume.stateId || 0}
         />
       )}
@@ -159,7 +157,7 @@ const ResumeList: React.FC = () => {
           onClose={() => setIisModalStatusOpen(false)}
           resumeId={selectedResume.resumeId}
           refId={storedUser.loginid}
-          resumeTitle={selectedResume.position || ""}
+          resumeTitle={selectedResume.position || ''}
           currentStateId={selectedResume.stateId || 0}
           onStatusChanged={handleStatusChanged}
         />

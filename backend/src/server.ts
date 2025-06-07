@@ -27,19 +27,25 @@ app.get('/getResumesWithUsers', (req: Request, res: Response) => api.getResumesW
 app.post('/addCompany', (req: Request, res: Response) => api.addCompany(req, res));
 app.get('/companies', (req: Request, res: Response) => api.getCompanies(req, res));
 app.post('/addHistory', (req: Request, res: Response) => api.addHistory(req, res));
-app.get('/getHistoryByResumeId', (req: Request, res: Response) => api.getHistoryByResumeId(req, res));
+app.get('/getHistoryByResumeId', (req: Request, res: Response) =>
+  api.getHistoryByResumeId(req, res)
+);
 app.post('/login', (req: Request, res: Response) => api.login(req, res));
 app.get('/getAnrede', (req: Request, res: Response) => api.getAnrede(req, res));
 app.get('/getStates', (req: Request, res: Response) => api.getStates(req, res));
-app.post('/updateOrCreateResume', (req: Request, res: Response) => api.updateOrCreateResume(req, res));
+app.post('/updateOrCreateResume', (req: Request, res: Response) =>
+  api.updateOrCreateResume(req, res)
+);
 app.get('/resume/:resumeId', (req: Request, res: Response) => api.getResumeById(req, res));
 app.get('/contacts', (req: Request, res: Response) => api.getContacts(req, res));
 app.get('/getResumeById/:resumeId', (req: Request, res: Response) => api.getResumeById(req, res));
-app.post('/changeResumeStatus', (req: Request, res: Response) =>   api.changeResumeStatus(req, res));
-app.post('/changeAccessData', (req: Request, res: Response) =>   api.changeAccessData(req, res));
+app.post('/changeResumeStatus', (req: Request, res: Response) => api.changeResumeStatus(req, res));
+app.post('/changeAccessData', (req: Request, res: Response) => api.changeAccessData(req, res));
 
 // Новые маршруты для восстановления пароля
-app.post('/request-password-reset', (req: Request, res: Response) => api.requestPasswordReset(req, res));
+app.post('/request-password-reset', (req: Request, res: Response) =>
+  api.requestPasswordReset(req, res)
+);
 app.get('/validate-token', (req: Request, res: Response) => api.checkPasswordResetToken(req, res));
 app.post('/reset-password', (req: Request, res: Response) => api.resetPassword(req, res));
 

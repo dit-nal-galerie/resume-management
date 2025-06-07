@@ -4,8 +4,6 @@ import { Anrede, Contact } from '../../../../interfaces/Contact';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
 
-
-
 interface ContactFormModalProps {
   isOpen: boolean;
   contact: Contact;
@@ -13,7 +11,12 @@ interface ContactFormModalProps {
   onClose: () => void;
 }
 
-const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, onSave, onClose }) => {
+const ContactFormModal: React.FC<ContactFormModalProps> = ({
+  isOpen,
+  contact,
+  onSave,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const [contactData, setContactData] = useState<Contact>(contact);
   const [anreden, setAnreden] = useState<Anrede[]>([]);
@@ -38,7 +41,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setContactData(prev => ({ ...prev, [name]: value }));
+    setContactData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleClose = () => {
@@ -54,9 +57,9 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
-        <h2 className="text-xl font-semibold mb-4">{t('contact.edit')}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="relative w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-semibold">{t('contact.edit')}</h2>
         <form className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -66,12 +69,15 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
                   name="anrede"
                   value={contactData.anrede ?? '0'}
                   onChange={(e) =>
-                    setContactData(prev => ({ ...prev, anrede: e.target.value ? Number(e.target.value) : 0 }))
+                    setContactData((prev) => ({
+                      ...prev,
+                      anrede: e.target.value ? Number(e.target.value) : 0,
+                    }))
                   }
                   className={inputClasses}
                   title={t('contact.anrede')}
                 >
-                  {anreden.map(a => (
+                  {anreden.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.text || t('common.select')}
                     </option>
@@ -143,10 +149,18 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, contact, on
             </div>
           </div>
           <div className="mt-6 flex justify-end">
-            <button type="button" className="px-4 py-2 bg-gray-200 rounded-lg mr-2" onClick={handleClose}>
+            <button
+              type="button"
+              className="mr-2 rounded-lg bg-gray-200 px-4 py-2"
+              onClick={handleClose}
+            >
               {t('common.cancel')}
             </button>
-            <button type="button" className="px-4 py-2 bg-blue-500 text-white rounded-lg" onClick={handleSave}>
+            <button
+              type="button"
+              className="rounded-lg bg-blue-500 px-4 py-2 text-white"
+              onClick={handleSave}
+            >
               {t('common.save')}
             </button>
           </div>

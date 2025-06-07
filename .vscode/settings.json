@@ -1,9 +1,22 @@
 {
     "git.ignoreLimitWarning": true,
     "editor.formatOnSave": true,
-    "prettier.requireConfig": true,
+    "editor.defaultFormatter":"esbenp.prettier-vscode",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter":  "esbenp.prettier-vscode"
+    },
     "i18n-ally.localesPaths": [
         "./frontend/src/utils/i18n/locales"
+    ],
+    "i18n-ally.enabledFrameworks": [
+        "i18next",
+        "react-i18next"
     ],
     "i18n-ally.sourceLanguage": "en",
     "i18n-ally.enabledParsers": [
@@ -12,5 +25,13 @@
         "js",
         "ts"
     ],
-    "i18n-ally.disablePathParsing": true
+    "i18n-ally.keystyle": "nested",
+    
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "typescript.tsserver.log": "off",
+    "typescript.suggest.autoImports": true,
+    "files.exclude": {
+        "**/node_modules": true
+    }
 }

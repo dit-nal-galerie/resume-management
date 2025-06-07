@@ -3,9 +3,7 @@ import { User } from '../../../interfaces/User';
 import { useTranslation } from 'react-i18next';
 import { FormField } from 'components/ui/FormField';
 
-
 // Wiederverwendbare FormField-Komponente
-
 
 interface LoginFormProps {
   loginname: string;
@@ -27,8 +25,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white rounded-xl shadow-lg border border-gray-100">
-
+    <div className="mx-auto max-w-3xl rounded-xl border border-gray-100 bg-white p-8 shadow-lg">
       <FormField label={t('profileEdit.loginname')} htmlFor="loginname">
         <input
           type="text"

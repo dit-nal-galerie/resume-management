@@ -1,5 +1,5 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CompanySectionProps {
   title: string;
@@ -23,39 +23,39 @@ const CompanySection: React.FC<CompanySectionProps> = ({
   const exists = name !== null;
 
   return (
-    <div className="mb-4 p-4 bg-gray-200 rounded-lg">
+    <div className="mb-4 rounded-lg bg-gray-200 p-4">
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-gray-700">{name || t("company.notSpecified")}</p>
-      <div className="flex space-x-2 mt-2">
+      <p className="text-gray-700">{name || t('company.notSpecified')}</p>
+      <div className="mt-2 flex space-x-2">
         {exists ? (
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-2 rounded-md"
+            className="rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-700"
             onClick={onEdit}
           >
-            {t("common.edit")}
+            {t('common.edit')}
           </button>
         ) : (
           <button
-            className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-2 rounded-md"
+            className="rounded-md bg-yellow-500 px-3 py-2 text-white hover:bg-yellow-700"
             onClick={onCreate}
           >
-            {t("company.createNew")}
+            {t('company.createNew')}
           </button>
         )}
 
         <button
-          className="bg-green-500 hover:bg-green-700 text-white px-3 py-2 rounded-md"
+          className="rounded-md bg-green-500 px-3 py-2 text-white hover:bg-green-700"
           onClick={onSelect}
         >
-          {t("company.select.select")}
+          {t('company.select.select')}
         </button>
 
         {exists && onRemove && (
           <button
-            className="bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-md"
+            className="rounded-md bg-red-500 px-3 py-2 text-white hover:bg-red-700"
             onClick={onRemove}
           >
-            {t("common.delete")}
+            {t('common.delete')}
           </button>
         )}
       </div>

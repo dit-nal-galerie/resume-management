@@ -7,11 +7,18 @@ import { createOrUpdateUser, login, getAnrede, changeAccessData } from './servic
 import { createOrUpdateContact, getContacts } from './services/contactService';
 import { getResumesWithUsers, getStates } from './services/resumeService';
 import { addCompany, getCompanies } from './services/companyService';
-import { addHistory,  getHistoryByResumeId } from './services/historyService';
-import {  updateOrCreateResume } from './services/saveResume';
-import { requestPasswordReset, checkPasswordResetToken, resetPassword } from './services/passwordResetService';
+import { addHistory, getHistoryByResumeId } from './services/historyService';
+import { updateOrCreateResume } from './services/saveResume';
+import {
+  requestPasswordReset,
+  checkPasswordResetToken,
+  resetPassword,
+} from './services/passwordResetService';
 
-import mysqlPromise, { Pool as PromisePool, PoolConnection as PromisePoolConnection } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
+import mysqlPromise, {
+  Pool as PromisePool,
+  PoolConnection as PromisePoolConnection,
+} from 'mysql2/promise'; // Hauptsächlich diesen verwenden
 import { changeResumeStatus, getResumeById } from './services/getResume';
 
 class ResumeManagementAPI {
@@ -33,13 +40,9 @@ class ResumeManagementAPI {
       database: config.DB_NAME,
       waitForConnections: true,
       connectionLimit: 10,
-      queueLimit: 0
+      queueLimit: 0,
     });
-    
-
   }
-
-
 
   async createOrUpdateUser(req: Request, res: Response): Promise<void> {
     await createOrUpdateUser(this.db, req, res);

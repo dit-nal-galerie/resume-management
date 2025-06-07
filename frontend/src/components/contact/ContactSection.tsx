@@ -44,21 +44,16 @@ const ContactSection: React.FC<ContactSectionProps> = ({
   }, []);
 
   const exists = contact !== null && contact?.name !== null && contact?.contactid !== undefined;
-  const newContact = contact === null || (contact?.name === null && contact?.contactid === undefined);
+  const newContact =
+    contact === null || (contact?.name === null && contact?.contactid === undefined);
   const canSelect = companyId !== undefined;
 
   const formatName = (kontakt: Contact | null, anreden: Anrede[]): string => {
     if (!kontakt) return t('contact.notSpecified');
-    const gefundeneAnrede = anreden.find(a => a.id === kontakt.anrede);
+    const gefundeneAnrede = anreden.find((a) => a.id === kontakt.anrede);
     const anredeText = gefundeneAnrede ? gefundeneAnrede.text : '';
-    const teile = [
-      anredeText,
-      kontakt.title,
-      kontakt.vorname,
-      kontakt.zusatzname,
-      kontakt.name
-    ];
-    return teile.filter(teil => teil).join(' ');
+    const teile = [anredeText, kontakt.title, kontakt.vorname, kontakt.zusatzname, kontakt.name];
+    return teile.filter((teil) => teil).join(' ');
   };
 
   if (isLoadingAnreden) {
@@ -66,20 +61,20 @@ const ContactSection: React.FC<ContactSectionProps> = ({
   }
 
   return (
-    <div className="mb-4 p-4 bg-gray-200 rounded-lg">
+    <div className="mb-4 rounded-lg bg-gray-200 p-4">
       <h3 className="text-lg font-semibold">{title}</h3>
       <p className="text-gray-700">{formatName(contact, anredenListe)}</p>
-      <div className="flex space-x-2 mt-2">
+      <div className="mt-2 flex space-x-2">
         {exists ? (
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white px-3 py-2 rounded-md"
+            className="rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-700"
             onClick={onEdit}
           >
             {t('common.edit')}
           </button>
         ) : newContact && companyId !== undefined && companyId === 0 ? (
           <button
-            className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-2 rounded-md"
+            className="rounded-md bg-yellow-500 px-3 py-2 text-white hover:bg-yellow-700"
             onClick={onCreate}
           >
             {t('contact.createNew')}
@@ -88,7 +83,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({
 
         {canSelect && (
           <button
-            className="bg-green-500 hover:bg-green-700 text-white px-3 py-2 rounded-md"
+            className="rounded-md bg-green-500 px-3 py-2 text-white hover:bg-green-700"
             onClick={onSelect}
           >
             {t('contact.select')}
@@ -97,7 +92,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({
 
         {exists && (
           <button
-            className="bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-md"
+            className="rounded-md bg-red-500 px-3 py-2 text-white hover:bg-red-700"
             onClick={onRemove}
           >
             {t('common.delete')}

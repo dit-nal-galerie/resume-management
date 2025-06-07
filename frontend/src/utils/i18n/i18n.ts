@@ -8,11 +8,11 @@ import translationEN from './locales/en/translation.json';
 // the translations
 const resources = {
   de: {
-    translation: translationDE
+    translation: translationDE,
   },
   en: {
-    translation: translationEN
-  }
+    translation: translationEN,
+  },
 };
 
 i18n
@@ -31,7 +31,7 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
-    }
+    },
   });
 
 export default i18n;

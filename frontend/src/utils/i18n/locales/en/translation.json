@@ -277,5 +277,86 @@
       "Freelancers and recruiters",
       "Small businesses without expensive applicant tracking systems"
     ]
+  },
+  "backend": {
+    "error": {
+      "validation": {
+        "missingFields": "All required fields must be filled in.",
+        "missingRequiredFields": "Required fields are missing.",
+        "missingUserId": "Missing user ID.",
+        "missingResumeData": "Missing required resume data (ref, position, stateId).",
+        "missingParameters": "Missing parameters.",
+        "missingLoginIdOrRecruiter": "Missing parameters: loginId and/or isRecruter.",
+        "missingRefOrCompany": "Missing parameters: ref and/or company.",
+        "invalidResumeId": "Invalid or missing resume ID.",
+        "missingData": "Missing data.",
+        "passwordMismatch": "New passwords do not match.",
+        "missingToken": "Token is required",
+        "invalidToken": "Invalid or expired token",
+        "missingTokenOrPassword": "Token and new password are required",
+        "passwordTooShort": "The password must be at least 2 characters long"
+      },
+      "auth": {
+        "wrongPassword": "Incorrect password.",
+        "oldPasswordWrong": "Old password is incorrect.",
+        "authNotFound": "Authentication not found.",
+        "noPermission": "No permission."
+      },
+      "notFound": {
+        "userNotFound": "User not found.",
+        "resumeNotFound": "Resume not found.",
+        "applicationNotFound": "Application not found.",
+        "userInfoNotFound": "User information not found."
+      },
+      "conflict": {
+        "emailTaken": "Email is already taken.",
+        "loginOrEmailTaken": "Login name or email is already taken.",
+        "statusAlreadySet": "Status is already set."
+      },
+      "server": {
+        "serverError": "Server error.",
+        "internalServerError": "Internal server error.",
+        "loadingUserDataError": "Error loading user data.",
+        "updateError": "Error updating data.",
+        "uniquenessCheckError": "Error checking uniqueness.",
+        "creationError": "Error creating entry.",
+        "credentialChangeError": "Server error while changing credentials.",
+        "companyAddError": "Error adding company.",
+        "fetchCompaniesError": "Error fetching companies.",
+        "fetchContactsError": "Error fetching contacts.",
+        "resumeFetchError": "Server error retrieving resume.",
+        "historyAddError": "Error adding history.",
+        "tokenCreationError": "Unable to create token",
+        "tokenUpdateError": "Error updating token status"
+      }
+    },
+    "success": {
+      "user": {
+        "created": "User successfully created.",
+        "dataUpdated": "User data successfully updated."
+      },
+      "company": {
+        "added": "Company successfully added."
+      },
+      "history": {
+        "added": "History successfully added."
+      },
+      "status": {
+        "changed": "Status successfully changed."
+      },
+      "contact": {
+        "added": "Contact successfully added.",
+        "updated": "Contact successfully updated."
+      },
+      "resume": {
+        "created": "Resume successfully created.",
+        "updated": "Resume successfully updated."
+      },
+      "passwordReset": {
+        "emailSent": "If an account exists with this data, we have sent an email with instructions to reset your password.",
+        "validToken": "Token is valid",
+        "passwordChanged": "Password has been successfully reset"
+      }
+    }
   }
 }

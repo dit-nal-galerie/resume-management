@@ -5,7 +5,6 @@ import { FormField, inputClasses, ProfileFormProps } from '../ui/FormField';
 
 // Schnittstelle für die Anrede-Optionen
 
-
 /**
  * Wiederverwendbare FormField-Komponente für konsistentes Label- und Input-Layout.
  * Verbessert die Ergonomie durch einheitliches Styling und Struktur.
@@ -18,7 +17,6 @@ import { FormField, inputClasses, ProfileFormProps } from '../ui/FormField';
  */
 
 // Schnittstelle für die ProfileFormProps
-
 
 /**
  * ProfileForm Komponente zur Anzeige und Bearbeitung von Benutzerprofildaten.
@@ -36,14 +34,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
   // Gemeinsame Tailwind-Klassen für Input- und Select-Felder
   // Verbesserter Fokus-Ring und Hover-Effekt für bessere Interaktion
 
-
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white rounded-xl shadow-lg border border-gray-100">
+    <div className="mx-auto max-w-3xl rounded-xl border border-gray-100 bg-white p-8 shadow-lg">
       {/* <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
         {t('profile.title')}
       </h2> */}
 
-      <div className="space-y-6"> {/* Einheitlicher vertikaler Abstand zwischen den Hauptfeldern */}
+      <div className="space-y-6">
+        {' '}
+        {/* Einheitlicher vertikaler Abstand zwischen den Hauptfeldern */}
         <FormField label={t('contact.anrede')} htmlFor="anrede">
           <select
             id="anrede"
@@ -60,7 +59,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             ))}
           </select>
         </FormField>
-
         <FormField label={t('common.name')} htmlFor="name">
           <input
             type="text"
@@ -71,7 +69,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             placeholder={t('common.name')}
           />
         </FormField>
-
         <FormField label={t('profile.email')} htmlFor="email">
           <input
             type="email"
@@ -82,7 +79,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             placeholder={t('profile.email')}
           />
         </FormField>
-
         <FormField label={t('profile.city')} htmlFor="city">
           <input
             type="text"
@@ -93,9 +89,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             placeholder={t('profile.city')}
           />
         </FormField>
-
         {/* Gruppe für Straße und Hausnummer mit responsivem Gitter */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <FormField label={t('profile.street')} htmlFor="street">
             <input
               type="text"
@@ -118,7 +113,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             />
           </FormField>
         </div>
-
         <FormField label={t('profile.postalCode')} htmlFor="postalCode">
           <input
             type="text"
@@ -129,7 +123,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             placeholder={t('profile.postalCode')}
           />
         </FormField>
-
         <FormField label={t('profile.phone')} htmlFor="phone">
           <input
             type="text"
@@ -140,7 +133,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             placeholder={t('profile.phone')}
           />
         </FormField>
-
         <FormField label={t('profile.mobile')} htmlFor="mobile">
           <input
             type="text"

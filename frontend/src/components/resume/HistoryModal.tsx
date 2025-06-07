@@ -19,7 +19,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
   refId,
   resumeTitle,
   currentStateId,
-  onStatusChanged
+  onStatusChanged,
 }) => {
   const { t } = useTranslation();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -54,7 +54,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
     if (!selectedDate) return alert(t('validation.required'));
 
     try {
-      const formattedDate = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+      const formattedDate = selectedDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
       await changeResumeStatus(resumeId, refId, selectedState, formattedDate);
       if (onStatusChanged) onStatusChanged();
       onClose();
@@ -65,10 +65,10 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
   };
 
   return (
-    <Dialog open={true} onClose={onClose} className="fixed z-50 inset-0 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-30 p-4">
-        <Dialog.Panel className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
-          <Dialog.Title className="text-xl font-bold mb-4">{resumeTitle}</Dialog.Title>
+    <Dialog open={true} onClose={onClose} className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex min-h-screen items-center justify-center bg-black bg-opacity-30 p-4">
+        <Dialog.Panel className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
+          <Dialog.Title className="mb-4 text-xl font-bold">{resumeTitle}</Dialog.Title>
 
           {loading ? (
             <p className="text-gray-500">{t('common.loading')}</p>
@@ -78,8 +78,8 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
             <table className="w-full border-t">
               <thead>
                 <tr>
-                  <th className="text-left py-2 border-b">{t('common.status')}</th>
-                  <th className="text-left py-2 border-b">{t('resume.history.date')}</th>
+                  <th className="border-b py-2 text-left">{t('common.status')}</th>
+                  <th className="border-b py-2 text-left">{t('resume.history.date')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -123,21 +123,22 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
             </>
           )}
           <div className="flex justify-end gap-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
+            <button onClick={onClose} className="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400">
               {t('common.cancel')}
             </button>
             {currentStateId > -1 && (
               <button
                 onClick={handleChangeStatus}
-                className={`px-4 py-2 rounded text-white ${isChangeEnabled ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
-                  }`}
+                className={`rounded px-4 py-2 text-white ${
+                  isChangeEnabled
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'cursor-not-allowed bg-gray-400'
+                }`}
                 disabled={!isChangeEnabled}
               >
                 {t('resume.edit.title')}
-              </button>)}
+              </button>
+            )}
           </div>
         </Dialog.Panel>
       </div>

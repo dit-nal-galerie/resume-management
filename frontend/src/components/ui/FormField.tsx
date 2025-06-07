@@ -1,4 +1,4 @@
-import { User } from "@interfaces/User";
+import { User } from '@interfaces/User';
 
 export interface AnredeOption {
   id: number;
@@ -17,9 +17,10 @@ export interface ProfileFormProps {
   anredeOptions: AnredeOption[];
   onChange: (field: keyof User, value: string | number) => void;
 }
-export const inputClasses = "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition duration-200 ease-in-out text-gray-800 placeholder-gray-400";
+export const inputClasses =
+  'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition duration-200 ease-in-out text-gray-800 placeholder-gray-400';
 export const FormField: React.FC<FormFieldProps> = ({ label, htmlFor, children }) => {
-  const labelClasses = "block text-sm font-medium text-gray-700 mb-1";
+  const labelClasses = 'block text-sm font-medium text-gray-700 mb-1';
   return (
     <div>
       <label htmlFor={htmlFor} className={labelClasses}>

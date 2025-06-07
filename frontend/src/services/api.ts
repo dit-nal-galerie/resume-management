@@ -1,6 +1,6 @@
 const API_URL = 'http://localhost:3001';
 import { User } from '../../../interfaces/User';
-import { Resume } from "../../../interfaces/Resume";
+import { Resume } from '../../../interfaces/Resume';
 
 // Create or update user
 export const createOrUpdateUser = async (userData: User): Promise<string> => {
@@ -13,7 +13,7 @@ export const createOrUpdateUser = async (userData: User): Promise<string> => {
   });
 
   if (!response.ok) {
-    throw new Error("api.error.user_update_failed");
+    throw new Error('api.error.user_update_failed');
   }
 
   return await response.text();
@@ -26,7 +26,10 @@ interface ApiResponse {
 }
 
 // Request password reset
-export const requestPasswordReset = async (loginname: string, email: string): Promise<ApiResponse> => {
+export const requestPasswordReset = async (
+  loginname: string,
+  email: string
+): Promise<ApiResponse> => {
   try {
     const response = await fetch(`${API_URL}/request-password-reset`, {
       method: 'POST',
@@ -39,7 +42,7 @@ export const requestPasswordReset = async (loginname: string, email: string): Pr
     if (!response.ok) {
       return {
         success: false,
-        error: "api.error.server"
+        error: 'api.error.server',
       };
     }
 
@@ -48,7 +51,7 @@ export const requestPasswordReset = async (loginname: string, email: string): Pr
   } catch (error) {
     return {
       success: false,
-      error: "api.error.server"
+      error: 'api.error.server',
     };
   }
 };
@@ -67,7 +70,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
     if (!response.ok) {
       return {
         success: false,
-        error: "api.error.password_reset_failed"
+        error: 'api.error.password_reset_failed',
       };
     }
 
@@ -76,7 +79,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
   } catch (error) {
     return {
       success: false,
-      error: "api.error.password_reset_failed"
+      error: 'api.error.password_reset_failed',
     };
   }
 };
@@ -87,7 +90,7 @@ export const validateToken = async (token: string): Promise<ApiResponse> => {
     if (!token) {
       return {
         success: false,
-        error: "api.error.token_required"
+        error: 'api.error.token_required',
       };
     }
 
@@ -95,13 +98,13 @@ export const validateToken = async (token: string): Promise<ApiResponse> => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
     });
 
     if (!response.ok) {
       return {
         success: false,
-        error: "api.error.token_invalid"
+        error: 'api.error.token_invalid',
       };
     }
 
@@ -110,7 +113,7 @@ export const validateToken = async (token: string): Promise<ApiResponse> => {
   } catch (error) {
     return {
       success: false,
-      error: "api.error.token_invalid"
+      error: 'api.error.token_invalid',
     };
   }
 };
@@ -126,7 +129,7 @@ export const login = async (loginname: string, password: string) => {
   });
 
   if (!response.ok) {
-    throw new Error("api.error.login_failed");
+    throw new Error('api.error.login_failed');
   }
 
   return await response.json();
@@ -143,7 +146,7 @@ export const getUserData = async (loginid: number): Promise<User[]> => {
   });
 
   if (!response.ok) {
-    throw new Error("api.error.user_fetch_failed");
+    throw new Error('api.error.user_fetch_failed');
   }
 
   return await response.json();
@@ -152,7 +155,7 @@ export const getUserData = async (loginid: number): Promise<User[]> => {
 // Update user data
 export const updateUserData = async (loginId: number, userData: User): Promise<string> => {
   if (!loginId) {
-    throw new Error("api.error.user_update_failed");
+    throw new Error('api.error.user_update_failed');
   }
 
   const requestBody: any = {
@@ -173,16 +176,16 @@ export const updateUserData = async (loginId: number, userData: User): Promise<s
   }
 
   const response = await fetch(`${API_URL}/createOrUpdateUser`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
-    throw new Error("api.error.user_update_failed");
+    throw new Error('api.error.user_update_failed');
   }
 
-  localStorage.setItem("user", JSON.stringify(userData));
+  localStorage.setItem('user', JSON.stringify(userData));
   return await response.text();
 };
 
@@ -196,27 +199,27 @@ export const getAnrede = async (): Promise<{ id: number; text: string }[]> => {
   });
 
   if (!response.ok) {
-    throw new Error("api.error.anrede_fetch_failed");
+    throw new Error('api.error.anrede_fetch_failed');
   }
 
   return await response.json();
 };
 
-import { Contact } from "../../../interfaces/Contact";
+import { Contact } from '../../../interfaces/Contact';
 import { Company } from '../../../interfaces/Company';
 import { HistoryEntry } from '../../../interfaces/histori';
 
 // Fetch resumes with users
 export const getResumesWithUsers = async (userid: number): Promise<any[]> => {
   const response = await fetch(`${API_URL}/getResumesWithUsers?userid=${userid}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
 
   if (!response.ok) {
-    throw new Error("api.error.resume_fetch_failed");
+    throw new Error('api.error.resume_fetch_failed');
   }
 
   return await response.json();
@@ -225,12 +228,12 @@ export const getResumesWithUsers = async (userid: number): Promise<any[]> => {
 // Fetch resume by id
 export const getResumeById = async (id: number): Promise<Resume> => {
   const response = await fetch(`${API_URL}/getResumeById/${id}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
-    throw new Error("api.error.resume_fetch_failed");
+    throw new Error('api.error.resume_fetch_failed');
   }
 
   return await response.json();
@@ -247,19 +250,19 @@ export const updateOrCreateResume = async (resume: Resume): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw new Error("api.error.resume_save_failed");
+    throw new Error('api.error.resume_save_failed');
   }
 };
 
 // Fetch states
 export const getStates = async (): Promise<{ stateid: number; text: string }[]> => {
   const response = await fetch(`${API_URL}/getStates`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
-    throw new Error("api.error.server");
+    throw new Error('api.error.server');
   }
 
   return await response.json();
@@ -270,25 +273,28 @@ export const createOrUpdateContact = async (contact: Contact): Promise<void> => 
   const contactData = { ...contact, contactid: contact.contactid ?? 0 };
 
   const response = await fetch(`${API_URL}/createOrUpdateContact`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(contactData),
   });
 
   if (!response.ok) {
-    throw new Error("api.error.contact_save_failed");
+    throw new Error('api.error.contact_save_failed');
   }
 };
 
 // Fetch companies
 export const getCompanies = async (loginId: number, isRecruter: boolean): Promise<Company[]> => {
-  const response = await fetch(`${API_URL}/companies?loginId=${loginId}&isRecruter=${isRecruter || false}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
+  const response = await fetch(
+    `${API_URL}/companies?loginId=${loginId}&isRecruter=${isRecruter || false}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 
   if (!response.ok) {
-    throw new Error("api.error.company_fetch_failed");
+    throw new Error('api.error.company_fetch_failed');
   }
 
   return await response.json();
@@ -297,19 +303,22 @@ export const getCompanies = async (loginId: number, isRecruter: boolean): Promis
 // Fetch contacts
 export const getContacts = async (loginId: number, companyId: number): Promise<Contact[]> => {
   const response = await fetch(`${API_URL}/contacts?ref=${loginId}&company=${companyId}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
-    throw new Error("api.error.contact_fetch_failed");
+    throw new Error('api.error.contact_fetch_failed');
   }
 
   return await response.json();
 };
 
 // Fetch history by resume id
-export const getHistoryByResumeId = async (resumeId: number, refId: number): Promise<HistoryEntry[]> => {
+export const getHistoryByResumeId = async (
+  resumeId: number,
+  refId: number
+): Promise<HistoryEntry[]> => {
   const url = `${API_URL}/getHistoryByResumeId?resumeId=${resumeId}&refId=${refId}`;
   const response = await fetch(url, {
     method: 'GET',
@@ -319,7 +328,7 @@ export const getHistoryByResumeId = async (resumeId: number, refId: number): Pro
   });
 
   if (!response.ok) {
-    throw new Error("api.error.history_fetch_failed");
+    throw new Error('api.error.history_fetch_failed');
   }
   return response.json();
 };
@@ -333,13 +342,13 @@ export const changeResumeStatus = async (
 ): Promise<void> => {
   const url = `${API_URL}/changeResumeStatus`;
   const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ resumeId, userId, stateId, date }),
   });
 
   if (!response.ok) {
-    throw new Error("api.error.status_change_failed");
+    throw new Error('api.error.status_change_failed');
   }
 };
 
@@ -363,8 +372,8 @@ export const updateAccessData = async (data: {
 
   try {
     const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
 
@@ -373,7 +382,7 @@ export const updateAccessData = async (data: {
     if (!res.ok) {
       return {
         success: false,
-        message: "api.error.access_save_failed",
+        message: 'api.error.access_save_failed',
       };
     }
 
@@ -385,7 +394,7 @@ export const updateAccessData = async (data: {
   } catch (error) {
     return {
       success: false,
-      message: "api.error.server",
+      message: 'api.error.server',
     };
   }
 };

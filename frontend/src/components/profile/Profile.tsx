@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getUserData, updateUserData, createOrUpdateUser, getAnrede } from '../../services/api';
-import { User } from "../../../interfaces/User";
+import { User } from '../../../interfaces/User';
 import { loadUserFromStorage } from '../../utils/storage';
 
-import ProfileForm from "./ProfileForm";
-import LoginForm from "components/login/LoginForm";
-import PageHeader from "components/ui/PageHeader";
-import { PageId } from "components/ui/PageId";
+import ProfileForm from './ProfileForm';
+import LoginForm from 'components/login/LoginForm';
+import PageHeader from 'components/ui/PageHeader';
+import { PageId } from 'components/ui/PageId';
 
 const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
   const { t } = useTranslation();
@@ -40,13 +40,13 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
   // Получение ID пользователя из URL или localStorage
   const getUserId = () => {
     const searchParams = new URLSearchParams(location.search);
-    const loginIdFromUrl = searchParams.get("loginid");
+    const loginIdFromUrl = searchParams.get('loginid');
 
     if (loginIdFromUrl) {
       return parseInt(loginIdFromUrl);
     }
 
-    const userJson = localStorage.getItem("user");
+    const userJson = localStorage.getItem('user');
     if (userJson) {
       const user = JSON.parse(userJson);
       return user.loginid;
@@ -77,11 +77,9 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
     fetchProfile();
   }, []);
 
-
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
@@ -126,15 +124,12 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
 
     const userId = getUserId();
 
-
     try {
       setIsLoading(true);
       if (loginId) {
         await updateUserData(loginId, formData);
-
       } else {
         await createOrUpdateUser(formData);
-
       }
 
       setIsLoading(true);
@@ -149,7 +144,6 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
           navigate('/login');
         }
       }, 3000);
-
     } catch (error) {
       setServerError(t('common.serverError'));
     } finally {
@@ -164,25 +158,26 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
     }));
     console.log('FormData:', { [field]: value });
   };
-  const pageTitle = loginId ? `${t("profile.title")} ${t("common.edit")}` : t("profileEdit.create_profile");
+  const pageTitle = loginId
+    ? `${t('profile.title')} ${t('common.edit')}`
+    : t('profileEdit.create_profile');
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
       <PageHeader pageTitle={pageTitle} pageId={PageId.Profile} />
       <div className="container mx-auto px-4 py-8">
         {isSuccess && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          <div className="mb-4 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
             {t('profile.saveSuccess')}
           </div>
         )}
 
         {serverError && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
             {serverError}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 space-y-6">
-
+        <form onSubmit={handleSubmit} className="space-y-6 rounded-lg bg-white p-6 shadow-md">
           <LoginForm
             loginname={formData.loginname}
             password={formData.password ?? ''}
@@ -197,13 +192,11 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
             onChange={handleFieldChange}
           />
 
-
-
-          <div className="flex justify-between mt-6">
+          <div className="mt-6 flex justify-between">
             <button
               type="button"
               onClick={() => navigate(loginId ? '/resumes' : '/login')}
-              className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+              className="rounded-md bg-gray-500 px-4 py-2 font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
               disabled={isLoading}
             >
               {t('common.cancel')}
@@ -211,8 +204,9 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
 
             <button
               type="submit"
-              className={`bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
-                }`}
+              className={`rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                isLoading ? 'cursor-not-allowed opacity-70' : ''
+              }`}
               disabled={isLoading}
             >
               {isLoading ? t('common.loading') : t('common.save')}

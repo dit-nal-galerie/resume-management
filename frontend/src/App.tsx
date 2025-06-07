@@ -15,7 +15,8 @@ import ChangeAccessData from 'components/profile/ChangeAccessData';
  * Die Haupt-App-Komponente, die das Routing und die globale Layout-Elemente verwaltet.
  * Verwendet React Router Dom v6 für die Navigation.
  */
-const App: React.FC = () => ( // Explizite Typisierung als React.FC ist guter Stil
+const App: React.FC = () => (
+  // Explizite Typisierung als React.FC ist guter Stil
   // BrowserRouter stellt den Routing-Kontext für die gesamte Anwendung bereit.
   <BrowserRouter>
     <Routes>
@@ -39,7 +40,6 @@ const App: React.FC = () => ( // Explizite Typisierung als React.FC ist guter St
 
       {/* Route zum Zurücksetzen des Passworts nach Anforderung */}
       <Route path="/reset-password" element={<ResetPassword />} />
-
     </Routes>
   </BrowserRouter>
 );

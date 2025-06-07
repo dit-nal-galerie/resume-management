@@ -24,16 +24,18 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
   }, [initialData]);
 
   const handleChange = (field: keyof Company, value: string | boolean) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
-        <h2 className="text-xl font-semibold mb-4">
-          {initialData.companyId ? t('company.form.title') + ' ' + t('common.edit') : t('company.select.new')}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="relative w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-semibold">
+          {initialData.companyId
+            ? t('company.form.title') + ' ' + t('common.edit')
+            : t('company.select.new')}
         </h2>
 
         <form className="space-y-4">
@@ -44,7 +46,7 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
                 type="text"
                 className={inputClasses}
                 value={form.name}
-                onChange={e => handleChange('name', e.target.value)}
+                onChange={(e) => handleChange('name', e.target.value)}
                 placeholder={t('common.name')}
               />
             </FormField>
@@ -55,7 +57,7 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
                 type="text"
                 className={inputClasses}
                 value={form.city}
-                onChange={e => handleChange('city', e.target.value)}
+                onChange={(e) => handleChange('city', e.target.value)}
                 placeholder={t('company.form.city')}
               />
             </FormField>
@@ -66,7 +68,7 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
                 type="text"
                 className={inputClasses}
                 value={form.street}
-                onChange={e => handleChange('street', e.target.value)}
+                onChange={(e) => handleChange('street', e.target.value)}
                 placeholder={t('company.form.street')}
               />
             </FormField>
@@ -77,7 +79,7 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
                 type="text"
                 className={inputClasses}
                 value={form.houseNumber}
-                onChange={e => handleChange('houseNumber', e.target.value)}
+                onChange={(e) => handleChange('houseNumber', e.target.value)}
                 placeholder={t('company.form.houseNumber')}
               />
             </FormField>
@@ -89,7 +91,7 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
                   type="text"
                   className={inputClasses}
                   value={form.postalCode}
-                  onChange={e => handleChange('postalCode', e.target.value)}
+                  onChange={(e) => handleChange('postalCode', e.target.value)}
                   placeholder={t('company.form.postalCode')}
                 />
               </FormField>
@@ -99,14 +101,14 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
           <div className="mt-6 flex justify-end space-x-2">
             <button
               type="button"
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg"
+              className="rounded-lg bg-gray-200 px-4 py-2 text-gray-700"
               onClick={onClose}
             >
               {t('common.cancel')}
             </button>
             <button
               type="button"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
               onClick={() => onSave(form)}
             >
               {t('common.save')}

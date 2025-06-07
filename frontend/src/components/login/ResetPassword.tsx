@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { FormField, inputClasses } from "../ui/FormField";
-import PageHeader from "components/ui/PageHeader";
-import { PageId } from "components/ui/PageId";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { FormField, inputClasses } from '../ui/FormField';
+import PageHeader from 'components/ui/PageHeader';
+import { PageId } from 'components/ui/PageId';
 
 const ResetPassword: React.FC = () => {
   const { t } = useTranslation();
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [token, setToken] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ newPassword?: string; confirmPassword?: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
@@ -20,7 +20,7 @@ const ResetPassword: React.FC = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const tokenFromUrl = searchParams.get("token");
+    const tokenFromUrl = searchParams.get('token');
     if (!tokenFromUrl) {
       setServerError(t('passwordReset.invalidToken'));
     } else {
@@ -69,7 +69,7 @@ const ResetPassword: React.FC = () => {
       if (result) {
         setIsSuccess(true);
         setTimeout(() => {
-          navigate("/login");
+          navigate('/login');
         }, 3000);
       } else {
         setServerError(t('common.error'));
@@ -86,20 +86,20 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <PageHeader pageTitle={t('passwordReset.resetTitle')} pageId={PageId.Login} />
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold text-center mb-6">{t('passwordReset.resetTitle')}</h2>
+      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
+        <h2 className="mb-6 text-center text-2xl font-semibold">{t('passwordReset.resetTitle')}</h2>
 
         {isSuccess ? (
           <div className="text-center">
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <div className="mb-4 rounded border border-green-400 bg-green-100 px-4 py-3 text-green-700">
               <p>{t('passwordReset.resetSuccess')}</p>
               <p className="mt-2">{t('passwordReset.redirecting')}</p>
             </div>
             <button
-              onClick={() => navigate("/login")}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+              onClick={() => navigate('/login')}
+              className="rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
             >
               {t('navigation.backToLogin')}
             </button>
@@ -108,7 +108,7 @@ const ResetPassword: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Server error */}
             {serverError && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              <div className="mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
                 {serverError}
               </div>
             )}
@@ -118,15 +118,20 @@ const ResetPassword: React.FC = () => {
               <input
                 id="newPassword"
                 type="password"
-                className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${errors.newPassword ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-                  }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                  errors.newPassword
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder={t('passwordReset.newPasswordPlaceholder')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 onBlur={handleBlur}
                 disabled={isLoading}
               />
-              {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
+              {errors.newPassword && (
+                <p className="mt-1 text-sm text-red-500">{errors.newPassword}</p>
+              )}
             </FormField>
 
             {/* Confirm password */}
@@ -134,23 +139,29 @@ const ResetPassword: React.FC = () => {
               <input
                 id="confirmPassword"
                 type="password"
-                className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 ${errors.confirmPassword ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-                  }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                  errors.confirmPassword
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder={t('passwordReset.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 onBlur={handleBlur}
                 disabled={isLoading}
               />
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-500">{errors.confirmPassword}</p>
+              )}
             </FormField>
 
             {/* Submit button */}
-            <div className="flex justify-between items-center mt-6">
+            <div className="mt-6 flex items-center justify-between">
               <button
                 type="submit"
-                className={`bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-full ${isLoading ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
+                className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                  isLoading ? 'cursor-not-allowed opacity-70' : ''
+                }`}
                 disabled={isLoading || !token}
               >
                 {isLoading ? t('common.loading') : t('passwordReset.resetPassword')}
@@ -158,10 +169,10 @@ const ResetPassword: React.FC = () => {
             </div>
 
             {/* Back to login */}
-            <div className="text-center mt-4">
+            <div className="mt-4 text-center">
               <button
                 type="button"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate('/login')}
                 className="text-blue-500 hover:underline focus:outline-none"
                 disabled={isLoading}
               >

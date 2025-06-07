@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Resume } from '../../../../interfaces/Resume';
 import { User } from '../../../../interfaces/User';
-import { getCompanies, getContacts, getResumeById, getStates, updateOrCreateResume } from '../../services/api';
+import {
+  getCompanies,
+  getContacts,
+  getResumeById,
+  getStates,
+  updateOrCreateResume,
+} from '../../services/api';
 import { loadUserFromStorage } from '../../utils/storage';
 
 import { Company } from '../../../../interfaces/Company';
@@ -17,8 +23,6 @@ import { FormField, inputClasses } from '../ui/FormField';
 import { CompanyFormModal, CompanySection, CompanySelectModal } from 'components/company';
 import PageHeader from 'components/ui/PageHeader';
 import { PageId } from 'components/ui/PageId';
-
-
 
 const ResumeEdit: React.FC = () => {
   const { t } = useTranslation();
@@ -52,15 +56,25 @@ const ResumeEdit: React.FC = () => {
     if (updated) {
       updated.ref = storedUser.loginid;
       updated.anrede = updated.anrede || 0;
-      const tKey = modalSectionContact === "contactCompany" ? "company" : "recrutingCompany";
+      const tKey = modalSectionContact === 'contactCompany' ? 'company' : 'recrutingCompany';
       updated.company = resumeData?.[tKey]?.companyId || 0;
     }
-    setResumeData(rd => rd ? ({ ...rd, [modalSectionContact === "contactCompany" ? "contactCompany" : "contactRecrutingCompany"]: updated }) : rd);
+    setResumeData((rd) =>
+      rd
+        ? {
+            ...rd,
+            [modalSectionContact === 'contactCompany'
+              ? 'contactCompany'
+              : 'contactRecrutingCompany']: updated,
+          }
+        : rd
+    );
   };
   const openSelectContact = async (section: ModalSectionContact) => {
     setModalType('selectContact');
     setModalSectionContact(section);
-    const compId = resumeData?.[section === 'contactCompany' ? 'company' : 'recrutingCompany']?.companyId;
+    const compId =
+      resumeData?.[section === 'contactCompany' ? 'company' : 'recrutingCompany']?.companyId;
     if (!compId) {
       alert(t('resumeEdit.selectCompanyFirst'));
       return;
@@ -70,11 +84,11 @@ const ResumeEdit: React.FC = () => {
     setModalOpen(true);
   };
   const handleRemoveContact = (section: ModalSectionContact) => {
-    const key = section === "contactCompany" ? 'contactCompany' : 'contactRecrutingCompany';
+    const key = section === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
     const contact = resumeData && resumeData[key];
     if (!contact?.contactid) return;
     if (!window.confirm(t('resumeEdit.confirmDeleteContact'))) return;
-    setResumeData(prev => prev ? ({ ...prev, [key]: null }) : prev);
+    setResumeData((prev) => (prev ? { ...prev, [key]: null } : prev));
   };
   const handleOpenEdit = (section: ModalSectionCompany) => {
     setModalType('edit');
@@ -92,15 +106,15 @@ const ResumeEdit: React.FC = () => {
     if (!modalSectionCompany) return;
     comp.isRecruter = modalSectionCompany === 'recrutingCompany';
     comp.companyId = comp.companyId || 0;
-    setResumeData(rd => rd ? { ...rd, [modalSectionCompany]: comp } : rd);
+    setResumeData((rd) => (rd ? { ...rd, [modalSectionCompany]: comp } : rd));
     setModalOpen(false);
   };
   const handleRemoveCompany = (section: ModalSectionCompany) => {
-    setResumeData(rd => rd ? { ...rd, [section]: null } : rd);
+    setResumeData((rd) => (rd ? { ...rd, [section]: null } : rd));
   };
   const handleSelectCompany = (comp: Company) => {
     if (!modalSectionCompany) return;
-    setResumeData(rd => rd ? { ...rd, [modalSectionCompany]: comp } : rd);
+    setResumeData((rd) => (rd ? { ...rd, [modalSectionCompany]: comp } : rd));
     setModalOpen(false);
   };
 
@@ -110,12 +124,12 @@ const ResumeEdit: React.FC = () => {
   useEffect(() => {
     getStates()
       .then(setStatusList)
-      .catch(() => { });
+      .catch(() => {});
 
     if (resumeId && resumeId !== '0') {
       getResumeById(Number(resumeId))
         .then((data) => setResumeData(data))
-        .catch(() => { });
+        .catch(() => {});
     } else {
       setResumeData({
         resumeId: 0,
@@ -158,27 +172,33 @@ const ResumeEdit: React.FC = () => {
   };
 
   const handleView = () => {
-    const tView = JSON.stringify(resumeData?.contactCompany, null, 2) +
-      '\n' + JSON.stringify(resumeData?.contactRecrutingCompany, null, 2);
+    const tView =
+      JSON.stringify(resumeData?.contactCompany, null, 2) +
+      '\n' +
+      JSON.stringify(resumeData?.contactRecrutingCompany, null, 2);
     alert(tView);
   };
 
   if (!resumeData) {
-    return <div className="text-center mt-10">{t('resumeEdit.loading')}</div>;
+    return <div className="mt-10 text-center">{t('resumeEdit.loading')}</div>;
   }
   if (errorMessage) {
-    return <div className="text-red-500 text-center mt-10">{errorMessage}</div>;
+    return <div className="mt-10 text-center text-red-500">{errorMessage}</div>;
   }
 
   const getCurrentContact = () =>
-    modalSectionContact === 'contactCompany' ? resumeData?.contactCompany : resumeData?.contactRecrutingCompany;
+    modalSectionContact === 'contactCompany'
+      ? resumeData?.contactCompany
+      : resumeData?.contactRecrutingCompany;
   const getCurrentCompanyId = () =>
-    modalSectionContact === 'contactCompany' ? resumeData?.company?.companyId : resumeData?.recrutingCompany?.companyId;
+    modalSectionContact === 'contactCompany'
+      ? resumeData?.company?.companyId
+      : resumeData?.recrutingCompany?.companyId;
   const title = resumeData.resumeId === 0 ? t('resumeEdit.createTitle') : t('resumeEdit.editTitle');
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
       <PageHeader pageTitle={title} pageId={PageId.ResumeEdit} />
-      <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
+      <div className="mx-auto max-w-3xl rounded-lg bg-white p-6 shadow-md">
         {/* <h2 className="text-2xl font-semibold mb-6 text-gray-800">
         {resumeData.resumeId === 0 ? t('resumeEdit.createTitle') : t('resumeEdit.editTitle')}
       </h2> */}
@@ -242,7 +262,7 @@ const ResumeEdit: React.FC = () => {
           <input
             type="text"
             id="created"
-            className={`${inputClasses} bg-gray-100 cursor-not-allowed`}
+            className={`${inputClasses} cursor-not-allowed bg-gray-100`}
             value={resumeData.created}
             readOnly
           />
@@ -289,16 +309,18 @@ const ResumeEdit: React.FC = () => {
         <CompanyFormModal
           isOpen={modalOpen && modalType === 'edit'}
           onClose={() => setModalOpen(false)}
-          initialData={modalSectionCompany && resumeData[modalSectionCompany] || {
-            companyId: 0,
-            name: '',
-            city: '',
-            street: '',
-            houseNumber: '',
-            postalCode: '',
-            isRecruter: false,
-            ref: storedUser.loginid,
-          }}
+          initialData={
+            (modalSectionCompany && resumeData[modalSectionCompany]) || {
+              companyId: 0,
+              name: '',
+              city: '',
+              street: '',
+              houseNumber: '',
+              postalCode: '',
+              isRecruter: false,
+              ref: storedUser.loginid,
+            }
+          }
           onSave={handleSaveCompany}
         />
         <CompanySelectModal
@@ -308,19 +330,21 @@ const ResumeEdit: React.FC = () => {
           onSelect={handleSelectCompany}
         />
         <ContactFormModal
-          contact={getCurrentContact() || {
-            contactid: 0,
-            vorname: '',
-            name: '',
-            email: '',
-            anrede: 0,
-            title: '',
-            zusatzname: '',
-            phone: '',
-            mobile: '',
-            company: getCurrentCompanyId() || 0,
-            ref: resumeData.ref,
-          }}
+          contact={
+            getCurrentContact() || {
+              contactid: 0,
+              vorname: '',
+              name: '',
+              email: '',
+              anrede: 0,
+              title: '',
+              zusatzname: '',
+              phone: '',
+              mobile: '',
+              company: getCurrentCompanyId() || 0,
+              ref: resumeData.ref,
+            }
+          }
           onSave={handleSaveContact}
           isOpen={modalOpen && modalType === 'editContact'}
           onClose={() => setModalOpen(false)}
@@ -331,30 +355,28 @@ const ResumeEdit: React.FC = () => {
             onClose={closeHistoryModal}
             resumeId={resumeData.resumeId}
             refId={storedUser.loginid}
-            resumeTitle={resumeData?.position || ""}
+            resumeTitle={resumeData?.position || ''}
             currentStateId={-1}
           />
         )}
 
-        {errorMessage && (
-          <div className="mb-4 text-red-600 font-medium">{errorMessage}</div>
-        )}
+        {errorMessage && <div className="mb-4 font-medium text-red-600">{errorMessage}</div>}
 
-        <div className="flex justify-between mt-6">
+        <div className="mt-6 flex justify-between">
           <button
-            className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+            className="rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-700"
             onClick={handleSave}
           >
             {t('common.save')}
           </button>
           <button
-            className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-md"
+            className="rounded-md bg-gray-500 px-4 py-2 text-white hover:bg-gray-700"
             onClick={handleBack}
           >
             {t('resumeEdit.backToList')}
           </button>
           <button
-            className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-md"
+            className="rounded-md bg-gray-500 px-4 py-2 text-white hover:bg-gray-700"
             onClick={handleView}
           >
             {t('common.view')}
@@ -362,7 +384,7 @@ const ResumeEdit: React.FC = () => {
           {resumeData && resumeData.resumeId > 0 && (
             <button
               onClick={() => openHistoryModal()}
-              className="bg-gray-600 hover:bg-gray-800 text-white px-3 py-1 rounded-md"
+              className="rounded-md bg-gray-600 px-3 py-1 text-white hover:bg-gray-800"
             >
               {t('resumeEdit.history')}
             </button>
@@ -370,7 +392,6 @@ const ResumeEdit: React.FC = () => {
         </div>
       </div>
     </div>
-
   );
 };
 

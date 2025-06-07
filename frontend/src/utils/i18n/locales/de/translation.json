@@ -1,8 +1,8 @@
 {
   "common": {
-    "loading": "Wird bearbeitet...",
-    "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-    "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "loading": "Wird bearbeitet",
+    "error": "Ein Fehler ist aufgetreten Bitte versuchen Sie es erneut",
+    "serverError": "Serverfehler Bitte versuchen Sie es später erneut",
     "back": "Zurück",
     "save": "Speichern",
     "cancel": "Abbrechen",
@@ -31,11 +31,11 @@
     "loginButton": "Anmelden",
     "registerButton": "Registrieren",
     "forgotPassword": "Passwort vergessen?",
-    "usernameRequired": "Bitte geben Sie Ihren Benutzernamen ein.",
-    "passwordRequired": "Bitte geben Sie Ihr Passwort ein.",
-    "invalidCredentials": "Ungültiger Login oder Passwort.",
-    "checkUsername": "Überprüfen Sie den Benutzernamen.",
-    "checkPassword": "Überprüfen Sie das Passwort.",
+    "usernameRequired": "Bitte geben Sie Ihren Benutzernamen ein",
+    "passwordRequired": "Bitte geben Sie Ihr Passwort ein",
+    "invalidCredentials": "Ungültiger Login oder Passwort",
+    "checkUsername": "Überprüfen Sie den Benutzernamen",
+    "checkPassword": "Überprüfen Sie das Passwort",
     "usernamePlaceholder": "Benutzername eingeben",
     "passwordPlaceholder": "Passwort eingeben"
   },
@@ -48,17 +48,17 @@
     "confirmPassword": "Passwort bestätigen",
     "sendResetLink": "Link zum Zurücksetzen senden",
     "resetPassword": "Passwort zurücksetzen",
-    "usernameRequired": "Bitte geben Sie Ihren Benutzernamen ein.",
-    "emailRequired": "Bitte geben Sie Ihre E-Mail-Adresse ein.",
-    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-    "passwordMinLength": "Das Passwort muss mindestens 2 Zeichen lang sein.",
-    "confirmPasswordRequired": "Bitte bestätigen Sie Ihr Passwort.",
-    "passwordsDoNotMatch": "Die Passwörter stimmen nicht überein.",
+    "usernameRequired": "Bitte geben Sie Ihren Benutzernamen ein",
+    "emailRequired": "Bitte geben Sie Ihre E-Mail-Adresse ein",
+    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "passwordMinLength": "Das Passwort muss mindestens 2 Zeichen lang sein",
+    "confirmPasswordRequired": "Bitte bestätigen Sie Ihr Passwort",
+    "passwordsDoNotMatch": "Die Passwörter stimmen nicht überein",
     "resetSuccess": "Ihr Passwort wurde erfolgreich zurückgesetzt!",
-    "redirecting": "Sie werden zur Anmeldeseite weitergeleitet...",
-    "emailSent": "Wenn ein Konto mit diesen Daten existiert, haben wir eine E-Mail mit Anweisungen zum Zurücksetzen Ihres Passworts gesendet.",
-    "checkInbox": "Bitte überprüfen Sie Ihren Posteingang und folgen Sie den Anweisungen in der E-Mail.",
-    "invalidToken": "Ungültiger oder fehlender Token. Bitte fordern Sie einen neuen Link an.",
+    "redirecting": "Sie werden zur Anmeldeseite weitergeleitet",
+    "emailSent": "Wenn ein Konto mit diesen Daten existiert, haben wir eine E-Mail mit Anweisungen zum Zurücksetzen Ihres Passworts gesendet",
+    "checkInbox": "Bitte überprüfen Sie Ihren Posteingang und folgen Sie den Anweisungen in der E-Mail",
+    "invalidToken": "Ungültiger oder fehlender Token Bitte fordern Sie einen neuen Link an",
     "usernamePlaceholder": "Benutzername eingeben",
     "emailPlaceholder": "E-Mail-Adresse eingeben",
     "newPasswordPlaceholder": "Neues Passwort eingeben",
@@ -156,26 +156,26 @@
     "select": "Auswahl"
   },
   "validation": {
-    "required": "Dieses Feld ist erforderlich.",
-    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-    "minLength": "Dieses Feld muss mindestens {{count}} Zeichen lang sein.",
-    "maxLength": "Dieses Feld darf höchstens {{count}} Zeichen lang sein.",
-    "passwordMatch": "Die Passwörter stimmen nicht überein."
+    "required": "Dieses Feld ist erforderlich",
+    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "minLength": "Dieses Feld muss mindestens {{count}} Zeichen lang sein",
+    "maxLength": "Dieses Feld darf höchstens {{count}} Zeichen lang sein",
+    "passwordMatch": "Die Passwörter stimmen nicht überein"
   },
   "profileEdit": {
-    "not_logged_in": "Sie sind nicht angemeldet.",
+    "not_logged_in": "Sie sind nicht angemeldet",
     "edit_profile": "Profil bearbeiten",
     "create_profile": "Profil erstellen",
     "save": "Speichern",
     "create": "Erstellen",
     "back": "Zurück",
-    "loading": "Lade...",
-    "loginname_required": "Feld \"Loginname\" ist erforderlich.",
-    "password_required": "Feld \"Passwort\" ist erforderlich.",
-    "email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-    "password2_required": "Feld \"Passwort wiederholen\" ist erforderlich.",
-    "passwords_do_not_match": "Passwörter stimmen nicht überein.",
-    "save_error": "Fehler beim Speichern. Bitte versuchen Sie es später erneut.",
+    "loading": "Lade",
+    "loginname_required": "Feld \"Loginname\" ist erforderlich",
+    "password_required": "Feld \"Passwort\" ist erforderlich",
+    "email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "password2_required": "Feld \"Passwort wiederholen\" ist erforderlich",
+    "passwords_do_not_match": "Passwörter stimmen nicht überein",
+    "save_error": "Fehler beim Speichern Bitte versuchen Sie es später erneut",
     "loginname": "Loginname",
     "password2": "Passwort wiederholen"
   },
@@ -195,7 +195,7 @@
     "loadError": "Fehler beim Laden der Bewerbungen"
   },
   "statusModal": {
-    "selectDate": "Bitte ein Datum wählen.",
+    "selectDate": "Bitte ein Datum wählen",
     "unknownError": "Unbekannter Fehler",
     "newDate": "Neues Datum",
     "newStatus": "Neuer Status",
@@ -217,34 +217,34 @@
     "recruiterContact": "Recruiter Kontakt",
     "company": "Firma",
     "companyContact": "Firmenkontakt",
-    "selectCompanyFirst": "Bitte zuerst eine Firma auswählen.",
+    "selectCompanyFirst": "Bitte zuerst eine Firma auswählen",
     "confirmDeleteContact": "Möchten Sie diesen Kontakt wirklich löschen?",
-    "requiredFields": "Bitte alle Pflichtfelder ausfüllen.",
-    "saveSuccessNew": "Bewerbung erfolgreich angelegt.",
-    "saveSuccessUpdate": "Bewerbung erfolgreich aktualisiert.",
-    "saveError": "Fehler beim Speichern der Bewerbung.",
-    "loading": "Lade...",
+    "requiredFields": "Bitte alle Pflichtfelder ausfüllen",
+    "saveSuccessNew": "Bewerbung erfolgreich angelegt",
+    "saveSuccessUpdate": "Bewerbung erfolgreich aktualisiert",
+    "saveError": "Fehler beim Speichern der Bewerbung",
+    "loading": "Lade",
     "history": "Historie",
     "backToList": "Zurück zur Liste"
   },
   "api": {
     "error": {
-      "server": "Serverfehler. Bitte versuchen Sie es später erneut.",
-      "login_failed": "Anmeldung fehlgeschlagen.",
-      "user_update_failed": "Benutzeraktualisierung fehlgeschlagen.",
-      "user_fetch_failed": "Benutzerdaten konnten nicht geladen werden.",
-      "token_required": "Token ist erforderlich.",
-      "token_invalid": "Token-Überprüfung fehlgeschlagen.",
-      "password_reset_failed": "Passwort-Zurücksetzung fehlgeschlagen.",
-      "resume_save_failed": "Bewerbung konnte nicht gespeichert werden.",
-      "resume_fetch_failed": "Bewerbung konnte nicht geladen werden.",
-      "status_change_failed": "Status konnte nicht geändert werden.",
-      "company_fetch_failed": "Firmen konnten nicht geladen werden.",
-      "contact_save_failed": "Kontakt konnte nicht gespeichert oder aktualisiert werden.",
-      "contact_fetch_failed": "Kontakte konnten nicht geladen werden.",
-      "history_fetch_failed": "Historie konnte nicht geladen werden.",
-      "access_save_failed": "Zugangsdaten konnten nicht gespeichert werden.",
-      "anrede_fetch_failed": "Anrede konnte nicht geladen werden."
+      "server": "Serverfehler Bitte versuchen Sie es später erneut",
+      "login_failed": "Anmeldung fehlgeschlagen",
+      "user_update_failed": "Benutzeraktualisierung fehlgeschlagen",
+      "user_fetch_failed": "Benutzerdaten konnten nicht geladen werden",
+      "token_required": "Token ist erforderlich",
+      "token_invalid": "Token-Überprüfung fehlgeschlagen",
+      "password_reset_failed": "Passwort-Zurücksetzung fehlgeschlagen",
+      "resume_save_failed": "Bewerbung konnte nicht gespeichert werden",
+      "resume_fetch_failed": "Bewerbung konnte nicht geladen werden",
+      "status_change_failed": "Status konnte nicht geändert werden",
+      "company_fetch_failed": "Firmen konnten nicht geladen werden",
+      "contact_save_failed": "Kontakt konnte nicht gespeichert oder aktualisiert werden",
+      "contact_fetch_failed": "Kontakte konnten nicht geladen werden",
+      "history_fetch_failed": "Historie konnte nicht geladen werden",
+      "access_save_failed": "Zugangsdaten konnten nicht gespeichert werden",
+      "anrede_fetch_failed": "Anrede konnte nicht geladen werden"
     }
   },
   "language": {
@@ -253,24 +253,24 @@
   },
   "about": {
     "title": "Über diese Anwendung",
-    "intro": "Dieses Projekt wurde entwickelt, um Bewerbern zu helfen, den Überblick über ihre Bewerbungen zu behalten. Es bietet ein zentrales Dashboard, in dem alle Bewerbungen samt Unternehmen, Kontakten, Status und deren Historie verwaltet werden können.",
+    "intro": "Dieses Projekt wurde entwickelt, um Bewerbern zu helfen, den Überblick über ihre Bewerbungen zu behalten Es bietet ein zentrales Dashboard, in dem alle Bewerbungen samt Unternehmen, Kontakten, Status und deren Historie verwaltet werden können",
     "features_title": "🔍 Hauptfunktionen:",
     "features": [
       "Bewerbungen erstellen, bearbeiten, löschen",
       "Statushistorie mit Datum verfolgen",
       "Verknüpfung mit Firmen und Ansprechpartnern",
       "Login & Profilverwaltung",
-      "Mehrsprachige Oberfläche (Deutsch & Englisch)"
+      "Mehrsprachige Oberfläche Deutsch & Englisch"
     ],
     "tech_title": "🛠 Verwendete Technologien:",
     "technologies": [
-      "React + TypeScript (Frontend)",
+      "React + TypeScript Frontend",
       "Tailwind CSS für das Design",
-      "Node.js mit Express (Backend)",
+      "Nodejs mit Express Backend",
       "MySQL-Datenbank"
     ],
     "ai_title": "🤖 KI-Unterstützung:",
-    "ai_text": "Rund 80 % des Codes dieses Projekts wurde mit Unterstützung durch künstliche Intelligenz (KI) entwickelt – insbesondere zur Beschleunigung von Boilerplate, Formularen, Validierung und Backend-Logik.",
+    "ai_text": "Rund 80 % des Codes dieses Projekts wurde mit Unterstützung durch künstliche Intelligenz KI entwickelt – insbesondere zur Beschleunigung von Boilerplate, Formularen, Validierung und Backend-Logik",
     "target_title": "📍 Zielgruppe:",
     "target_intro": "Diese App ist gedacht für:",
     "targets": [
@@ -278,5 +278,104 @@
       "Freelancer und Recruiter",
       "KMU ohne teure Bewerbermanagementsysteme"
     ]
+  },
+  "backend": {
+    "db": {
+        "salutation": {
+          "mr": "Herr",
+          "mrs": "Frau",
+          "diverse": "Diverse"
+      },
+   
+      "state": {
+          "registered":"Eingetragen",
+          "sent":"Gesendet",
+          "response_received":"Antwort erhalten",
+          "invited_to_meeting":"Zu Besprechung eingeladen",
+          "canceled": "Abgesagt",
+          "offer_received": "Angebot erhalten"
+
+      }
+  
+    },
+    "error": {
+      "validation": {
+        "missingFields": "Alle Pflichtfelder müssen ausgefüllt sein",
+        "missingRequiredFields": "Pflichtfelder fehlen",
+        "missingUserId": "Fehlende Nutzer-ID",
+        "missingResumeData": "Fehlende erforderliche Resume-Daten ref, position, stateId",
+        "missingParameters": "Fehlende Parameter",
+        "missingLoginIdOrRecruiter": "Fehlende Parameter: loginId und/oder isRecruter",
+        "missingRefOrCompany": "Fehlende Parameter: ref und/oder company",
+        "invalidResumeId": "Ungültige oder fehlende Resume-ID",
+        "missingData": "Fehlende Daten",
+        "passwordMismatch": "Neue Passwörter stimmen nicht überein",
+        "missingToken": "Token ist erforderlich",
+        "invalidToken": "Ungültiger oder abgelaufener Token",
+        "missingTokenOrPassword": "Token und neues Passwort sind erforderlich",
+        "passwordTooShort": "Das Passwort muss mindestens 2 Zeichen lang sein"
+      },
+      "auth": {
+        "wrongPassword": "Falsches Passwort",
+        "oldPasswordWrong": "Altes Passwort ist falsch",
+        "authNotFound": "Authentifizierung nicht gefunden",
+        "noPermission": "Keine Berechtigung"
+      },
+      "notFound": {
+        "userNotFound": "Benutzer nicht gefunden",
+        "resumeNotFound": "Resume nicht gefunden",
+        "applicationNotFound": "Bewerbung nicht gefunden",
+        "userInfoNotFound": "Benutzerinformationen nicht gefunden"
+      },
+      "conflict": {
+        "emailTaken": "E-Mail ist bereits vergeben",
+        "loginOrEmailTaken": "Loginname oder E-Mail bereits vergeben",
+        "statusAlreadySet": "Status ist bereits gesetzt"
+      },
+      "server": {
+        "serverError": "Serverfehler",
+        "internalServerError": "Interner Serverfehler",
+        "loadingUserDataError": "Fehler beim Laden der Nutzerdaten",
+        "updateError": "Fehler beim Aktualisieren",
+        "uniquenessCheckError": "Fehler beim Einmaligkeitscheck",
+        "creationError": "Fehler beim Anlegen",
+        "credentialChangeError": "Serverfehler beim Ändern der Zugangsdaten",
+        "companyAddError": "Fehler beim Hinzufügen der Firma",
+        "fetchCompaniesError": "Fehler beim Abrufen der Firmen",
+        "fetchContactsError": "Fehler beim Abrufen der Kontakte",
+        "resumeFetchError": "Serverfehler beim Abrufen des Resumes",
+        "historyAddError": "Fehler beim Hinzufügen der Historie",
+        "tokenCreationError": "Nicht möglich, Token zu erstellen",
+        "tokenUpdateError": "Fehler beim Aktualisieren des Token-Status"
+      }
+    },
+    "success": {
+      "user": {
+        "created": "Benutzer erfolgreich erstellt",
+        "dataUpdated": "Benutzerdaten erfolgreich aktualisiert"
+      },
+      "company": {
+        "added": "Firma erfolgreich hinzugefügt"
+      },
+      "history": {
+        "added": "Historie erfolgreich hinzugefügt"
+      },
+      "status": {
+        "changed": "Status erfolgreich geändert"
+      },
+      "contact": {
+        "added": "Kontakt erfolgreich hinzugefügt",
+        "updated": "Kontakt erfolgreich aktualisiert"
+      },
+      "resume": {
+        "created": "Resume erfolgreich erstellt",
+        "updated": "Resume erfolgreich aktualisiert"
+      },
+      "passwordReset": {
+        "emailSent": "Wenn ein Konto mit diesen Daten existiert, haben wir eine E-Mail mit Anweisungen zum Zurücksetzen Ihres Passworts gesendet",
+        "validToken": "Token ist gültig",
+        "passwordChanged": "Passwort wurde erfolgreich zurückgesetzt"
+      }
+    }
   }
 }

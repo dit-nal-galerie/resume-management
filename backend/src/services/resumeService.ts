@@ -1,17 +1,14 @@
 import { Request, Response } from 'express';
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2';
 
-
-
-
 export const getResumesWithUsers = (db: Connection, req: Request, res: Response): void => {
   const { userid } = req.query;
 
   if (!userid) {
-    res.status(400).send("Fehlende Nutzer-ID.");
+    res.status(400).send('backend.error.validation.missingUserId');
     return;
   }
-//console.log("getResumesWithUsers userid:", userid);
+  //console.log("getResumesWithUsers userid:", userid);
   // SQL-Abfrage, um die Bewerbungen mit den zugehörigen Benutzern abzurufen
   const query = `
    SELECT 
@@ -79,8 +76,8 @@ WHERE r.ref = ?
 
   db.query(query, [userid], (err, results) => {
     if (err) {
-      console.error("Fehler beim Abrufen der Bewerbungen:", err);
-      res.status(500).send("Serverfehler.");
+      console.error('Fehler beim Abrufen der Bewerbungen:', err);
+      res.status(500).send('backend.error.server.serverError');
       return;
     }
 
@@ -97,39 +94,39 @@ WHERE r.ref = ?
         created: row.created,
         company: row.companyId
           ? {
-            companyId: row.companyId,
-            name: row.companyName,
-            city: row.companyCity,
-            street: row.companyStreet,
-            houseNumber: row.companyHouseNumber,
-            postalCode: row.companyPostalCode,
-            isRecruter: row.companyIsRecruter,
-            ref: row.companyRef,
-          }
+              companyId: row.companyId,
+              name: row.companyName,
+              city: row.companyCity,
+              street: row.companyStreet,
+              houseNumber: row.companyHouseNumber,
+              postalCode: row.companyPostalCode,
+              isRecruter: row.companyIsRecruter,
+              ref: row.companyRef,
+            }
           : null,
         parentCompany: row.parentCompanyId
           ? {
-            companyId: row.parentCompanyId,
-            name: row.parentCompanyName,
-            city: row.parentCompanyCity,
-            street: row.parentCompanyStreet,
-            houseNumber: row.parentCompanyHouseNumber,
-            postalCode: row.parentCompanyPostalCode,
-            isRecruter: row.parentCompanyIsRecruter,
-            ref: row.parentCompanyRef,
-          }
+              companyId: row.parentCompanyId,
+              name: row.parentCompanyName,
+              city: row.parentCompanyCity,
+              street: row.parentCompanyStreet,
+              houseNumber: row.parentCompanyHouseNumber,
+              postalCode: row.parentCompanyPostalCode,
+              isRecruter: row.parentCompanyIsRecruter,
+              ref: row.parentCompanyRef,
+            }
           : null,
         contactCompany: row.contactCompanyId
           ? {
-            contactId: row.contactCompanyId,
-            name: row.contactCompanyName,
-          }
+              contactId: row.contactCompanyId,
+              name: row.contactCompanyName,
+            }
           : null,
         contactParentCompany: row.contactParentCompanyId
           ? {
-            contactId: row.contactParentCompanyId,
-            name: row.contactParentCompanyName,
-          }
+              contactId: row.contactParentCompanyId,
+              name: row.contactParentCompanyName,
+            }
           : null,
       }))
     );
@@ -137,12 +134,12 @@ WHERE r.ref = ?
 };
 
 export const getStates = (db: Connection, req: Request, res: Response): void => {
-  const query = "SELECT stateid, text FROM states ORDER BY stateid ASC";
+  const query = 'SELECT stateid, text FROM states ORDER BY stateid ASC';
 
   db.query(query, (err, results) => {
     if (err) {
-      console.error("Fehler beim Abrufen der Status:", err);
-      res.status(500).send("Serverfehler.");
+      console.error('Fehler beim Abrufen der Status:', err);
+      res.status(500).send('backend.error.server.serverError');
       return;
     }
 
