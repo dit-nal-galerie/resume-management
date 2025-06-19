@@ -23,7 +23,7 @@ CREATE TABLE authentification (
 -- Таблица обращений
 CREATE TABLE anrede (
     id INT PRIMARY KEY, -- Уникальный идентификатор
-    text VARCHAR(20) NOT NULL -- Обращение (Herr, Frau и т.д.)
+    text VARCHAR(80) NOT NULL -- Обращение (Herr, Frau и т.д.)
 );
 CREATE TABLE users (
     userid INT AUTO_INCREMENT PRIMARY KEY,
@@ -115,15 +115,16 @@ CREATE TABLE history (
 
 INSERT INTO anrede (id, text) VALUES
 (0, ''),
-(1, 'Herr'),
-(2, 'Frau'),
-(99, 'Diverse');
+(1, 'backend.db.salutation.mr'),
+(2, 'backend.db.salutation.mrs'),
+(99, 'backend.db.salutation.diverse');
 
+-- Status (States) mit Keys statt Text
 INSERT INTO states (stateid, text) VALUES
-(0, 'Eingetragen'),
-(10, 'Gesendet'),
-(20, 'Antwort erhalten'),
-(30, 'Zu Besprechung eingeladen'),
-(40, 'Abgesagt'),
-(50, 'Angebot erhalten');
+(0, 'backend.db.state.registered'),
+(10, 'backend.db.state.sent'),
+(20, 'backend.db.state.response_received'),
+(30, 'backend.db.state.invited_to_meeting'),
+(40, 'backend.db.state.canceled'),
+(50, 'backend.db.state.offer_received');
 

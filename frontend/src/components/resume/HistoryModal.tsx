@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { changeResumeStatus, getHistoryByResumeId, getStates } from '../../services/api';
+import { changeResumeStatus, getHistoryByResumeId } from '../../services/api';
 import { HistoryEntry } from '../../../../interfaces/histori';
 import DatePicker from 'react-datepicker';
 import { StatusModalProps } from './ResumeEditModals.types';
 import { useTranslation } from 'react-i18next';
+import { FormField, inputClasses } from '../ui/FormField';
+import { getCachedStates } from '../../utils/storage';
 
 interface StateOption {
   stateid: number;
@@ -18,7 +20,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
   refId,
   resumeTitle,
   currentStateId,
-  onStatusChanged
+  onStatusChanged,
 }) => {
   const { t } = useTranslation();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -28,7 +30,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
   const [selectedState, setSelectedState] = useState<number>(currentStateId);
 
   useEffect(() => {
-    getStates().then(setStates).catch(console.error);
+    getCachedStates().then(setStates).catch(console.error);
     setSelectedDate(new Date());
   }, [resumeId]);
 
@@ -53,21 +55,21 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
     if (!selectedDate) return alert(t('validation.required'));
 
     try {
-      const formattedDate = selectedDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+      const formattedDate = selectedDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
       await changeResumeStatus(resumeId, refId, selectedState, formattedDate);
       if (onStatusChanged) onStatusChanged();
       onClose();
     } catch (err) {
       console.error(t('resume.edit.saveError'), err);
-      alert(err instanceof Error ? err.message : t('common.error'));
+      alert(err instanceof Error ? t(err.message) : t('common.error'));
     }
   };
 
   return (
-    <Dialog open={true} onClose={onClose} className="fixed z-50 inset-0 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-30 p-4">
-        <Dialog.Panel className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
-          <Dialog.Title className="text-xl font-bold mb-4">{resumeTitle}</Dialog.Title>
+    <Dialog open={true} onClose={onClose} className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex min-h-screen items-center justify-center bg-black bg-opacity-30 p-4">
+        <Dialog.Panel className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
+          <Dialog.Title className="mb-4 text-xl font-bold">{resumeTitle}</Dialog.Title>
 
           {loading ? (
             <p className="text-gray-500">{t('common.loading')}</p>
@@ -77,14 +79,14 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
             <table className="w-full border-t">
               <thead>
                 <tr>
-                  <th className="text-left py-2 border-b">{t('resume.list.status')}</th>
-                  <th className="text-left py-2 border-b">{t('resume.history.date')}</th>
+                  <th className="border-b py-2 text-left">{t('common.status')}</th>
+                  <th className="border-b py-2 text-left">{t('resume.history.date')}</th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((entry, index) => (
                   <tr key={index}>
-                    <td className="py-2">{entry.status}</td>
+                    <td className="py-2">{t(entry.status)}</td>
                     <td className="py-2">{new Date(entry.date).toLocaleDateString()}</td>
                   </tr>
                 ))}
@@ -93,50 +95,51 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
           )}
           {currentStateId > -1 && (
             <>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('resume.history.date')}</label>
+              <FormField label={t('resume.history.date')} htmlFor="history-date">
                 <DatePicker
+                  id="history-date"
                   selected={selectedDate}
                   onChange={(date) => setSelectedDate(date)}
-                  className="w-full border rounded-md p-2"
+                  className={inputClasses}
                   dateFormat="dd.MM.yyyy"
                 />
-              </div>
+              </FormField>
 
-              <div className="mb-6">
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">{t('resume.list.status')}</label>
+              <FormField label={t('common.status')} htmlFor="status">
                 <select
                   id="status"
                   name="status"
                   value={selectedState}
                   onChange={(e) => setSelectedState(Number(e.target.value))}
-                  className="w-full border rounded-md p-2"
+                  className={inputClasses}
+                  aria-label={t('common.status')}
                 >
                   {states.map((s) => (
                     <option key={s.stateid} value={s.stateid}>
-                      {s.text}
+                      {t(s.text)}
                     </option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             </>
           )}
           <div className="flex justify-end gap-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
+            <button onClick={onClose} className="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400">
               {t('common.cancel')}
             </button>
             {currentStateId > -1 && (
               <button
                 onClick={handleChangeStatus}
-                className={`px-4 py-2 rounded text-white ${isChangeEnabled ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+                className={`rounded px-4 py-2 text-white ${
+                  isChangeEnabled
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'cursor-not-allowed bg-gray-400'
                 }`}
                 disabled={!isChangeEnabled}
               >
                 {t('resume.edit.title')}
-              </button>)}
+              </button>
+            )}
           </div>
         </Dialog.Panel>
       </div>

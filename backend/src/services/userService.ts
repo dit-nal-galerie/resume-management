@@ -1,46 +1,48 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { Connection, OkPacket, RowDataPacket } from 'mysql2';
-import { Pool } from "mysql2/promise";
+import { Pool } from 'mysql2/promise';
 
-export const createAccount = async (db: Connection, loginname: string, password: string): Promise<number | null> => {
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const query = 'INSERT INTO authentification (loginname, password) VALUES (?, ?)';
-      return new Promise((resolve, reject) => {
-        db.query(query, [loginname, hashedPassword], (err, result) => {
-          if (err) {
-            reject(err);
-          } else {
-            // Cast result to OkPacket to access insertId
-            const okPacket = result as OkPacket;
-            resolve(okPacket.insertId);
-          }
-        });
+export const createAccount = async (
+  db: Connection,
+  loginname: string,
+  password: string
+): Promise<number | null> => {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const query = 'INSERT INTO authentification (loginname, password) VALUES (?, ?)';
+    return new Promise((resolve, reject) => {
+      db.query(query, [loginname, hashedPassword], (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          // Cast result to OkPacket to access insertId
+          const okPacket = result as OkPacket;
+          resolve(okPacket.insertId);
+        }
       });
-    } catch (error) {
-      console.error('Error hashing password:', error);
-      return null;
-    }
-  };
-
-
+    });
+  } catch (error) {
+    console.error('Error hashing password:', error);
+    return null;
+  }
+};
 
 export const login = async (db: Connection, req: Request, res: Response): Promise<void> => {
   const { loginname, password } = req.body;
-  const queryAuth = "SELECT id, password FROM authentification WHERE loginname = ?";
+  const queryAuth = 'SELECT id, password FROM authentification WHERE loginname = ?';
 
   db.query(queryAuth, [loginname], async (err, authResults) => {
     if (err) {
-      console.error("Fehler beim Abrufen der Login-Daten:", err);
-      res.status(500).send("Serverfehler.");
+      console.error('Fehler beim Abrufen der Login-Daten:', err);
+      res.status(500).send('backend.error.server.serverError');
       return;
     }
 
     const authRows = authResults as RowDataPacket[];
 
     if (authRows.length === 0) {
-      res.status(404).json({ message: "Benutzer nicht gefunden." });
+      res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
       return;
     }
 
@@ -48,7 +50,7 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
     const isPasswordValid = await bcrypt.compare(password, hashedPassword);
 
     if (!isPasswordValid) {
-      res.status(401).json({ message: "Falsches Passwort." });
+      res.status(401).json({ message: 'backend.error.auth.wrongPassword' });
       return;
     }
 
@@ -63,15 +65,15 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
 
     db.query(queryUser, [loginid], (userErr, userResults) => {
       if (userErr) {
-        console.error("Fehler beim Abrufen der Benutzerinformationen:", userErr);
-        res.status(500).send("Fehler beim Laden der Nutzerdaten.");
+        console.error('Fehler beim Abrufen der Benutzerinformationen:', userErr);
+        res.status(500).send('backend.error.server.loadingUserDataError');
         return;
       }
 
       const userRows = userResults as RowDataPacket[];
 
       if (userRows.length === 0) {
-        res.status(404).json({ message: "Benutzerinformationen nicht gefunden." });
+        res.status(404).json({ message: 'backend.error.notFound.userInfoNotFound' });
         return;
       }
 
@@ -87,7 +89,7 @@ export const getAnrede = (db: Connection, req: Request, res: Response): void => 
   db.query(query, (err, results) => {
     if (err) {
       console.error('Fehler beim Abrufen der Anrede:', err);
-      res.status(500).send('Serverfehler.');
+      res.status(500).send('backend.error.server.serverError');
       return;
     }
 
@@ -95,42 +97,32 @@ export const getAnrede = (db: Connection, req: Request, res: Response): void => 
   });
 };
 
-//------------------  
+//------------------
 export const changeAccessData = async (db: Pool, req: Request, res: Response): Promise<void> => {
-  const {
-    userId,
-    loginname,
-    email,
-    oldPassword,
-    password,
-    password2,
-    changePassword,
-  } = req.body;
+  const { userId, loginname, email, oldPassword, password, password2, changePassword } = req.body;
 
   if (!userId || !loginname || !email || !oldPassword) {
-    res.status(400).json({ message: "Fehlende Pflichtfelder." });
-    console.log("Fehlende Pflichtfelder:", { userId, loginname, email, oldPassword });
+    res.status(400).json({ message: 'backend.error.validation.missingFields' });
+    console.log('Fehlende Pflichtfelder:', { userId, loginname, email, oldPassword });
     return;
   }
-if (changePassword && (!password || !password2)) {
-    res.status(400).json({ message: "Fehlende Pflichtfelder." });
-    console.log("Fehlende Pflichtfelder:", { changePassword, password, password2, oldPassword });
+  if (changePassword && (!password || !password2)) {
+    res.status(400).json({ message: 'backend.error.validation.missingFields' });
+    console.log('Fehlende Pflichtfelder:', { changePassword, password, password2, oldPassword });
     return;
   }
   try {
     // 1. Benutzer mit Login-Daten laden (JOIN authentification)
-    const [userRows]: any = await db
-
-      .query(
-        `SELECT u.userid, u.email, u.name, a.id AS loginid, a.loginname, a.password
+    const [userRows]: any = await db.query(
+      `SELECT u.userid, u.email, u.name, a.id AS loginid, a.loginname, a.password
          FROM users u
          JOIN authentification a ON u.loginid = a.id
          WHERE u.userid = ?`,
-        [userId]
-      );
+      [userId]
+    );
 
     if (!userRows || userRows.length === 0) {
-      res.status(404).json({ message: "Benutzer nicht gefunden." });
+      res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
       return;
     }
 
@@ -139,16 +131,17 @@ if (changePassword && (!password || !password2)) {
     // 2. Altes Passwort prüfen
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
-      res.status(401).json({ message: "Altes Passwort ist falsch." });
+      res.status(401).json({ message: 'backend.error.auth.oldPasswordWrong' });
       return;
     }
 
     // 3. Prüfen, ob E-Mail bereits vergeben ist (außer eigene)
-    const [emailRows]: any = await db
-
-      .query("SELECT * FROM users WHERE email = ? AND userid != ?", [email, userId]);
+    const [emailRows]: any = await db.query('SELECT * FROM users WHERE email = ? AND userid != ?', [
+      email,
+      userId,
+    ]);
     if (emailRows.length > 0) {
-      res.status(409).json({ message: "E-Mail ist bereits vergeben." });
+      res.status(409).json({ message: 'backend.error.conflict.emailTaken' });
       return;
     }
 
@@ -156,24 +149,21 @@ if (changePassword && (!password || !password2)) {
     let newPasswordHash = user.password;
     if (changePassword) {
       if (!password || !password2 || password !== password2) {
-        res.status(400).json({ message: "Neue Passwörter stimmen nicht überein." });
+        res.status(400).json({ message: 'backend.error.validation.passwordMismatch' });
         return;
       }
       newPasswordHash = await bcrypt.hash(password, 10);
     }
 
     // 5. Update in authentification
-    await db
-
-      .query(
-        "UPDATE authentification SET loginname = ?, password = ? WHERE id = ?",
-        [loginname, newPasswordHash, user.loginid]
-      );
+    await db.query('UPDATE authentification SET loginname = ?, password = ? WHERE id = ?', [
+      loginname,
+      newPasswordHash,
+      user.loginid,
+    ]);
 
     // 6. Update in users
-    await db
-
-      .query("UPDATE users SET email = ? WHERE userid = ?", [email, userId]);
+    await db.query('UPDATE users SET email = ? WHERE userid = ?', [email, userId]);
 
     // 7. Aktualisierte Benutzerdaten zurückgeben (ohne Passwort)
     const updatedUser = {
@@ -184,29 +174,37 @@ if (changePassword && (!password || !password2)) {
     };
 
     res.json({
-      message: "Zugangsdaten erfolgreich geändert.",
+      message: 'backend.success.user.dataUpdated',
       user: updatedUser,
     });
   } catch (error) {
-    console.error("Fehler beim Ändern der Zugangsdaten:", error);
-    res.status(500).json({ message: "Serverfehler beim Ändern der Zugangsdaten." });
+    console.error('Fehler beim Ändern der Zugangsdaten:', error);
+    res.status(500).json({ message: 'backend.error.server.credentialChangeError' });
   }
 };
 
 //------------------
 async function getPasswordForLoginId(db: Connection, loginid: number): Promise<string | null> {
   return new Promise((resolve, reject) => {
-    db.query("SELECT password FROM authentification WHERE id = ?", [loginid], (err, results: RowDataPacket[]) => {
-      if (err || results.length === 0) return resolve(null);
-      resolve(results[0].password);
-    });
+    db.query(
+      'SELECT password FROM authentification WHERE id = ?',
+      [loginid],
+      (err, results: RowDataPacket[]) => {
+        if (err || results.length === 0) return resolve(null);
+        resolve(results[0].password);
+      }
+    );
   });
 }
 
-async function emailExistsForOtherUser(db: Connection, email: string, loginid: number): Promise<boolean> {
+async function emailExistsForOtherUser(
+  db: Connection,
+  email: string,
+  loginid: number
+): Promise<boolean> {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT COUNT(*) AS count FROM users WHERE email = ? AND loginid != ?",
+      'SELECT COUNT(*) AS count FROM users WHERE email = ? AND loginid != ?',
       [email, loginid],
       (err, results) => {
         if (err) return reject(err);
@@ -216,7 +214,11 @@ async function emailExistsForOtherUser(db: Connection, email: string, loginid: n
   });
 }
 
-async function createAuthEntry(db: Connection, loginname: string, password: string): Promise<number> {
+async function createAuthEntry(
+  db: Connection,
+  loginname: string,
+  password: string
+): Promise<number> {
   const hash = await bcrypt.hash(password, 10);
   return new Promise((resolve, reject) => {
     db.query(
@@ -230,7 +232,11 @@ async function createAuthEntry(db: Connection, loginname: string, password: stri
   });
 }
 
-export const createOrUpdateUser = async (db: Connection, req: Request, res: Response): Promise<void> => {
+export const createOrUpdateUser = async (
+  db: Connection,
+  req: Request,
+  res: Response
+): Promise<void> => {
   const {
     loginid,
     loginname,
@@ -248,7 +254,7 @@ export const createOrUpdateUser = async (db: Connection, req: Request, res: Resp
 
   // Neu: Pflichtfelder
   if (!email || (!loginid && (!loginname || !password))) {
-    res.status(400).send("Pflichtfelder fehlen.");
+    res.status(400).send('backend.error.validation.missingRequiredFields');
     return;
   }
 
@@ -259,19 +265,19 @@ export const createOrUpdateUser = async (db: Connection, req: Request, res: Resp
       // 1. Passwort prüfen
       const hashed = await getPasswordForLoginId(db, loginid);
       if (!hashed) {
-        res.status(404).send("Authentifizierung nicht gefunden.");
+        res.status(404).send('backend.error.auth.authNotFound');
         return;
       }
       const match = await bcrypt.compare(password, hashed);
       if (!match) {
-        res.status(401).send("Falsches Passwort.");
+        res.status(401).send('backend.error.auth.wrongPassword');
         return;
       }
 
       // 2. Prüfen, ob E-Mail bei anderem Benutzer vergeben ist
       const emailInUse = await emailExistsForOtherUser(db, email, loginid);
       if (emailInUse) {
-        res.status(409).send("E-Mail ist bereits vergeben.");
+        res.status(409).send('backend.error.conflict.emailTaken');
         return;
       }
 
@@ -283,8 +289,8 @@ export const createOrUpdateUser = async (db: Connection, req: Request, res: Resp
          WHERE loginid = ?`,
         [name, email, anrede, city, street, houseNumber, postalCode, phone, mobile, loginid],
         (err) => {
-          if (err) return res.status(500).send("Fehler beim Aktualisieren.");
-          res.send("Benutzerdaten erfolgreich aktualisiert.");
+          if (err) return res.status(500).send('backend.error.server.updateError');
+          res.send('backend.success.user.dataUpdated');
         }
       );
     } else {
@@ -297,10 +303,10 @@ export const createOrUpdateUser = async (db: Connection, req: Request, res: Resp
            (SELECT COUNT(*) FROM users WHERE email = ?) AS emailCount`,
         [loginname, email],
         async (err, results: any) => {
-          if (err) return res.status(500).send("Fehler beim Einmaligkeitscheck.");
+          if (err) return res.status(500).send('backend.error.server.uniquenessCheckError');
 
           if (results[0].loginCount > 0 || results[0].emailCount > 0) {
-            return res.status(409).send("Loginname oder E-Mail bereits vergeben.");
+            return res.status(409).send('backend.error.conflict.loginOrEmailTaken');
           }
 
           try {
@@ -308,21 +314,32 @@ export const createOrUpdateUser = async (db: Connection, req: Request, res: Resp
             db.query(
               `INSERT INTO users (loginid, name, email, anrede, city, street, houseNumber, postalCode, phone, mobile)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-              [newLoginId, name, email, anrede, city, street, houseNumber, postalCode, phone, mobile],
+              [
+                newLoginId,
+                name,
+                email,
+                anrede,
+                city,
+                street,
+                houseNumber,
+                postalCode,
+                phone,
+                mobile,
+              ],
               (uErr) => {
-                if (uErr) return res.status(500).send("Fehler beim Anlegen.");
-                res.status(201).send("Benutzer erfolgreich erstellt.");
+                if (uErr) return res.status(500).send('backend.error.server.creationError');
+                res.status(201).send('backend.success.user.created');
               }
             );
           } catch (err) {
-            console.error("Fehler beim Anlegen:", err);
-            res.status(500).send("Serverfehler.");
+            console.error('Fehler beim Anlegen:', err);
+            res.status(500).send('backend.error.server.serverError');
           }
         }
       );
     }
   } catch (error) {
-    console.error("Fehler in createOrUpdateUser:", error);
-    res.status(500).send("Serverfehler.");
+    console.error('Fehler in createOrUpdateUser:', error);
+    res.status(500).send('backend.error.server.serverError');
   }
 };

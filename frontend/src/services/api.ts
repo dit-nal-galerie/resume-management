@@ -1,7 +1,8 @@
 const API_URL = 'http://localhost:3001';
 import { User } from '../../../interfaces/User';
-import { Resume } from "../../../interfaces/Resume";
-// Функция для создания нового пользователя
+import { Resume } from '../../../interfaces/Resume';
+
+// Create or update user
 export const createOrUpdateUser = async (userData: User): Promise<string> => {
   const response = await fetch(`${API_URL}/createOrUpdateUser`, {
     method: 'POST',
@@ -12,30 +13,23 @@ export const createOrUpdateUser = async (userData: User): Promise<string> => {
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-  throw new Error(`Serverfehler: ${errorText}`);
-
+    throw new Error('api.error.user_update_failed');
   }
 
   return await response.text();
 };
 
-// API сервис для работы с запросами восстановления пароля
-
-// Интерфейс для ответа API
 interface ApiResponse {
   success: boolean;
   message?: string;
   error?: string;
 }
 
-/**
- * Функция для запроса восстановления пароля
- * @param loginname Имя пользователя
- * @param email Email пользователя
- * @returns Promise с результатом операции
- */
-export const requestPasswordReset = async (loginname: string, email: string): Promise<ApiResponse> => {
+// Request password reset
+export const requestPasswordReset = async (
+  loginname: string,
+  email: string
+): Promise<ApiResponse> => {
   try {
     const response = await fetch(`${API_URL}/request-password-reset`, {
       method: 'POST',
@@ -44,33 +38,26 @@ export const requestPasswordReset = async (loginname: string, email: string): Pr
       },
       body: JSON.stringify({ loginname, email }),
     });
-    
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API error:", errorText);
       return {
         success: false,
-        error: "Serverfehler. Bitte versuchen Sie es später erneut."
+        error: 'api.error.server',
       };
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("API error:", error);
     return {
       success: false,
-      error: "Serverfehler. Bitte versuchen Sie es später erneut."
+      // error: 'api.error.server',
+      error: error instanceof Error ? error.message : 'api.error.server',
     };
   }
 };
 
-/**
- * Функция для отправки запроса на сброс пароля
- * @param token Токен для сброса пароля
- * @param newPassword Новый пароль пользователя
- * @returns Promise с результатом операции
- */
+// Reset password
 export const resetPassword = async (token: string, newPassword: string): Promise<ApiResponse> => {
   try {
     const response = await fetch(`${API_URL}/reset-password`, {
@@ -80,75 +67,60 @@ export const resetPassword = async (token: string, newPassword: string): Promise
       },
       body: JSON.stringify({ token, newPassword }),
     });
-    
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API error:", errorText);
       return {
         success: false,
-        error: "Serverfehler. Bitte versuchen Sie es später erneut."
+        error: 'api.error.password_reset_failed',
       };
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("API error:", error);
     return {
       success: false,
-      error: "Serverfehler. Bitte versuchen Sie es später erneut."
+      error: error instanceof Error ? error.message : 'api.error.password_reset_failed',
     };
   }
 };
 
-/**
- * Функция для проверки валидности токена
- * @param token Токен для проверки
- * @returns Promise с результатом проверки
- */
+// Validate token
 export const validateToken = async (token: string): Promise<ApiResponse> => {
   try {
-    // Проверка на пустой токен
     if (!token) {
       return {
         success: false,
-        error: "Token ist erforderlich"
+        error: 'api.error.token_required',
       };
     }
-    
+
     const response = await fetch(`${API_URL}/validate-token?token=${token}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
     });
-    
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API error:", errorText);
       return {
         success: false,
-        error: "Fehler bei der Tokenüberprüfung"
+        error: 'api.error.token_invalid',
       };
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("API error:", error);
     return {
       success: false,
-      error: "Fehler bei der Tokenüberprüfung"
+      error: error instanceof Error ? error.message : 'api.error.token_invalid',
     };
   }
 };
 
-
-
-// Функция для логина пользователя
+// User login
 export const login = async (loginname: string, password: string) => {
-  console.log("🔹 API-Aufruf mit loginname:", loginname, "und Passwort:"  ,password);
-
   const response = await fetch(`${API_URL}/login`, {
     method: 'POST',
     headers: {
@@ -158,15 +130,15 @@ export const login = async (loginname: string, password: string) => {
   });
 
   if (!response.ok) {
-    throw new Error('Ошибка при авторизации');
+    throw new Error('api.error.login_failed');
   }
 
   return await response.json();
 };
 
-// Функция для получения данных пользователя
+// Fetch user data
 export const getUserData = async (loginid: number): Promise<User[]> => {
-  const response = await fetch(`${API_URL}/getUserData`, {
+  const response = await fetch(`${API_URL}/createOrUpdateUser`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -175,23 +147,19 @@ export const getUserData = async (loginid: number): Promise<User[]> => {
   });
 
   if (!response.ok) {
-    throw new Error('Ошибка при получении данных пользователя');
+    throw new Error('api.error.user_fetch_failed');
   }
 
   return await response.json();
 };
 
-// Функция для обновления данных пользователя
-export const updateUserData = async (loginId:number, userData: User): Promise<string> => {
-  
-
+// Update user data
+export const updateUserData = async (loginId: number, userData: User): Promise<string> => {
   if (!loginId) {
-    throw new Error("Fehler: Kein loginId gefunden. Bitte erneut einloggen.");
+    throw new Error('api.error.user_update_failed');
   }
 
-  console.log("🔹 API-Aufruf mit loginId:", loginId, "und Daten:", JSON.stringify(userData));
-
-  const requestBody: any = {
+  const requestBody: Partial<User> = {
     loginid: loginId,
     name: userData.name,
     email: userData.email,
@@ -209,22 +177,20 @@ export const updateUserData = async (loginId:number, userData: User): Promise<st
   }
 
   const response = await fetch(`${API_URL}/createOrUpdateUser`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Fehler bei der Benutzeraktualisierung: ${errorText}`);
+    throw new Error('api.error.user_update_failed');
   }
 
-  // ✅ Nutzerprofil in `localStorage` speichern, wenn Update erfolgreich war
-  localStorage.setItem("user", JSON.stringify(userData));
-
+  localStorage.setItem('user', JSON.stringify(userData));
   return await response.text();
 };
-// Функция для получения списка обращений (Anrede)
+
+// Fetch salutation list
 export const getAnrede = async (): Promise<{ id: number; text: string }[]> => {
   const response = await fetch(`${API_URL}/getAnrede`, {
     method: 'GET',
@@ -234,41 +200,47 @@ export const getAnrede = async (): Promise<{ id: number; text: string }[]> => {
   });
 
   if (!response.ok) {
-    throw new Error('Ошибка при получении данных anrede');
+    throw new Error('api.error.anrede_fetch_failed');
   }
 
   return await response.json();
 };
 
-export const getResumesWithUsers = async (userid: number): Promise<any[]> => {
+import { Contact } from '../../../interfaces/Contact';
+import { Company } from '../../../interfaces/Company';
+import { HistoryEntry } from '../../../interfaces/histori';
+
+// Fetch resumes with users
+export const getResumesWithUsers = async (userid: number): Promise<Resume[]> => {
   const response = await fetch(`${API_URL}/getResumesWithUsers?userid=${userid}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Serverfehler: ${errorText}`);
+    throw new Error('api.error.resume_fetch_failed');
   }
 
   return await response.json();
 };
 
+// Fetch resume by id
 export const getResumeById = async (id: number): Promise<Resume> => {
- console.log("🔹 123 API-Aufruf mit ID:", id);
   const response = await fetch(`${API_URL}/getResumeById/${id}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
-    throw new Error(`Serverfehler: ${await response.text()}`);
+    throw new Error('api.error.resume_fetch_failed');
   }
 
   return await response.json();
 };
+
+// Update or create resume
 export const updateOrCreateResume = async (resume: Resume): Promise<void> => {
   const response = await fetch(`${API_URL}/updateOrCreateResume`, {
     method: 'POST',
@@ -279,99 +251,105 @@ export const updateOrCreateResume = async (resume: Resume): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw new Error(`Fehler beim Speichern der Bewerbung: ${response.statusText}`);
+    throw new Error('api.error.resume_save_failed');
   }
 };
 
+// Fetch states
 export const getStates = async (): Promise<{ stateid: number; text: string }[]> => {
   const response = await fetch(`${API_URL}/getStates`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
-    throw new Error("Fehler beim Laden der Status.");
+    throw new Error('api.error.server');
   }
 
   return await response.json();
 };
 
-import { Contact } from "../../../interfaces/Contact";
-import { Company } from '../../../interfaces/Company';
-import { HistoryEntry } from '../../../interfaces/histori';
-
+// Create or update contact
 export const createOrUpdateContact = async (contact: Contact): Promise<void> => {
-  // Setzt `contactid` auf 0, falls er nicht vorhanden ist (neuer Kontakt)
   const contactData = { ...contact, contactid: contact.contactid ?? 0 };
 
   const response = await fetch(`${API_URL}/createOrUpdateContact`, {
-    method: "POST", // Backend entscheidet automatisch, ob Insert oder Update
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(contactData),
   });
 
   if (!response.ok) {
-    throw new Error("Fehler beim Speichern oder Aktualisieren des Kontakts: " + await response.text());
+    throw new Error('api.error.contact_save_failed');
   }
 };
 
-
+// Fetch companies
 export const getCompanies = async (loginId: number, isRecruter: boolean): Promise<Company[]> => {
-  console.log("🔹 API-Aufruf getCompanies mit loginId:", loginId, "und isRecruter:", isRecruter);
-  const response = await fetch(`${API_URL}/companies?loginId=${loginId}&isRecruter=${isRecruter||false}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
+  const response = await fetch(
+    `${API_URL}/companies?loginId=${loginId}&isRecruter=${isRecruter || false}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 
   if (!response.ok) {
-    throw new Error(`Fehler beim Abrufen der Firmen: ${await response.text()}`);
+    throw new Error('api.error.company_fetch_failed');
   }
 
   return await response.json();
 };
+
+// Fetch contacts
 export const getContacts = async (loginId: number, companyId: number): Promise<Contact[]> => {
   const response = await fetch(`${API_URL}/contacts?ref=${loginId}&company=${companyId}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
-    throw new Error(`Fehler beim Abrufen der Kontakte: ${await response.text()}`);
+    throw new Error('api.error.contact_fetch_failed');
   }
 
   return await response.json();
 };
 
-export const getHistoryByResumeId = async (resumeId: number, refId: number): Promise<HistoryEntry[]> => {
-    const url = `${API_URL}/getHistoryByResumeId?resumeId=${resumeId}&refId=${refId}`;
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
+// Fetch history by resume id
+export const getHistoryByResumeId = async (
+  resumeId: number,
+  refId: number
+): Promise<HistoryEntry[]> => {
+  const url = `${API_URL}/getHistoryByResumeId?resumeId=${resumeId}&refId=${refId}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
-    if (!response.ok) {
-        throw new Error(`Failed to fetch history: ${response.status}`);
-    }
-    return response.json();
+  if (!response.ok) {
+    throw new Error('api.error.history_fetch_failed');
+  }
+  return response.json();
 };
+
+// Change resume status
 export const changeResumeStatus = async (
   resumeId: number,
   userId: number,
   stateId: number,
   date: string
 ): Promise<void> => {
-    const url = `${API_URL}/changeResumeStatus`;
+  const url = `${API_URL}/changeResumeStatus`;
   const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ resumeId, userId, stateId, date }),
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Fehler beim Ändern des Status");
+    throw new Error('api.error.status_change_failed');
   }
 };
 
@@ -381,6 +359,7 @@ interface UpdateAccessDataResponse {
   user?: User;
 }
 
+// Update access data
 export const updateAccessData = async (data: {
   userId: number;
   loginname: string;
@@ -394,8 +373,8 @@ export const updateAccessData = async (data: {
 
   try {
     const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
 
@@ -404,20 +383,19 @@ export const updateAccessData = async (data: {
     if (!res.ok) {
       return {
         success: false,
-        message: result.message || "Fehler beim Speichern",
+        message: 'api.error.access_save_failed',
       };
     }
 
     return {
       success: true,
       message: result.message,
-      user: result.user, // vom Backend zurückgegeben
+      user: result.user,
     };
   } catch (error) {
-    console.error("API-Fehler:", error);
     return {
       success: false,
-      message: "Serverfehler oder keine Verbindung: \n" + error,
+      message: error instanceof Error ? error.message : 'api.error.server',
     };
   }
 };

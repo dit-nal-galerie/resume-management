@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false, 
-    "target": "ES6",
+    "noImplicitAny": false,
+    "target": "ES2015", // oder höher, z. B. ES2020
+    "lib": ["ES2015"], // optional, für moderne APIs
+
     "module": "commonjs",
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx"
-
-  
-  
-},
-  "include": ["src/**/*.ts", "../../interfaces/**/*.ts"]
+  },
+  "include": ["tests", "src/**/*.ts", "../../interfaces/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

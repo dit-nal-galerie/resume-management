@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "es2015",
+    "lib": ["dom", "dom.iterable", "esnext", "es2015"],
+
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,9 +15,18 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["jest", "node"],
+    "baseUrl": "src",
+    "paths": {
+      "@interfaces/*": ["../../interfaces/*"]
+    }
   },
+
   "include": [
-    "src", "../../interfaces/**/*.ts"
-  ]
+    "src",
+    "tests",
+    "../../interfaces/**/*.ts" // Behalten Sie dies, damit TypeScript die Dateien zur Typprüfung findet
+  ],
+  "exclude": ["node_modules"]
 }

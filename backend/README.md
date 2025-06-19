@@ -3,6 +3,7 @@
 ## Обзор
 
 Данная интеграция добавляет в TypeScript-бэкенд полноценную функциональность восстановления пароля:
+
 1. Запрос восстановления пароля (проверка пользователя и отправка email)
 2. Проверка валидности токена
 3. Сброс пароля по токену
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 ## API Endpoints
 
 ### 1. Запрос восстановления пароля
+
 - **URL**: `/request-password-reset`
 - **Метод**: `POST`
 - **Тело запроса**:
@@ -76,6 +78,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   ```
 
 ### 2. Проверка валидности токена
+
 - **URL**: `/validate-token?token=YOUR_TOKEN`
 - **Метод**: `GET`
 - **Ответ при успехе**:
@@ -94,6 +97,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   ```
 
 ### 3. Сброс пароля по токену
+
 - **URL**: `/reset-password`
 - **Метод**: `POST`
 - **Тело запроса**:
@@ -125,6 +129,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 1. Убедитесь, что URL в конфигурации (`RESET_PASSWORD_URL`) указывает на правильный адрес страницы восстановления пароля.
 
 2. В React-компоненте `RequestPasswordReset.tsx` используйте следующий код для запроса восстановления пароля:
+
 ```typescript
 const requestPasswordReset = async (loginname: string, email: string) => {
   try {
@@ -135,7 +140,7 @@ const requestPasswordReset = async (loginname: string, email: string) => {
       },
       body: JSON.stringify({ loginname, email }),
     });
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -146,6 +151,7 @@ const requestPasswordReset = async (loginname: string, email: string) => {
 ```
 
 3. В React-компоненте `ResetPassword.tsx` используйте следующий код для проверки токена и сброса пароля:
+
 ```typescript
 // Для проверки токена
 const validateToken = async (token: string) => {
@@ -169,7 +175,7 @@ const resetPassword = async (token: string, newPassword: string) => {
       },
       body: JSON.stringify({ token, newPassword }),
     });
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -182,12 +188,14 @@ const resetPassword = async (token: string, newPassword: string) => {
 ## Безопасность
 
 1. **Токены**:
+
    - Токены генерируются с использованием криптографически стойкого генератора случайных чисел
    - Токены имеют ограниченный срок действия (10 минут по умолчанию)
    - Токены могут быть использованы только один раз
    - Старые токены автоматически удаляются при создании новых
 
 2. **Пароли**:
+
    - Пароли хешируются с использованием bcrypt
    - Минимальная длина пароля - 2 символа (можно увеличить в валидации)
 
@@ -202,12 +210,14 @@ const resetPassword = async (token: string, newPassword: string) => {
 ## Рекомендации по улучшению
 
 1. **Безопасность**:
+
    - Увеличить минимальную длину пароля до 8 символов
    - Добавить требования к сложности пароля (цифры, спецсимволы)
    - Настроить HTTPS для всех API-запросов
    - Добавить ограничение на количество попыток восстановления пароля
 
 2. **Мониторинг**:
+
    - Добавить логирование всех попыток восстановления пароля
    - Настроить уведомления о подозрительной активности
 

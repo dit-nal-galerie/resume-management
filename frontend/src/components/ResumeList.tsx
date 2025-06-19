@@ -1,191 +1,167 @@
-import React, { useState, useEffect } from "react";
-import { getResumesWithUsers } from "../services/api";
-import { Resume } from "../../../interfaces/Resume";
-import { loadUserFromStorage } from "../utils/storage";
-import { User } from "../../../interfaces/User";
-import { useNavigate } from "react-router-dom";
-import { HistoryModal } from "./resume/HistoryModal";
-import { StatusModal } from "./resume/StatusModal";
-import { Menu, MenuButton } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
-
-
-
+import React, { useState, useEffect, useRef } from 'react';
+import { getResumesWithUsers } from '../services/api';
+import { Resume } from '../../../interfaces/Resume';
+import { loadUserFromStorage } from '../utils/storage';
+import { User } from '../../../interfaces/User';
+import { useNavigate } from 'react-router-dom';
+import { HistoryModal } from './resume/HistoryModal';
+import { StatusModal } from './resume/StatusModal';
+import { useTranslation } from 'react-i18next';
+import PageHeader from './ui/PageHeader';
+import { PageId } from './ui/PageId';
 
 const ResumeList: React.FC = () => {
+  const { t } = useTranslation();
   const storedUser: User = loadUserFromStorage();
-  const [userLoginName, setUserLoginName] = useState(storedUser.name ||storedUser.loginname);
+  const [userLoginName] = useState(storedUser.name || storedUser.loginname);
   const [resumes, setResumes] = useState<Resume[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Umbenannt, um klarer zu sein
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
- const [isModalStatusOpen, setIisModalStatusOpen] = useState(false);
+  const [isModalStatusOpen, setIisModalStatusOpen] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
- const [refresh, setRefresh] = useState(false);
-
-const refreshResumes = () => {
-  const userId = storedUser?.loginid;
-  if (userId) {
-    getResumesWithUsers(userId)
-      .then((data) => setResumes(data))
-      .catch((err) => console.error("Fehler beim Laden der Bewerbungen:", err));
-  }
-};
+  // Dropdown state
+  const [menuOpen, setMenuOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
 
   const navigate = useNavigate();
 
-useEffect(() => {
-   console.log("🔁 Resumes neu laden...");
-  refreshResumes();
-}, [refresh]);
+  useEffect(() => {
+    const userId = storedUser?.loginid;
+    if (userId) {
+      getResumesWithUsers(userId)
+        .then((data) => setResumes(data))
+        .catch((err) => console.error(t('resumeList.loadError'), err));
+    }
+  }, [refresh, storedUser, t]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      // Prüfe, ob Klick außerhalb von Menü UND Button war
+      if (
+        menuOpen &&
+        menuRef.current &&
+        buttonRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) {
+      setTimeout(() => document.addEventListener('mousedown', handleClick), 0);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }
+  }, [menuOpen]);
+  // Position menu below button
+  const handleMenuOpen = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
+    }
+    setMenuOpen(true);
+  };
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (menuOpen) setMenuOpen(false);
+    };
+    if (menuOpen) {
+      setTimeout(() => document.addEventListener('mousedown', handleClick), 0);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }
+  }, [menuOpen]);
 
   const openHistoryModal = (resume: Resume) => {
     setSelectedResume(resume);
-    setIsModalOpen(true); // Geändert
+    setIsModalOpen(true);
   };
-const handleStatusChanged = () => {
-  setRefresh((prev) => !prev); // Toggle -> löst useEffect aus
-};
+  const handleStatusChanged = () => setRefresh((prev) => !prev);
   const openStatusModal = (resume: Resume) => {
     setSelectedResume(resume);
-    console.log("openStatusModal", resume, "status", resume.stateId);
-    setIisModalStatusOpen(true); // Geändert
+    setIisModalStatusOpen(true);
+  };
+  const closeHistoryModal = () => {
+    setIsModalOpen(false);
+    setSelectedResume(null);
   };
 
-  const closeHistoryModal = () => {
-    setIsModalOpen(false); // Hinzugefügt
-    setSelectedResume(null); // Zurücksetzen des ausgewählten Resumes
-  };
+  const pageTitle = `${t('resumeList.title')} - ${userLoginName}`;
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
-     
-<div className="sticky top-0 bg-gray-800 text-white p-4 rounded-lg flex justify-between items-center">
-  <h2 className="text-xl font-semibold">Bewerbungen – {userLoginName}</h2>
-
-  <Menu as="div" className="relative inline-block text-left">
-    <MenuButton className="inline-flex justify-center w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-sm font-medium">
-      Menü
-      <ChevronDownIcon className="w-5 h-5 ml-2 -mr-1" aria-hidden="true" />
-    </MenuButton >
-
-    <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-      <div className="py-1">
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              onClick={() => navigate("/resume/0")}
-              className={`${
-                active ? "bg-gray-100" : ""
-              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
-            >
-              Neue Bewerbung
-            </button>
-          )}
-        </Menu.Item>
-
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              onClick={() => navigate("/profile")}
-              className={`${
-                active ? "bg-gray-100" : ""
-              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
-            >
-              Profil editieren
-            </button>
-          )}
-        </Menu.Item>
-
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              onClick={() => navigate("/changeaccess")} // passe Route für Zugangsdaten an
-              className={`${
-                active ? "bg-gray-100" : ""
-              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
-            >
-              Zugangsdaten ändern
-            </button>
-          )}
-        </Menu.Item>
-
-        <Menu.Item>
-          {({ active }) => (
-            <button
-              onClick={() => navigate("/about")} // passe Route für „Über“ an
-              className={`${
-                active ? "bg-gray-100" : ""
-              } block w-full text-left px-4 py-2 text-sm text-gray-700`}
-            >
-              Über
-            </button>
-          )}
-        </Menu.Item>
-      </div>
-    </Menu.Items>
-  </Menu>
-</div>
-
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+    <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
+      <PageHeader pageTitle={pageTitle} pageId={PageId.ResumeList} />
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         {resumes.map((resume) => (
-          <div
-            key={resume.resumeId}
-            className="p-4 bg-gray-100 rounded-lg shadow-md relative"
-          >
+          // console.log('Rendering resume:', JSON.stringify(resume, null, 2)),
+          <div key={resume.resumeId} className="relative rounded-lg bg-gray-100 p-4 shadow-md">
             <h3 className="text-lg font-semibold">{resume.position}</h3>
-            <p className="text-gray-600">Firma: {resume.company?.name}</p>
-            <p className="text-gray-600">Recruting: {resume.recrutingCompany?.name}</p>
-            <p className="text-gray-600">Status: {resume.stateText}</p>
-            <p className="text-gray-500 text-sm">Erstellt am: {resume.created}</p>
+            <p className="text-gray-600">
+              {t('resumeList.company')}: {resume.company?.name}
+            </p>
+            <p className="text-gray-600">
+              {t('resumeList.recruiting')}: {resume.recrutingCompany?.name || ''}
+            </p>
+            <p className="text-gray-600">
+              {t('common.status')}: {t(resume.stateText)}
+            </p>
+            <p className="text-sm text-gray-500">
+              {t('resumeList.createdAt')}: {resume.created}
+            </p>
 
-          
-            <div className="sticky bottom-0 flex space-x-2 mt-4">
+            <div className="sticky bottom-0 mt-4 flex space-x-2">
               <button
                 onClick={() => navigate(`/resume/${resume.resumeId}`)}
-                className="bg-green-500 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+                className="rounded-md bg-green-500 px-3 py-1 text-white hover:bg-green-700"
               >
-                Anschauen/Ändern
+                {t('resumeList.viewEdit')}
               </button>
               <button
                 onClick={() => openStatusModal(resume)}
-                className="bg-yellow-500 hover:bg-yellow-700 text-white px-3 py-1 rounded-md"
+                className="rounded-md bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-700"
               >
-                Status ändern
+                {t('resumeList.changeStatus')}
               </button>
-             {resume&&resume.resumeId>0 && (<button
-                onClick={() => openHistoryModal(resume)}
-                className="bg-gray-600 hover:bg-gray-800 text-white px-3 py-1 rounded-md"
-              >
-                Historie
-              </button> )}
+              {resume && resume.resumeId > 0 && (
+                <button
+                  onClick={() => openHistoryModal(resume)}
+                  className="rounded-md bg-gray-600 px-3 py-1 text-white hover:bg-gray-800"
+                >
+                  {t('resumeList.history')}
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
-      {isModalOpen && selectedResume&& (
-      <HistoryModal
-      isOpen= {isModalOpen} // Verwenden Sie den Zustand isModalOpen,
-        onClose={closeHistoryModal} // Verwenden Sie die neue closeHistoryModal Funktion
-        resumeId={selectedResume.resumeId  } // Verwenden Sie selectedResume
-        refId={storedUser.loginid}
-        resumeTitle={selectedResume.position || ""} // Verwenden Sie selectedResume
-         currentStateId={selectedResume.stateId || 0} // Verwenden Sie selectedResume;
-      />)}
-
-            {/* StatusModal */}
-      {selectedResume &&isModalStatusOpen && (
-
-
-        <StatusModal
-  isOpen={true}
-   onClose={() => setIisModalStatusOpen(false)}
-  resumeId={selectedResume.resumeId}
-  refId={storedUser.loginid}
-  resumeTitle={selectedResume.position || ""}
+      {isModalOpen && selectedResume && (
+        <HistoryModal
+          isOpen={isModalOpen}
+          onClose={closeHistoryModal}
+          resumeId={selectedResume.resumeId}
+          refId={storedUser.loginid}
+          resumeTitle={selectedResume.position || ''}
           currentStateId={selectedResume.stateId || 0}
-  onStatusChanged={handleStatusChanged}
-/>
+        />
+      )}
+
+      {/* StatusModal */}
+      {selectedResume && isModalStatusOpen && (
+        <StatusModal
+          isOpen={true}
+          onClose={() => setIisModalStatusOpen(false)}
+          resumeId={selectedResume.resumeId}
+          refId={storedUser.loginid}
+          resumeTitle={selectedResume.position || ''}
+          currentStateId={selectedResume.stateId || 0}
+          onStatusChanged={handleStatusChanged}
+        />
       )}
     </div>
   );
