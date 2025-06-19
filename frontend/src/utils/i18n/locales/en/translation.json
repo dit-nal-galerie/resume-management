@@ -202,7 +202,8 @@
     "mobilePlaceholder": "Enter mobile number",
     "notSpecified": "Not specified",
     "createNew": "Create new",
-    "select": "Select"
+    "select": "Select",
+    "mobile": "Mobile"
   },
   "validation": {
     "required": "This field is required.",
@@ -279,6 +280,22 @@
     ]
   },
   "backend": {
+    "db": {
+      "salutation": {
+        "mr": "Mr.",
+        "mrs": "Mrs.",
+        "diverse": "Diverse"
+      },
+      "state": {
+        "registered": "Registered",
+        "sent": "Sent",
+        "response_received": "Response received",
+        "invited_to_meeting": "Invited to meeting",
+        "canceled": "Canceled",
+        "offer_received": "Offer received"
+      }
+    },
+
     "error": {
       "validation": {
         "missingFields": "All required fields must be filled in.",

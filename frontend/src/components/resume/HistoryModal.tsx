@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { changeResumeStatus, getHistoryByResumeId, getStates } from '../../services/api';
+import { changeResumeStatus, getHistoryByResumeId } from '../../services/api';
 import { HistoryEntry } from '../../../../interfaces/histori';
 import DatePicker from 'react-datepicker';
 import { StatusModalProps } from './ResumeEditModals.types';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
+import { getCachedStates } from '../../utils/storage';
 
 interface StateOption {
   stateid: number;
@@ -29,7 +30,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
   const [selectedState, setSelectedState] = useState<number>(currentStateId);
 
   useEffect(() => {
-    getStates().then(setStates).catch(console.error);
+    getCachedStates().then(setStates).catch(console.error);
     setSelectedDate(new Date());
   }, [resumeId]);
 
@@ -85,7 +86,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
               <tbody>
                 {history.map((entry, index) => (
                   <tr key={index}>
-                    <td className="py-2">{entry.status}</td>
+                    <td className="py-2">{t(entry.status)}</td>
                     <td className="py-2">{new Date(entry.date).toLocaleDateString()}</td>
                   </tr>
                 ))}
@@ -115,7 +116,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
                 >
                   {states.map((s) => (
                     <option key={s.stateid} value={s.stateid}>
-                      {s.text}
+                      {t(s.text)}
                     </option>
                   ))}
                 </select>

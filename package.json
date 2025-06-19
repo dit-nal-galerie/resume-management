@@ -26,6 +26,8 @@
     "@typescript-eslint/parser": "^8.33.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-unused-imports": "^4.1.4",
     "prettier": "^3.5.3",
     "prettier-plugin-curly": "^0.3.2",

@@ -54,7 +54,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
             <option value="">{t('common.required')}</option>
             {anredeOptions.map((option) => (
               <option key={option.id} value={option.id}>
-                {option.text}
+                {t(option.text)}
               </option>
             ))}
           </select>

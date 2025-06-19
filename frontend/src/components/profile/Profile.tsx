@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getUserData, updateUserData, createOrUpdateUser, getAnrede } from '../../services/api';
+import { updateUserData, createOrUpdateUser } from '../../services/api';
 import { User } from '../../../interfaces/User';
-import { loadUserFromStorage } from '../../utils/storage';
+import { getCachedAnrede, loadUserFromStorage } from '../../utils/storage';
 
 import ProfileForm from './ProfileForm';
 import LoginForm from 'components/login/LoginForm';
@@ -57,20 +57,7 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      // const userId = getUserId();
-      // try {
-      //   setIsLoading(true);
-      //   const profileData = await getUserData(userId);
-
-      //   if (profileData) {
-      //     setFormData(profileData[0]);
-      //   }
-      // } catch (error) {
-      //   setServerError(t('common.serverError')+ " " + error);
-      // } finally {
-      //   setIsLoading(false);
-      // }
-      const anredeData = await getAnrede();
+      const anredeData = await getCachedAnrede();
       setAnredeOptions(anredeData);
     };
 

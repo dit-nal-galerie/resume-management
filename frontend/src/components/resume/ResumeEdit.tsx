@@ -2,14 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Resume } from '../../../../interfaces/Resume';
 import { User } from '../../../../interfaces/User';
-import {
-  getCompanies,
-  getContacts,
-  getResumeById,
-  getStates,
-  updateOrCreateResume,
-} from '../../services/api';
-import { loadUserFromStorage } from '../../utils/storage';
+import { getCompanies, getContacts, getResumeById, updateOrCreateResume } from '../../services/api';
+import { getCachedStates, loadUserFromStorage } from '../../utils/storage';
 
 import { Company } from '../../../../interfaces/Company';
 
@@ -122,7 +116,7 @@ const ResumeEdit: React.FC = () => {
   const openHistoryModal = () => setIsModalOpen(true);
 
   useEffect(() => {
-    getStates()
+    getCachedStates()
       .then(setStatusList)
       .catch(() => {});
 
@@ -227,7 +221,7 @@ const ResumeEdit: React.FC = () => {
             <option value="">{t('resumeEdit.statusSelect')}</option>
             {statusList.map((s) => (
               <option key={s.stateid} value={s.stateid}>
-                {s.text}
+                {t(s.text)}
               </option>
             ))}
           </select>
@@ -265,6 +259,7 @@ const ResumeEdit: React.FC = () => {
             className={`${inputClasses} cursor-not-allowed bg-gray-100`}
             value={resumeData.created}
             readOnly
+            title={t('resumeEdit.created')}
           />
         </FormField>
 

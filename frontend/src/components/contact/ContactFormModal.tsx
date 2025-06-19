@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getAnrede } from '../../services/api';
+
 import { Anrede, Contact } from '../../../../interfaces/Contact';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
+import { getCachedAnrede } from '../../utils/storage';
 
 interface ContactFormModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
   useEffect(() => {
     const fetchAnreden = async () => {
       try {
-        const result = await getAnrede();
+        const result = await getCachedAnrede();
         setAnreden(result);
       } catch (error) {
         console.error(t('common.error'), error);
@@ -79,7 +80,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                 >
                   {anreden.map((a) => (
                     <option key={a.id} value={a.id}>
-                      {a.text || t('common.select')}
+                      {t(a.text)}
                     </option>
                   ))}
                 </select>
@@ -119,6 +120,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   value={contactData.email}
                   onChange={handleChange}
                   className={inputClasses}
+                  placeholder={t('contact.email')}
                   required
                 />
               </FormField>

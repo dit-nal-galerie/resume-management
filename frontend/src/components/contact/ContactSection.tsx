@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Anrede, Contact } from '../../../../interfaces/Contact';
 import { getAnrede } from '../../services/api';
 import { useTranslation } from 'react-i18next';
+import { getCachedAnrede } from '../../utils/storage';
 
 interface ContactSectionProps {
   title: string;
@@ -30,7 +31,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({
     const fetchAnreden = async () => {
       setIsLoadingAnreden(true);
       try {
-        const result = await getAnrede();
+        const result = await getCachedAnrede();
         setAnredenListe(result);
       } catch (error) {
         console.error(t('common.error'), error);
@@ -40,7 +41,6 @@ const ContactSection: React.FC<ContactSectionProps> = ({
       }
     };
     fetchAnreden();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const exists = contact !== null && contact?.name !== null && contact?.contactid !== undefined;
@@ -52,7 +52,17 @@ const ContactSection: React.FC<ContactSectionProps> = ({
     if (!kontakt) return t('contact.notSpecified');
     const gefundeneAnrede = anreden.find((a) => a.id === kontakt.anrede);
     const anredeText = gefundeneAnrede ? gefundeneAnrede.text : '';
-    const teile = [anredeText, kontakt.title, kontakt.vorname, kontakt.zusatzname, kontakt.name];
+    if (!kontakt.name && !kontakt.vorname && !kontakt.title && !kontakt.zusatzname) {
+      return t('contact.notSpecified');
+    }
+    console.log('Anrede:', anredeText);
+    const teile = [
+      anredeText ? t(anredeText) : '',
+      kontakt.title,
+      kontakt.vorname,
+      kontakt.zusatzname,
+      kontakt.name,
+    ];
     return teile.filter((teil) => teil).join(' ');
   };
 

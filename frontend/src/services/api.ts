@@ -51,7 +51,8 @@ export const requestPasswordReset = async (
   } catch (error) {
     return {
       success: false,
-      error: 'api.error.server',
+      // error: 'api.error.server',
+      error: error instanceof Error ? error.message : 'api.error.server',
     };
   }
 };
@@ -79,7 +80,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
   } catch (error) {
     return {
       success: false,
-      error: 'api.error.password_reset_failed',
+      error: error instanceof Error ? error.message : 'api.error.password_reset_failed',
     };
   }
 };
@@ -113,7 +114,7 @@ export const validateToken = async (token: string): Promise<ApiResponse> => {
   } catch (error) {
     return {
       success: false,
-      error: 'api.error.token_invalid',
+      error: error instanceof Error ? error.message : 'api.error.token_invalid',
     };
   }
 };
@@ -158,7 +159,7 @@ export const updateUserData = async (loginId: number, userData: User): Promise<s
     throw new Error('api.error.user_update_failed');
   }
 
-  const requestBody: any = {
+  const requestBody: Partial<User> = {
     loginid: loginId,
     name: userData.name,
     email: userData.email,
@@ -210,7 +211,7 @@ import { Company } from '../../../interfaces/Company';
 import { HistoryEntry } from '../../../interfaces/histori';
 
 // Fetch resumes with users
-export const getResumesWithUsers = async (userid: number): Promise<any[]> => {
+export const getResumesWithUsers = async (userid: number): Promise<Resume[]> => {
   const response = await fetch(`${API_URL}/getResumesWithUsers?userid=${userid}`, {
     method: 'GET',
     headers: {
@@ -394,7 +395,7 @@ export const updateAccessData = async (data: {
   } catch (error) {
     return {
       success: false,
-      message: 'api.error.server',
+      message: error instanceof Error ? error.message : 'api.error.server',
     };
   }
 };

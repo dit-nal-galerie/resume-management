@@ -153,7 +153,8 @@
     "mobilePlaceholder": "Mobilnummer eingeben",
     "notSpecified": "Nicht angegeben",
     "createNew": "Neu erstellen",
-    "select": "Auswahl"
+    "select": "Auswahl",
+    "mobile": "Händy"
   },
   "validation": {
     "required": "Dieses Feld ist erforderlich",
@@ -281,22 +282,19 @@
   },
   "backend": {
     "db": {
-        "salutation": {
-          "mr": "Herr",
-          "mrs": "Frau",
-          "diverse": "Diverse"
+      "salutation": {
+        "mr": "Herr",
+        "mrs": "Frau",
+        "diverse": "Diverse"
       },
-   
       "state": {
-          "registered":"Eingetragen",
-          "sent":"Gesendet",
-          "response_received":"Antwort erhalten",
-          "invited_to_meeting":"Zu Besprechung eingeladen",
-          "canceled": "Abgesagt",
-          "offer_received": "Angebot erhalten"
-
+        "registered": "Eingetragen",
+        "sent": "Gesendet",
+        "response_received": "Antwort erhalten",
+        "invited_to_meeting": "Zu Besprechung eingeladen",
+        "canceled": "Abgesagt",
+        "offer_received": "Angebot erhalten"
       }
-  
     },
     "error": {
       "validation": {

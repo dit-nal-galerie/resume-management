@@ -1,5 +1,5 @@
+import React from 'react';
 import { User } from '@interfaces/User';
-
 export interface AnredeOption {
   id: number;
   text: string;

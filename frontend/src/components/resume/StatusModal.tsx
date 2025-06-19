@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { changeResumeStatus, getStates } from '../../services/api';
+import { changeResumeStatus } from '../../services/api';
 import { StatusModalProps } from './ResumeEditModals.types';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
+import { getCachedStates } from '../../utils/storage';
 
 interface StateOption {
   stateid: number;
@@ -27,7 +28,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   const [selectedState, setSelectedState] = useState<number>(currentStateId);
 
   useEffect(() => {
-    getStates().then(setStates).catch(console.error);
+    getCachedStates().then(setStates).catch(console.error);
     setSelectedDate(new Date());
   }, [resumeId]);
 
@@ -76,7 +77,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
             >
               {states.map((s) => (
                 <option key={s.stateid} value={s.stateid}>
-                  {s.text}
+                  {t(s.text)}
                 </option>
               ))}
             </select>

@@ -99,16 +99,17 @@ const ResumeList: React.FC = () => {
       <PageHeader pageTitle={pageTitle} pageId={PageId.ResumeList} />
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         {resumes.map((resume) => (
+          // console.log('Rendering resume:', JSON.stringify(resume, null, 2)),
           <div key={resume.resumeId} className="relative rounded-lg bg-gray-100 p-4 shadow-md">
             <h3 className="text-lg font-semibold">{resume.position}</h3>
             <p className="text-gray-600">
               {t('resumeList.company')}: {resume.company?.name}
             </p>
             <p className="text-gray-600">
-              {t('resumeList.recruiting')}: {resume.recrutingCompany?.name}
+              {t('resumeList.recruiting')}: {resume.recrutingCompany?.name || ''}
             </p>
             <p className="text-gray-600">
-              {t('common.status')}: {resume.stateText}
+              {t('common.status')}: {t(resume.stateText)}
             </p>
             <p className="text-sm text-gray-500">
               {t('resumeList.createdAt')}: {resume.created}
