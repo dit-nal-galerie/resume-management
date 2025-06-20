@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../../../interfaces/User';
 import { useTranslation } from 'react-i18next';
-import { login } from 'services/api';
-import { FormField, inputClasses } from '../ui/FormField';
+import { getUserAnredeAndName, login } from 'services/api';
+import { FormField } from '../ui/FormField';
 import { PageId } from 'components/ui/PageId';
 import PageHeader from 'components/ui/PageHeader';
 import i18n from 'utils/i18n/i18n';
@@ -16,10 +16,19 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ loginname?: string; password?: string }>({});
   const navigate = useNavigate();
   const loginInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    getUserAnredeAndName()
+      .then(goToResume)
+      .catch(() => setServerError(null));
+  }, []);
 
+  const goToResume = () => {
+    setServerError(null);
+    navigate('/resumes');
+  }
   const handleRegister = () => {
     localStorage.removeItem('user');
-    navigate('/profile?loginid=0');
+    navigate('/profile?isNew=true');
   };
 
   const handleRestorePassword = () => {
@@ -28,6 +37,7 @@ const Login: React.FC = () => {
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
 
     if (!loginname || !password) {
       setErrors({
@@ -38,12 +48,10 @@ const Login: React.FC = () => {
     }
 
     try {
-      const userData: User = await login(loginname, password);
+      const userData: User | null = await login(loginname, password);
 
       if (userData) {
-        setServerError(null);
-        localStorage.setItem('user', JSON.stringify(userData));
-        navigate('/resumes');
+        goToResume();
       } else {
         setServerError(t('login.invalidCredentials'));
         setErrors({
@@ -62,6 +70,7 @@ const Login: React.FC = () => {
     setErrors({});
   };
   console.log(i18n);
+
   return (
     <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
       <PageHeader pageTitle={t('login.title')} pageId={PageId.Login} />
@@ -73,11 +82,10 @@ const Login: React.FC = () => {
               <input
                 id="loginname"
                 type="text"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.loginname
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.loginname
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 placeholder={t('login.usernamePlaceholder')}
                 value={loginname}
                 onChange={(e) => setLoginname(e.target.value)}
@@ -92,11 +100,10 @@ const Login: React.FC = () => {
               <input
                 id="password"
                 type="password"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.password
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.password
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 placeholder={t('login.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

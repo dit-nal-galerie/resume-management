@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getResumesWithUsers } from '../services/api';
+import { getResumesWithUsers, getUserAnredeAndName } from '../services/api';
 import { Resume } from '../../../interfaces/Resume';
-import { loadUserFromStorage } from '../utils/storage';
+
 import { User } from '../../../interfaces/User';
 import { useNavigate } from 'react-router-dom';
 import { HistoryModal } from './resume/HistoryModal';
@@ -12,8 +12,8 @@ import { PageId } from './ui/PageId';
 
 const ResumeList: React.FC = () => {
   const { t } = useTranslation();
-  const storedUser: User = loadUserFromStorage();
-  const [userLoginName] = useState(storedUser.name || storedUser.loginname);
+
+  // const [userLoginName] = useState(storedUser.name || storedUser.loginname);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
@@ -28,17 +28,23 @@ const ResumeList: React.FC = () => {
     top: 0,
     left: 0,
   });
+  const [storedUser, setStoredUser] = useState<{ name: string; anredeText: string } | null>(null);
+
+  useEffect(() => {
+    getUserAnredeAndName()
+      .then(setStoredUser)
+      .catch(() => setStoredUser(null));
+  }, []);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userId = storedUser?.loginid;
-    if (userId) {
-      getResumesWithUsers(userId)
-        .then((data) => setResumes(data))
-        .catch((err) => console.error(t('resumeList.loadError'), err));
-    }
-  }, [refresh, storedUser, t]);
+
+    getResumesWithUsers()
+      .then((data) => setResumes(data))
+      .catch((err) => console.error(t('resumeList.loadError'), err));
+
+  }, [refresh, t]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -92,7 +98,7 @@ const ResumeList: React.FC = () => {
     setSelectedResume(null);
   };
 
-  const pageTitle = `${t('resumeList.title')} - ${userLoginName}`;
+  const pageTitle = `${t('resumeList.title')} - ${storedUser?.anredeText ? t(storedUser?.anredeText) : ''} ${storedUser?.name || ''}`;
 
   return (
     <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
@@ -145,7 +151,7 @@ const ResumeList: React.FC = () => {
           isOpen={isModalOpen}
           onClose={closeHistoryModal}
           resumeId={selectedResume.resumeId}
-          refId={storedUser.loginid}
+          refId={0}
           resumeTitle={selectedResume.position || ''}
           currentStateId={selectedResume.stateId || 0}
         />
@@ -157,7 +163,7 @@ const ResumeList: React.FC = () => {
           isOpen={true}
           onClose={() => setIisModalStatusOpen(false)}
           resumeId={selectedResume.resumeId}
-          refId={storedUser.loginid}
+          refId={0}
           resumeTitle={selectedResume.position || ''}
           currentStateId={selectedResume.stateId || 0}
           onStatusChanged={handleStatusChanged}

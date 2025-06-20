@@ -22,6 +22,7 @@
     "lint:backend": "eslint \"backend/**/*.{js,ts}\" --fix"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
     "@typescript-eslint/eslint-plugin": "^8.33.0",
     "@typescript-eslint/parser": "^8.33.0",
     "concurrently": "^8.2.2",
@@ -42,5 +43,8 @@
     "express"
   ],
   "author": "Ihr Name oder Team",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7"
+  }
 }

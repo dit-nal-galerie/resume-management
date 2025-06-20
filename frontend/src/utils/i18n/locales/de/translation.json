@@ -14,7 +14,8 @@
     "status": "Status",
     "name": "Name",
     "close": "Schließen",
-    "about": "Über"
+    "about": "Über",
+    "logout": "Ausloggen\n"
   },
   "navigation": {
     "login": "Anmelden",

@@ -1,10 +1,10 @@
 import { Anrede } from '../../../interfaces/Contact';
 import { getAnrede, getStates } from '../services/api';
 
-export const loadUserFromStorage = () => {
-  const userData = localStorage.getItem('user');
-  return userData ? JSON.parse(userData) : null;
-};
+// export const loadUserFromStorage = () => {
+//   const userData = localStorage.getItem('user');
+//   return userData ? JSON.parse(userData) : null;
+// };
 
 export const getCachedAnrede = async (): Promise<Anrede[]> => {
   const cached = sessionStorage.getItem('anredeList');

@@ -2,16 +2,25 @@ import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors'; // Importiere CORS
 import ResumeManagementAPI from './resumeManagementAPI'; // Importiere die API-Klasse
-
+import { getUserAnredeAndName } from './services';
+import config from './config/config';
+import cookieParser from 'cookie-parser';
+import { logout } from './services/logoutService';
 export const app = express();
-const PORT = 3001;
-app.use(cors());
+
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: config.FRONTEND_URL, // exakt deine Frontend-URL!
+    credentials: true, // wichtig für Cookies/Token
+  })
+);
 // Middleware für JSON-Anfragen
 app.use(bodyParser.json());
 
 // Middleware für CORS
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', config.FRONTEND_URL);
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
@@ -19,7 +28,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Erstelle eine Instanz der API-Klasse
 const api = new ResumeManagementAPI();
-
+app.get('/me/anrede', (req, res) => api.getUserAnredeAndName(req, res));
+app.get('/me', (req, res) => api.getUserProfile(req, res));
 // Definiere die Routen
 app.post('/createOrUpdateUser', (req: Request, res: Response) => api.createOrUpdateUser(req, res));
 app.post('/addContact', (req: Request, res: Response) => api.createOrUpdateContact(req, res));
@@ -50,10 +60,11 @@ app.get('/validate-token', (req: Request, res: Response) => api.checkPasswordRes
 app.post('/reset-password', (req: Request, res: Response) => api.resetPassword(req, res));
 
 // Starte den Server
-app.listen(PORT, () => {
-  console.log(`Server läuft auf Port ${PORT}`);
+app.listen(config.DB_PORT, () => {
+  console.log(`Server läuft auf Port ${config.DB_PORT}`);
 });
 
+app.post('/logout', logout);
 // Fehlerbehandlung für unvorhergesehene Fehler
 process.on('uncaughtException', (err) => {
   console.error('Unbehandelter Fehler:', err);

@@ -3,7 +3,14 @@ import mysql from 'mysql2';
 import config from './config/config';
 
 // Importiere die ausgelagerten Services
-import { createOrUpdateUser, login, getAnrede, changeAccessData } from './services/userService';
+import {
+  createOrUpdateUser,
+  login,
+  getAnrede,
+  changeAccessData,
+  getUserProfile,
+  getUserAnredeAndName,
+} from './services/userService';
 import { createOrUpdateContact, getContacts } from './services/contactService';
 import { getResumesWithUsers, getStates } from './services/resumeService';
 import { addCompany, getCompanies } from './services/companyService';
@@ -44,6 +51,12 @@ class ResumeManagementAPI {
     });
   }
 
+  async getUserAnredeAndName(req: Request, res: Response): Promise<void> {
+    await getUserAnredeAndName(this.db, req, res);
+  }
+  async getUserProfile(req: Request, res: Response): Promise<void> {
+    await getUserProfile(this.db, req, res);
+  }
   async createOrUpdateUser(req: Request, res: Response): Promise<void> {
     await createOrUpdateUser(this.db, req, res);
   }

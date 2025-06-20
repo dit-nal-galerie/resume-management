@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
 import { Connection } from 'mysql2';
+import jwt from 'jsonwebtoken';
+import { getUserIdFromToken } from './userService';
+
+// Hilfsfunktion: User-ID aus JWT holen
 
 export const createOrUpdateContact = async (
   db: Connection,
@@ -18,10 +22,11 @@ export const createOrUpdateContact = async (
       phone,
       mobile,
       company,
-      ref,
     } = req.body;
 
-    if (!vorname || !name || !email || !anrede || !company || !ref) {
+    const loginid = getUserIdFromToken(req);
+
+    if (!vorname || !name || !email || !anrede || !company || !loginid) {
       res.status(400).json({ message: 'backend.error.validation.missingFields' });
       return;
     }
@@ -32,7 +37,7 @@ export const createOrUpdateContact = async (
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
       db.query(
         insertQuery,
-        [vorname, name, email, anrede, title, zusatzname, phone, mobile, company, ref],
+        [vorname, name, email, anrede, title, zusatzname, phone, mobile, company, loginid],
         (err) => {
           if (err) {
             res.status(500).json({ message: 'backend.error.server.serverError' });
@@ -48,7 +53,19 @@ export const createOrUpdateContact = async (
         WHERE contactid = ?`;
       db.query(
         updateQuery,
-        [vorname, name, email, anrede, title, zusatzname, phone, mobile, company, ref, contactid],
+        [
+          vorname,
+          name,
+          email,
+          anrede,
+          title,
+          zusatzname,
+          phone,
+          mobile,
+          company,
+          loginid,
+          contactid,
+        ],
         (err) => {
           if (err) {
             res.status(500).json({ message: 'backend.error.server.serverError' });
@@ -65,9 +82,10 @@ export const createOrUpdateContact = async (
 };
 
 export const getContacts = (db: Connection, req: Request, res: Response): void => {
-  const { ref, company } = req.query; // `ref` und `company` aus der Anfrage entnehmen
+  const { company } = req.query;
+  const loginid = getUserIdFromToken(req);
 
-  if (!ref || !company) {
+  if (!loginid || !company) {
     res.status(400).send('backend.error.validation.missingRefOrCompany');
     return;
   }
@@ -89,7 +107,7 @@ export const getContacts = (db: Connection, req: Request, res: Response): void =
     WHERE ref = ? AND company = ?
   `;
 
-  db.query(query, [ref, company], (err, results) => {
+  db.query(query, [loginid, company], (err, results) => {
     if (err) {
       console.error('Fehler beim Abrufen der Kontakte:', err);
       res.status(500).send('backend.error.server.fetchContactsError');

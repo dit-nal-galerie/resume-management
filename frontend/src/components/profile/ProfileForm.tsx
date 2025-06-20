@@ -41,7 +41,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ formData, anredeOptions, onCh
       </h2> */}
 
       <div className="space-y-6">
-        {' '}
         {/* Einheitlicher vertikaler Abstand zwischen den Hauptfeldern */}
         <FormField label={t('contact.anrede')} htmlFor="anrede">
           <select
