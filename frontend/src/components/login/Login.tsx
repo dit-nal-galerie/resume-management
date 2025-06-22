@@ -25,7 +25,7 @@ const Login: React.FC = () => {
   const goToResume = () => {
     setServerError(null);
     navigate('/resumes');
-  }
+  };
   const handleRegister = () => {
     localStorage.removeItem('user');
     navigate('/profile?isNew=true');
@@ -37,7 +37,6 @@ const Login: React.FC = () => {
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
 
     if (!loginname || !password) {
       setErrors({
@@ -82,10 +81,11 @@ const Login: React.FC = () => {
               <input
                 id="loginname"
                 type="text"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.loginname
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
-                  }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                  errors.loginname
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder={t('login.usernamePlaceholder')}
                 value={loginname}
                 onChange={(e) => setLoginname(e.target.value)}
@@ -100,10 +100,11 @@ const Login: React.FC = () => {
               <input
                 id="password"
                 type="password"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.password
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
-                  }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                  errors.password
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder={t('login.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

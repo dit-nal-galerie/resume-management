@@ -34,6 +34,7 @@ export const requestPasswordReset = async (
   try {
     const response = await fetch(`${API_URL}/request-password-reset`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -63,6 +64,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
   try {
     const response = await fetch(`${API_URL}/reset-password`, {
       method: 'POST',
+
       headers: {
         'Content-Type': 'application/json',
       },
@@ -293,6 +295,7 @@ export const getCompanies = async (loginId: number, isRecruter: boolean): Promis
     `${API_URL}/companies?loginId=${loginId}&isRecruter=${isRecruter || false}`,
     {
       method: 'GET',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
     }
   );
@@ -308,6 +311,7 @@ export const getCompanies = async (loginId: number, isRecruter: boolean): Promis
 export const getContacts = async (loginId: number, companyId: number): Promise<Contact[]> => {
   const response = await fetch(`${API_URL}/contacts?ref=${loginId}&company=${companyId}`, {
     method: 'GET',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
 
@@ -326,6 +330,7 @@ export const getHistoryByResumeId = async (
   const url = `${API_URL}/getHistoryByResumeId?resumeId=${resumeId}&refId=${refId}`;
   const response = await fetch(url, {
     method: 'GET',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },

@@ -14,7 +14,8 @@
     "status": "Status",
     "name": "Name",
     "close": "Close",
-    "about": "About"
+    "about": "About",
+    "logout": "Logout"
   },
   "navigation": {
     "login": "Login",
@@ -295,7 +296,6 @@
         "offer_received": "Offer received"
       }
     },
-
     "error": {
       "validation": {
         "missingFields": "All required fields must be filled in.",
@@ -317,7 +317,8 @@
         "wrongPassword": "Incorrect password.",
         "oldPasswordWrong": "Old password is incorrect.",
         "authNotFound": "Authentication not found.",
-        "noPermission": "No permission."
+        "noPermission": "No permission.",
+        "unauthorized": "unauthorized"
       },
       "notFound": {
         "userNotFound": "User not found.",
@@ -348,6 +349,8 @@
       }
     },
     "success": {
+      "login": "Login successful",
+      "logout": "Logout successful",
       "user": {
         "created": "User successfully created.",
         "dataUpdated": "User data successfully updated."

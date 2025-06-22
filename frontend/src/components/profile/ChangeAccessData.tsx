@@ -24,7 +24,8 @@ const ChangeAccessData: React.FC = () => {
   // const loginUser: User = loadUserFromStorage();
 
   useEffect(() => {
-    getUserProfile().then(setStoredUser)
+    getUserProfile()
+      .then(setStoredUser)
       .catch(() => setStoredUser(null));
     if (storedUser) {
       setFormData({
@@ -36,7 +37,6 @@ const ChangeAccessData: React.FC = () => {
         changePassword: false,
       });
     }
-
   }, []);
   const handleFieldChange = (field: keyof typeof formData, value: string | boolean) => {
     setFormData((prev) => ({

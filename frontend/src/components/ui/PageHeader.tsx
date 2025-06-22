@@ -7,7 +7,6 @@ import { AboutModal } from 'components/AboutModal';
 import { useNavigate } from 'react-router-dom';
 import { PageId } from './PageId';
 
-import { User } from '@interfaces/User';
 import { getUserAnredeAndName, getUserProfile, logout } from '../../services/api';
 
 interface PageHeaderProps {
@@ -28,11 +27,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
 
   const handleLogout = () => {
     logout().then(gotoLogin);
-
   };
   const gotoLogin = () => {
     navigate('/login');
-  }
+  };
   const menuItems = (pageId: string) => {
     if (!storedUser || pageId === PageId.Login) {
       return [];
@@ -43,8 +41,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/resume/0')}
-              className={`${active ? 'bg-gray-100' : ''
-                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${
+                active ? 'bg-gray-100' : ''
+              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('resumeList.newResume')}
             </button>
@@ -56,8 +55,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/resumes')}
-              className={`${active ? 'bg-gray-100' : ''
-                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${
+                active ? 'bg-gray-100' : ''
+              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('navigation.resumes')}
             </button>
@@ -69,8 +69,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/profile')}
-              className={`${active ? 'bg-gray-100' : ''
-                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${
+                active ? 'bg-gray-100' : ''
+              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('resumeList.editProfile')}
             </button>
@@ -109,20 +110,20 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
                 {dynamischenMenuItems.map((item, index) => (
                   <React.Fragment key={index}>{item}</React.Fragment>
                 ))}
-                {(pageId !== PageId.Login) && (
+                {pageId !== PageId.Login && (
                   <MenuItem>
                     {({ active }) => (
                       <button
                         onClick={() => handleLogout()}
-                        className={`${active ? 'bg-gray-100' : ''
-                          } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+                        className={`${
+                          active ? 'bg-gray-100' : ''
+                        } block w-full px-4 py-2 text-left text-sm text-gray-700`}
                       >
                         {t('common.logout')}
                       </button>
                     )}
                   </MenuItem>
-                )
-                }
+                )}
                 <MenuItem>
                   {({ active }) => (
                     <button

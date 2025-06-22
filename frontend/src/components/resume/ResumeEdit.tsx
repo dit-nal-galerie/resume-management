@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Resume } from '../../../../interfaces/Resume';
 import { User } from '../../../../interfaces/User';
-import { getCompanies, getContacts, getResumeById, getUserProfile, updateOrCreateResume } from '../../services/api';
+import {
+  getCompanies,
+  getContacts,
+  getResumeById,
+  getUserProfile,
+  updateOrCreateResume,
+} from '../../services/api';
 import { getCachedStates } from '../../utils/storage';
 
 import { Company } from '../../../../interfaces/Company';
@@ -25,7 +31,6 @@ const ResumeEdit: React.FC = () => {
   const [resumeData, setResumeData] = useState<Resume | null>(null);
   const [statusList, setStatusList] = useState<{ stateid: number; text: string }[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -57,7 +62,6 @@ const ResumeEdit: React.FC = () => {
 
   const handleSaveContact = (updated: Contact) => {
     if (updated) {
-
       updated.anrede = updated.anrede || 0;
       const tKey = modalSectionContact === 'contactCompany' ? 'company' : 'recrutingCompany';
       updated.company = resumeData?.[tKey]?.companyId || 0;
@@ -65,11 +69,11 @@ const ResumeEdit: React.FC = () => {
     setResumeData((rd) =>
       rd
         ? {
-          ...rd,
-          [modalSectionContact === 'contactCompany'
-            ? 'contactCompany'
-            : 'contactRecrutingCompany']: updated,
-        }
+            ...rd,
+            [modalSectionContact === 'contactCompany'
+              ? 'contactCompany'
+              : 'contactRecrutingCompany']: updated,
+          }
         : rd
     );
   };
@@ -127,12 +131,12 @@ const ResumeEdit: React.FC = () => {
   useEffect(() => {
     getCachedStates()
       .then(setStatusList)
-      .catch(() => { });
+      .catch(() => {});
 
     if (resumeId && resumeId !== '0') {
       getResumeById(Number(resumeId))
         .then((data) => setResumeData(data))
-        .catch(() => { });
+        .catch(() => {});
     } else {
       setResumeData({
         resumeId: 0,

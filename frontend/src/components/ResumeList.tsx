@@ -39,11 +39,9 @@ const ResumeList: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-
     getResumesWithUsers()
       .then((data) => setResumes(data))
       .catch((err) => console.error(t('resumeList.loadError'), err));
-
   }, [refresh, t]);
 
   useEffect(() => {

@@ -318,7 +318,8 @@
         "wrongPassword": "Falsches Passwort",
         "oldPasswordWrong": "Altes Passwort ist falsch",
         "authNotFound": "Authentifizierung nicht gefunden",
-        "noPermission": "Keine Berechtigung"
+        "noPermission": "Keine Berechtigung",
+        "unauthorized": "Nicht autorisiert"
       },
       "notFound": {
         "userNotFound": "Benutzer nicht gefunden",
@@ -349,6 +350,8 @@
       }
     },
     "success": {
+      "login": "Login erfolgreich",
+      "logout": "Logout erfolgreich",
       "user": {
         "created": "Benutzer erfolgreich erstellt",
         "dataUpdated": "Benutzerdaten erfolgreich aktualisiert"
