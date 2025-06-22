@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import config from '../config/config';
-import { PasswordResetValidation, PasswordResetResponse } from '../../../interfaces/PasswordReset';
+// import { PasswordResetValidation, PasswordResetResponse } from '../../../interfaces/PasswordReset';
 
 // Конфигурация для токенов восстановления пароля
 const TOKEN_LENGTH = 32; // Длина токена
@@ -17,7 +17,13 @@ const EMAIL_CONFIG = {
   secure: config.EMAIL_SECURE === 'true',
   auth: {
     user: config.EMAIL_USER || '',
-    password: config.EMAIL_PASSWORD || '',
+    pass: config.EMAIL_PASSWORD || '',
+  },
+  tls: {
+    // Wenn du Probleme hast, kann das Hinzufügen dieser Option helfen,
+    // um Selbstsignierte Zertifikate zu ignorieren, obwohl es nicht empfohlen wird
+    // für Produktionsumgebungen ohne genaue Kenntnis der Risiken.
+    rejectUnauthorized: false,
   },
 };
 
@@ -140,14 +146,16 @@ export const sendPasswordResetEmail = async (to: string, token: string): Promise
     EMAIL_CONFIG.secure = false;
     EMAIL_CONFIG.auth = {
       user: testAccount.user,
-      password: testAccount.pass,
+      pass: testAccount.pass,
     };
 
     console.log('Тестовый SMTP аккаунт создан:', testAccount);
+  } else {
+    console.log('Используется реальный SMTP аккаунт:', EMAIL_CONFIG);
   }
   try {
     // Проверка наличия настроек email
-    if (!EMAIL_CONFIG.auth.user || !EMAIL_CONFIG.auth.password) {
+    if (!EMAIL_CONFIG.auth.user || !EMAIL_CONFIG.auth.pass) {
       console.warn(
         'Email-Konfiguration fehlt. E-Mails zum Zurücksetzen des Passworts werden nicht gesendet.'
       );

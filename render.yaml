@@ -18,7 +18,7 @@ services:
   - type: web
     name: resume-management-backend
     env: node
-    region: frankfurt # Wähle eine Region, die für dich und deine Nutzer am besten passt
+    region: stuttgart # Wähle eine Region, die für dich und deine Nutzer am besten passt
     # 'rootDir' gibt an, wo sich der Code für diesen Service befindet, relativ zum Repo-Root
     rootDir: ./backend
     # Der Build-Befehl für das Backend
