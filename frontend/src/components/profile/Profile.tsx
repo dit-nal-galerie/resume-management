@@ -1,35 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { updateUserData, createOrUpdateUser } from '../../services/api';
+import { updateUserData, createOrUpdateUser, getUserProfile } from '../../services/api';
 import { User } from '../../../interfaces/User';
-import { getCachedAnrede, loadUserFromStorage } from '../../utils/storage';
+import { getCachedAnrede } from '../../utils/storage';
 
 import ProfileForm from './ProfileForm';
 import LoginForm from 'components/login/LoginForm';
 import PageHeader from 'components/ui/PageHeader';
 import { PageId } from 'components/ui/PageId';
 
-const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
+const Profile = () => {
+  const checkIsNew = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const isNew = searchParams.get('isNew');
+    return isNew === 'true';
+  };
   const { t } = useTranslation();
+  // const [storedUser, setStoredUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const storedUser = loadUserFromStorage();
-  loginId = loginId || storedUser?.loginid || 0;
+  const isNew = checkIsNew();
   const [formData, setFormData] = useState<User>({
-    loginid: storedUser?.loginid || loginId,
-    loginname: storedUser?.loginname || '',
-    password: storedUser?.password || '',
-    password2: storedUser?.password2 || '',
-    name: storedUser?.name || '',
-    email: storedUser?.email || '',
-    anrede: storedUser?.anrede || 0,
-    city: storedUser?.city || '',
-    street: storedUser?.street || '',
-    houseNumber: storedUser?.houseNumber || '',
-    postalCode: storedUser?.postalCode || '',
-    phone: storedUser?.phone || '',
-    mobile: storedUser?.mobile || '',
+    loginname: '',
+    password: '',
+    password2: '',
+    name: '',
+    email: '',
+    anrede: 0,
+    city: '',
+    street: '',
+    houseNumber: '',
+    postalCode: '',
+    phone: '',
+    mobile: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -37,28 +41,12 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Получение ID пользователя из URL или localStorage
-  const getUserId = () => {
-    const searchParams = new URLSearchParams(location.search);
-    const loginIdFromUrl = searchParams.get('loginid');
-
-    if (loginIdFromUrl) {
-      return parseInt(loginIdFromUrl);
-    }
-
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      return user.loginid;
-    }
-
-    return null;
-  };
-
   useEffect(() => {
     const fetchProfile = async () => {
       const anredeData = await getCachedAnrede();
       setAnredeOptions(anredeData);
+      const data = await getUserProfile();
+      setFormData(data);
     };
 
     fetchProfile();
@@ -109,23 +97,23 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
       return;
     }
 
-    const userId = getUserId();
+    // const userId = getUserId();
 
     try {
       setIsLoading(true);
-      if (loginId) {
-        await updateUserData(loginId, formData);
+      if (!isNew) {
+        await updateUserData(formData);
       } else {
         await createOrUpdateUser(formData);
       }
 
       setIsLoading(true);
-      const result = await updateUserData(userId, formData);
+      const result = await updateUserData(formData);
       console.log('Profile updated:', result);
       setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
-        if (loginId) {
+        if (!isNew) {
           navigate('/resumes');
         } else {
           navigate('/login');
@@ -145,7 +133,7 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
     }));
     console.log('FormData:', { [field]: value });
   };
-  const pageTitle = loginId
+  const pageTitle = !isNew
     ? `${t('profile.title')} ${t('common.edit')}`
     : t('profileEdit.create_profile');
   return (
@@ -170,8 +158,8 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
             password={formData.password ?? ''}
             password2={formData.password2 ?? ''}
             onChange={handleFieldChange}
-            readonlyLoginname={!!loginId}
-            showPassword2={!loginId}
+            readonlyLoginname={!isNew}
+            showPassword2={isNew}
           />
           <ProfileForm
             formData={formData}
@@ -182,7 +170,7 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
           <div className="mt-6 flex justify-between">
             <button
               type="button"
-              onClick={() => navigate(loginId ? '/resumes' : '/login')}
+              onClick={() => navigate(!isNew ? '/resumes' : '/login')}
               className="rounded-md bg-gray-500 px-4 py-2 font-medium text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
               disabled={isLoading}
             >
@@ -191,8 +179,9 @@ const Profile: React.FC<{ loginId?: number }> = ({ loginId }) => {
 
             <button
               type="submit"
-              className={`rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? 'cursor-not-allowed opacity-70' : ''
-                }`}
+              className={`rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                isLoading ? 'cursor-not-allowed opacity-70' : ''
+              }`}
               disabled={isLoading}
             >
               {isLoading ? t('common.loading') : t('common.save')}

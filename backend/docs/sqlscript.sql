@@ -12,7 +12,11 @@ CREATE TABLE password_reset_tokens (
     FOREIGN KEY (user_id) REFERENCES authentification(id) ON DELETE CASCADE,
     UNIQUE KEY (token)
 );
-
+-- Таблица обращений
+CREATE TABLE anrede (
+    id INT PRIMARY KEY, -- Уникальный идентификатор
+    text VARCHAR(80) NOT NULL -- Обращение (Herr, Frau и т.д.)
+);
 -- Таблица аутентификации пользователей
 
 CREATE TABLE authentification (
@@ -20,11 +24,7 @@ CREATE TABLE authentification (
     loginname VARCHAR(40) NOT NULL,
     password VARCHAR(255) NOT NULL
 ); 
--- Таблица обращений
-CREATE TABLE anrede (
-    id INT PRIMARY KEY, -- Уникальный идентификатор
-    text VARCHAR(80) NOT NULL -- Обращение (Herr, Frau и т.д.)
-);
+
 CREATE TABLE users (
     userid INT AUTO_INCREMENT PRIMARY KEY,
     loginid INT NOT NULL,

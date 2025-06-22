@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { AboutModal } from 'components/AboutModal';
 import { useNavigate } from 'react-router-dom';
 import { PageId } from './PageId';
-import { loadUserFromStorage } from 'utils/storage';
-import { User } from '@interfaces/User';
+
+import { getUserAnredeAndName, getUserProfile, logout } from '../../services/api';
 
 interface PageHeaderProps {
   pageTitle: string;
@@ -17,9 +17,22 @@ interface PageHeaderProps {
 const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const storedUser: User = loadUserFromStorage();
+  const [storedUser, setStoredUser] = useState<{ name: string; anredeText: string } | null>(null);
+
+  useEffect(() => {
+    getUserAnredeAndName()
+      .then(setStoredUser)
+      .catch(() => setStoredUser(null));
+  }, []);
+
+  const handleLogout = () => {
+    logout().then(gotoLogin);
+  };
+  const gotoLogin = () => {
+    navigate('/login');
+  };
   const menuItems = (pageId: string) => {
-    if (!storedUser || !storedUser.loginid || pageId === PageId.Login) {
+    if (!storedUser || pageId === PageId.Login) {
       return [];
     }
     return [
@@ -97,6 +110,20 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
                 {dynamischenMenuItems.map((item, index) => (
                   <React.Fragment key={index}>{item}</React.Fragment>
                 ))}
+                {pageId !== PageId.Login && (
+                  <MenuItem>
+                    {({ active }) => (
+                      <button
+                        onClick={() => handleLogout()}
+                        className={`${
+                          active ? 'bg-gray-100' : ''
+                        } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+                      >
+                        {t('common.logout')}
+                      </button>
+                    )}
+                  </MenuItem>
+                )}
                 <MenuItem>
                   {({ active }) => (
                     <button

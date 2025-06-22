@@ -1,8 +1,70 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { Connection, OkPacket, RowDataPacket } from 'mysql2';
 import { Pool } from 'mysql2/promise';
+import jwt from 'jsonwebtoken';
 
+// Middleware: User aus JWT holen (z.B. req.user.loginid)
+export const getUserIdFromToken = (req: Request): number | null => {
+  const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+  if (!token) return null;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dein_geheimes_jwt_secret') as any;
+    return decoded.loginid;
+  } catch {
+    return null;
+  }
+};
+
+export const getUserAnredeAndName = (db: Connection, req: Request, res: Response): void => {
+  const loginid = getUserIdFromToken(req);
+
+  if (!loginid) {
+    res.status(401).json({ message: 'backend.error.auth.unauthorized' });
+    return;
+  }
+
+  const query = `
+    SELECT u.name, a.text AS anredeText
+    FROM users u
+    LEFT JOIN anrede a ON u.anrede = a.id
+    WHERE u.loginid = ?
+  `;
+  db.query(query, [loginid], (err, results) => {
+    if (err) {
+      res.status(500).json({ message: 'backend.error.server.serverError' });
+      return;
+    }
+    const rowResults = results as RowDataPacket[];
+    if (!rowResults.length) {
+      res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
+      return;
+    }
+    res.json(rowResults[0]);
+  });
+};
+export const getUserProfile = (db: Connection, req: Request, res: Response): void => {
+  const loginid = getUserIdFromToken(req);
+  if (!loginid) {
+    res.status(401).json({ message: 'backend.error.auth.unauthorized' });
+    return;
+  }
+
+  const query =
+    ' SELECT u.*, a.loginname FROM users u JOIN authentification a ON u.loginid = a.id WHERE u.loginid = ?';
+  db.query(query, [loginid], (err, results) => {
+    if (err) {
+      res.status(500).json({ message: 'backend.error.server.serverError' });
+      return;
+    }
+    const rowResults = results as RowDataPacket[];
+    if (!rowResults.length) {
+      res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
+      return;
+    }
+    res.json(rowResults[0]);
+  });
+};
 export const createAccount = async (
   db: Connection,
   loginname: string,
@@ -56,9 +118,9 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
 
     const loginid = authRows[0].id;
 
-    // 🔹 Nutzerinformationen aus der `users`-Tabelle abrufen
+    // Nutzerinformationen abrufen (optional, falls du Claims brauchst)
     const queryUser = `
-      SELECT a.loginname, u.loginid, u.name, u.email, u.anrede, u.city, u.street, u.houseNumber, u.postalCode, u.phone, u.mobile 
+      SELECT a.loginname,u.userid, u.loginid, u.name, u.email, u.anrede, u.city, u.street, u.houseNumber, u.postalCode, u.phone, u.mobile 
       FROM users u
       JOIN authentification a ON u.loginid = a.id
       WHERE u.loginid = ?`;
@@ -77,8 +139,31 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
         return;
       }
 
-      // ✅ Erfolgreicher Login → Senden der vollständigen Benutzerinformationen
-      res.json(userRows[0]);
+      // JWT erzeugen (nur mit minimalen Claims, z.B. loginid und ggf. Rolle)
+      const user = userRows[0];
+      const token = jwt.sign(
+        {
+          loginid: user.loginid,
+          loginname: user.loginname,
+          userId: user.userid,
+          // Optional: weitere Claims wie Rolle, Name, etc.
+        },
+        process.env.JWT_SECRET || 'dein_geheimes_jwt_secret', // Setze das Secret in .env!
+        { expiresIn: '2h' }
+      );
+
+      // Token als HttpOnly-Cookie senden (empfohlen) oder im Body zurückgeben
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: false, // in Produktion: true (nur über HTTPS)
+        sameSite: 'lax', // oder 'strict'
+        maxAge: 2 * 60 * 60 * 1000, // 2 Stunden
+      });
+
+      // Sende nur die erlaubten Userdaten zurück (ohne loginid!):
+      res.json({
+        name: user.name,
+      });
     });
   });
 };
@@ -184,7 +269,10 @@ export const changeAccessData = async (db: Pool, req: Request, res: Response): P
 };
 
 //------------------
-async function getPasswordForLoginId(db: Connection, loginid: number): Promise<string | null> {
+export async function getPasswordForLoginId(
+  db: Connection,
+  loginid: number
+): Promise<string | null> {
   return new Promise((resolve, reject) => {
     db.query(
       'SELECT password FROM authentification WHERE id = ?',
@@ -197,7 +285,7 @@ async function getPasswordForLoginId(db: Connection, loginid: number): Promise<s
   });
 }
 
-async function emailExistsForOtherUser(
+export async function emailExistsForOtherUser(
   db: Connection,
   email: string,
   loginid: number
@@ -214,7 +302,7 @@ async function emailExistsForOtherUser(
   });
 }
 
-async function createAuthEntry(
+export async function createAuthEntry(
   db: Connection,
   loginname: string,
   password: string
@@ -238,7 +326,6 @@ export const createOrUpdateUser = async (
   res: Response
 ): Promise<void> => {
   const {
-    loginid,
     loginname,
     password,
     name,
@@ -251,6 +338,8 @@ export const createOrUpdateUser = async (
     phone,
     mobile,
   } = req.body;
+
+  const loginid = getUserIdFromToken(req) || 0;
 
   // Neu: Pflichtfelder
   if (!email || (!loginid && (!loginname || !password))) {

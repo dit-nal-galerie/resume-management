@@ -6,6 +6,7 @@ import { Resume } from '../../../interfaces/Resume';
 export const createOrUpdateUser = async (userData: User): Promise<string> => {
   const response = await fetch(`${API_URL}/createOrUpdateUser`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -33,6 +34,7 @@ export const requestPasswordReset = async (
   try {
     const response = await fetch(`${API_URL}/request-password-reset`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -62,6 +64,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
   try {
     const response = await fetch(`${API_URL}/reset-password`, {
       method: 'POST',
+
       headers: {
         'Content-Type': 'application/json',
       },
@@ -123,6 +126,7 @@ export const validateToken = async (token: string): Promise<ApiResponse> => {
 export const login = async (loginname: string, password: string) => {
   const response = await fetch(`${API_URL}/login`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -137,13 +141,14 @@ export const login = async (loginname: string, password: string) => {
 };
 
 // Fetch user data
-export const getUserData = async (loginid: number): Promise<User[]> => {
+export const getUserData = async (): Promise<User[]> => {
   const response = await fetch(`${API_URL}/createOrUpdateUser`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ loginid }),
+    // body: JSON.stringify({ loginid }),
   });
 
   if (!response.ok) {
@@ -154,13 +159,8 @@ export const getUserData = async (loginid: number): Promise<User[]> => {
 };
 
 // Update user data
-export const updateUserData = async (loginId: number, userData: User): Promise<string> => {
-  if (!loginId) {
-    throw new Error('api.error.user_update_failed');
-  }
-
+export const updateUserData = async (userData: User): Promise<string> => {
   const requestBody: Partial<User> = {
-    loginid: loginId,
     name: userData.name,
     email: userData.email,
     city: userData.city,
@@ -178,6 +178,7 @@ export const updateUserData = async (loginId: number, userData: User): Promise<s
 
   const response = await fetch(`${API_URL}/createOrUpdateUser`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody),
   });
@@ -211,9 +212,10 @@ import { Company } from '../../../interfaces/Company';
 import { HistoryEntry } from '../../../interfaces/histori';
 
 // Fetch resumes with users
-export const getResumesWithUsers = async (userid: number): Promise<Resume[]> => {
-  const response = await fetch(`${API_URL}/getResumesWithUsers?userid=${userid}`, {
+export const getResumesWithUsers = async (): Promise<Resume[]> => {
+  const response = await fetch(`${API_URL}/getResumesWithUsers`, {
     method: 'GET',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -230,6 +232,7 @@ export const getResumesWithUsers = async (userid: number): Promise<Resume[]> => 
 export const getResumeById = async (id: number): Promise<Resume> => {
   const response = await fetch(`${API_URL}/getResumeById/${id}`, {
     method: 'GET',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
 
@@ -244,6 +247,7 @@ export const getResumeById = async (id: number): Promise<Resume> => {
 export const updateOrCreateResume = async (resume: Resume): Promise<void> => {
   const response = await fetch(`${API_URL}/updateOrCreateResume`, {
     method: 'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -275,6 +279,7 @@ export const createOrUpdateContact = async (contact: Contact): Promise<void> => 
 
   const response = await fetch(`${API_URL}/createOrUpdateContact`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(contactData),
   });
@@ -290,6 +295,7 @@ export const getCompanies = async (loginId: number, isRecruter: boolean): Promis
     `${API_URL}/companies?loginId=${loginId}&isRecruter=${isRecruter || false}`,
     {
       method: 'GET',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
     }
   );
@@ -305,6 +311,7 @@ export const getCompanies = async (loginId: number, isRecruter: boolean): Promis
 export const getContacts = async (loginId: number, companyId: number): Promise<Contact[]> => {
   const response = await fetch(`${API_URL}/contacts?ref=${loginId}&company=${companyId}`, {
     method: 'GET',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
 
@@ -323,6 +330,7 @@ export const getHistoryByResumeId = async (
   const url = `${API_URL}/getHistoryByResumeId?resumeId=${resumeId}&refId=${refId}`;
   const response = await fetch(url, {
     method: 'GET',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -398,4 +406,46 @@ export const updateAccessData = async (data: {
       message: error instanceof Error ? error.message : 'api.error.server',
     };
   }
+};
+
+// import { getUserProfile } from '../services/api'; // Schreibe diese Funktion im API-Service
+
+// src/services/api.ts
+
+export const getUserAnredeAndName = async (): Promise<{ name: string; anredeText: string }> => {
+  const response = await fetch(`${API_URL}/me/anrede`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('api.error.user_fetch_failed');
+  }
+
+  return await response.json();
+};
+
+export const getUserProfile = async (): Promise<User> => {
+  const response = await fetch(`${API_URL}/me`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('api.error.user_fetch_failed');
+  }
+
+  return await response.json();
+};
+export const logout = async () => {
+  await fetch(`${API_URL}/logout`, {
+    method: 'POST',
+    credentials: 'include',
+  });
 };

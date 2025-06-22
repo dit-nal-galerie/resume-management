@@ -3,8 +3,7 @@ import { Request, Response } from 'express';
 import { Pool, PoolConnection } from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2/promise';
 import { Resume } from '../../../interfaces/Resume';
-import { Company } from '../../../interfaces/Company';
-import { Contact } from '../../../interfaces/Contact';
+import { getUserIdFromToken } from './userService';
 
 /**
  * Lädt ein spezifisches Resume anhand seiner ID, inklusive zugehöriger
@@ -168,7 +167,8 @@ export const getResumeById = async (dbPool: Pool, req: Request, res: Response): 
   }
 };
 export const changeResumeStatus = async (db: Pool, req: Request, res: Response) => {
-  const { resumeId, userId, stateId, date } = req.body;
+  const { resumeId, stateId, date } = req.body;
+  const userId = getUserIdFromToken(req);
 
   if (!resumeId || !userId || !stateId || !date) {
     return res.status(400).send('backend.error.validation.missingData');
@@ -207,17 +207,3 @@ export const changeResumeStatus = async (db: Pool, req: Request, res: Response) 
     return res.status(500).send('backend.error.server.internalServerError');
   }
 };
-// Diese Funktion kann dann in Ihrer Klasse/Ihrem Controller verwendet werden:
-/*
-class ResumeController {
-    private dbPool: Pool;
-
-    constructor(pool: Pool) {
-        this.dbPool = pool;
-    }
-
-    async getResume(req: Request, res: Response): Promise<void> {
-        await getResumeById(this.dbPool, req, res);
-    }
-}
-*/

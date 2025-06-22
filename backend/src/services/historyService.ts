@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Connection } from 'mysql2'; // Для обычного соединения с callback
 import { RowDataPacket } from 'mysql2/promise'; // Для Promise API
 import { HistoryEntry } from '../../../interfaces/histori';
+import { getUserIdFromToken } from './userService';
 
 export const addHistory = (db: Connection, req: Request, res: Response): void => {
   const { resume_id, description } = req.body;
@@ -24,9 +25,10 @@ export const addHistory = (db: Connection, req: Request, res: Response): void =>
 };
 
 export const getHistoryByResumeId = (db: Connection, req: Request, res: Response): void => {
-  const { refId, resumeId } = req.query;
-  console.log('getHistoryByResumeId', refId, resumeId);
-  if (!resumeId || !refId) {
+  const { resumeId } = req.query;
+  const loginid = getUserIdFromToken(req);
+
+  if (!resumeId || !loginid) {
     res.status(400).json({ message: 'backend.error.validation.missingFields' });
     return;
   }
@@ -35,7 +37,7 @@ export const getHistoryByResumeId = (db: Connection, req: Request, res: Response
     SELECT resumeId FROM resumes WHERE resumeId = ? AND ref = ?
   `;
 
-  db.query(validateQuery, [resumeId, refId], (err, validationResult: RowDataPacket[]) => {
+  db.query(validateQuery, [resumeId, loginid], (err, validationResult: RowDataPacket[]) => {
     if (err) {
       console.error('Fehler beim Prüfen der Bewerbung:', err);
       res.status(500).json({ message: 'backend.error.server.serverError' });
@@ -54,7 +56,6 @@ export const getHistoryByResumeId = (db: Connection, req: Request, res: Response
       WHERE h.resumeid = ?
       ORDER BY h.date ASC
     `;
-    console.log('historyQuery', historyQuery, 'resumeid', resumeId);
     db.query(historyQuery, [resumeId], (err, results: RowDataPacket[]) => {
       if (err) {
         console.error('Fehler beim Abrufen der Historie:', err);

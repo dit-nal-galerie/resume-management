@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2';
+import { getUserIdFromToken } from './userService';
 
 export const getResumesWithUsers = (db: Connection, req: Request, res: Response): void => {
-  const { userid } = req.query;
+  // UserId nicht mehr aus req.query, sondern sicher aus Token!
+  const loginid = getUserIdFromToken(req);
 
-  if (!userid) {
-    res.status(400).send('backend.error.validation.missingUserId');
+  if (!loginid) {
+    res.status(401).send('backend.error.auth.unauthorized');
     return;
   }
 
@@ -57,7 +59,7 @@ LEFT JOIN contacts cp ON r.contactParentCompanyId = cp.contactId
 WHERE r.ref = ?
   `;
 
-  db.query(query, [userid], (err, results) => {
+  db.query(query, [loginid], (err, results) => {
     if (err) {
       console.error('Fehler beim Abrufen der Bewerbungen:', err);
       res.status(500).send('backend.error.server.serverError');

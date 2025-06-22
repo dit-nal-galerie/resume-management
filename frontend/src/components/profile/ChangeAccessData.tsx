@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { User } from '../../../interfaces/User';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { loadUserFromStorage } from 'utils/storage';
-import { updateAccessData } from 'services/api';
+
+import { getUserProfile, updateAccessData } from 'services/api';
 import { FormField, inputClasses } from '../ui/FormField';
 import PageHeader from 'components/ui/PageHeader';
 import { PageId } from 'components/ui/PageId';
 
 const ChangeAccessData: React.FC = () => {
   const { t } = useTranslation();
+  const [storedUser, setStoredUser] = useState<User | null>(null);
+
   const [formData, setFormData] = useState({
     loginname: '',
     email: '',
@@ -18,16 +20,23 @@ const ChangeAccessData: React.FC = () => {
     oldPassword: '',
     changePassword: false,
   });
-  const loginUser: User = loadUserFromStorage();
+
+  // const loginUser: User = loadUserFromStorage();
+
   useEffect(() => {
-    setFormData({
-      loginname: loginUser.loginname,
-      email: loginUser.email,
-      password: '',
-      password2: '',
-      oldPassword: '',
-      changePassword: false,
-    });
+    getUserProfile()
+      .then(setStoredUser)
+      .catch(() => setStoredUser(null));
+    if (storedUser) {
+      setFormData({
+        loginname: storedUser.loginname,
+        email: storedUser.email,
+        password: '',
+        password2: '',
+        oldPassword: '',
+        changePassword: false,
+      });
+    }
   }, []);
   const handleFieldChange = (field: keyof typeof formData, value: string | boolean) => {
     setFormData((prev) => ({
@@ -41,7 +50,7 @@ const ChangeAccessData: React.FC = () => {
   };
   const handleSave = async () => {
     try {
-      const response = await updateAccessData({ ...formData, userId: loginUser.loginid });
+      const response = await updateAccessData({ ...formData, userId: 0 });
       if (response.success) {
         localStorage.setItem('user', JSON.stringify(response.user));
         alert(t('profile.saveSuccess'));

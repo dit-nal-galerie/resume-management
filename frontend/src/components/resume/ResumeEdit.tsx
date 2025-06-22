@@ -2,8 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Resume } from '../../../../interfaces/Resume';
 import { User } from '../../../../interfaces/User';
-import { getCompanies, getContacts, getResumeById, updateOrCreateResume } from '../../services/api';
-import { getCachedStates, loadUserFromStorage } from '../../utils/storage';
+import {
+  getCompanies,
+  getContacts,
+  getResumeById,
+  getUserProfile,
+  updateOrCreateResume,
+} from '../../services/api';
+import { getCachedStates } from '../../utils/storage';
 
 import { Company } from '../../../../interfaces/Company';
 
@@ -26,7 +32,6 @@ const ResumeEdit: React.FC = () => {
   const [statusList, setStatusList] = useState<{ stateid: number; text: string }[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const storedUser: User = loadUserFromStorage();
   const [modalOpen, setModalOpen] = useState(false);
 
   const [modalType, setModalType] = useState<ModalType | null>();
@@ -35,6 +40,8 @@ const ResumeEdit: React.FC = () => {
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [companicontactses, setContacts] = useState<Contact[]>([]);
+  const [storedUser, setStoredUser] = useState<User | null>(null);
+
   const openEditContact = (section: ModalSectionContact) => {
     setModalType('editContact');
     setModalSectionContact(section);
@@ -46,9 +53,15 @@ const ResumeEdit: React.FC = () => {
     setModalSectionContact(null);
     setModalOpen(false);
   };
+
+  useEffect(() => {
+    getUserProfile()
+      .then(setStoredUser)
+      .catch(() => setStoredUser(null));
+  }, []);
+
   const handleSaveContact = (updated: Contact) => {
     if (updated) {
-      updated.ref = storedUser.loginid;
       updated.anrede = updated.anrede || 0;
       const tKey = modalSectionContact === 'contactCompany' ? 'company' : 'recrutingCompany';
       updated.company = resumeData?.[tKey]?.companyId || 0;
@@ -73,7 +86,7 @@ const ResumeEdit: React.FC = () => {
       alert(t('resumeEdit.selectCompanyFirst'));
       return;
     }
-    const list = await getContacts(storedUser.loginid, compId);
+    const list = await getContacts(0, compId);
     setContacts(list);
     setModalOpen(true);
   };
@@ -90,7 +103,7 @@ const ResumeEdit: React.FC = () => {
     setModalOpen(true);
   };
   const handleOpenSelect = async (section: 'company' | 'recrutingCompany') => {
-    const list = await getCompanies(storedUser.loginid, section === 'recrutingCompany');
+    const list = await getCompanies(0, section === 'recrutingCompany');
     setCompanies(list);
     setModalType('select');
     setModalSectionCompany(section);
@@ -127,7 +140,7 @@ const ResumeEdit: React.FC = () => {
     } else {
       setResumeData({
         resumeId: 0,
-        ref: storedUser.loginid,
+        ref: 0,
         position: '',
         stateId: 0,
         stateText: '',
@@ -313,7 +326,7 @@ const ResumeEdit: React.FC = () => {
               houseNumber: '',
               postalCode: '',
               isRecruter: false,
-              ref: storedUser.loginid,
+              ref: 0,
             }
           }
           onSave={handleSaveCompany}
@@ -349,7 +362,7 @@ const ResumeEdit: React.FC = () => {
             isOpen={isModalOpen}
             onClose={closeHistoryModal}
             resumeId={resumeData.resumeId}
-            refId={storedUser.loginid}
+            refId={0}
             resumeTitle={resumeData?.position || ''}
             currentStateId={-1}
           />
