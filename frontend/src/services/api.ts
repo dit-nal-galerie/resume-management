@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = 'http://localhost:8888'; // 'http://localhost:3001';
 import { User } from '../../../interfaces/User';
 import { Resume } from "../../../interfaces/Resume";
 // Функция для создания нового пользователя
