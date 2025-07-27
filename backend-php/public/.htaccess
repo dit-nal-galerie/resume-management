@@ -1,0 +1,10 @@
+# Установка переменной среды (окружение)
+SetEnv APP_ENV dev
+
+# Включить mod_rewrite (если не включён — проверь в Apache)
+RewriteEngine On
+
+# Если файл или директория не существует — перенаправить на index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
