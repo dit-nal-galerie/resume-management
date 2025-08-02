@@ -1,42 +1,46 @@
 <?php
-
 namespace App\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use App\Services\UserService;
 use App\Config\DB;
+use App\Services\ResumeService;
 
 class ResumeController
 {
-    private $db;
-    private $userService;
+    private $service;
 
     public function __construct()
     {
-        $this->db = DB::connect();
-        $this->userService = new UserService($this->db);
+        $db = DB::connect();
+        $this->service = new ResumeService($db);
     }
 
-    public function getUserProfile(Request $request, Response $response): Response
+    public function getResumesWithUsers(Request $request, Response $response): Response
     {
-        $result = $this->userService->getUserProfile($request);
+        $result = $this->service->getResumesWithUsers();
         $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function createOrUpdateUser(Request $request, Response $response): Response
+    public function getStates(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
-        $result = $this->userService->createOrUpdateUser($data);
+        $result = $this->service->getStates();
         $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function login(Request $request, Response $response): Response
+    public function updateOrCreateResume(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
-        $result = $this->userService->login($data);
+        $result = $this->service->updateOrCreateResume($data);
+        $response->getBody()->write(json_encode($result));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public function getResumeById(Request $request, Response $response, array $args): Response
+    {
+        $result = $this->service->getResumeById($args['id']);
         $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json');
     }

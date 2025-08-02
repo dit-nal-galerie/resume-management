@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services;
 
 use PDO;
@@ -14,13 +13,22 @@ class UserService
         $this->db = $db;
     }
 
-    public function getUserProfile($request)
+    public function getUserProfile($loginid)
     {
-        return ['id' => 1, 'name' => 'John Doe'];
+        $stmt = $this->db->prepare("SELECT name, email, phone FROM users WHERE loginid = :loginid");
+        $stmt->execute(['loginid' => $loginid]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            return ['success' => false, 'error' => 'User not found'];
+        }
+
+        return ['success' => true, 'user' => $user];
     }
 
     public function createOrUpdateUser($data)
     {
+        // TODO: implement create or update logic
         return ['success' => true];
     }
 
@@ -28,7 +36,7 @@ class UserService
     {
         $loginname = $data['loginname'] ?? null;
         $password = $data['password'] ?? null;
-
+        
         if (!$loginname || !$password) {
             return ['success' => false, 'error' => 'Missing loginname or password'];
         }
@@ -43,10 +51,13 @@ class UserService
 
         $loginid = $auth['id'];
 
-        $stmtUser = $this->db->prepare("SELECT a.loginname, u.userid, u.loginid, u.name, u.email, u.anrede, u.city, u.street, u.houseNumber, u.postalCode, u.phone, u.mobile
-                                         FROM users u
-                                         JOIN authentification a ON u.loginid = a.id
-                                         WHERE u.loginid = :loginid");
+        $stmtUser = $this->db->prepare("
+            SELECT a.loginname, u.userid, u.loginid, u.name, u.email, u.anrede, u.city,
+                   u.street, u.houseNumber, u.postalCode, u.phone, u.mobile
+            FROM users u
+            JOIN authentification a ON u.loginid = a.id
+            WHERE u.loginid = :loginid
+        ");
         $stmtUser->execute(['loginid' => $loginid]);
         $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
