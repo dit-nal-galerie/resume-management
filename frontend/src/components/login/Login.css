@@ -1,0 +1,49 @@
+/* Контейнер для страницы авторизации */
+.login-container {
+  margin-top: 50px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовок */
+.login-header {
+  color: #007bff;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Метки для полей */
+.login-label {
+  font-size: 16px;
+  color: #333;
+}
+
+/* Поля ввода */
+.login-input {
+  border: 2px solid #007bff;
+  border-radius: 5px;
+}
+
+/* Кнопки */
+.login-button {
+  width: 48%;
+  font-size: 16px;
+}
+
+/* Ошибки */
+.login-alert {
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-input {
+  border: 2px solid #007bff;
+  border-radius: 5px;
+}
+
+.login-label {
+  font-weight: bold;
+  color: #333;
+}

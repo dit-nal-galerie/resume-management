@@ -1,29 +1,44 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, BrowserRouter } from 'react-router-dom';
-import Login from './components/Login';
-import ResumeList from './components/ResumeList';
-import NewUser from './components/ResumeList';
-import ResumeEdit from './components/resume/ResumeEdit';
-import ChangeAccessData from './components/ChangeAccessData';
-import ResetPassword from './components/ResetPassword';
-import RequestPasswordReset from './components/RequestPasswordReset';
-import LanguageSwitcher from './components/LanguageSwitcher';
-import Profile from './components/Profile';
 
-const App = () => (
+import ResumeEdit from './components/resume/ResumeEdit';
+
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Profile from 'components/profile/Profile';
+import Login from 'components/login/Login';
+
+import RequestPasswordReset from 'components/login/RequestPasswordReset';
+import ResetPassword from 'components/login/ResetPassword';
+import ResumeList from 'components/ResumeList';
+import ChangeAccessData from 'components/profile/ChangeAccessData';
+
+/**
+ * Die Haupt-App-Komponente, die das Routing und die globale Layout-Elemente verwaltet.
+ * Verwendet React Router Dom v6 für die Navigation.
+ */
+const App: React.FC = () => (
+  // Explizite Typisierung als React.FC ist guter Stil
+  // BrowserRouter stellt den Routing-Kontext für die gesamte Anwendung bereit.
   <BrowserRouter>
-    <div className="fixed top-4 right-4 z-50">
-      <LanguageSwitcher />
-    </div>
     <Routes>
+      {/* Route für die Startseite und die explizite Login-Seite */}
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
+
+      {/* Route für die Profilseite des Benutzers */}
       <Route path="/profile" element={<Profile />} />
+
+      {/* Route für die Anzeige der Liste der Lebensläufe */}
       <Route path="/resumes" element={<ResumeList />} />
-      <Route path="/newUser" element={<NewUser />} />
+      {/* Route für die Bearbeitung eines spezifischen Lebenslaufs, mit einem dynamischen Parameter ':resumeId' */}
       <Route path="/resume/:resumeId" element={<ResumeEdit />} />
-      <Route path="/changeaccess" element={<ChangeAccessData />} /> 
+
+      {/* Route zum Ändern von Zugangsdaten */}
+      <Route path="/changeaccess" element={<ChangeAccessData />} />
+
+      {/* Route zur Anforderung einer Passwortzurücksetzung */}
       <Route path="/restore" element={<RequestPasswordReset />} />
+
+      {/* Route zum Zurücksetzen des Passworts nach Anforderung */}
       <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
   </BrowserRouter>

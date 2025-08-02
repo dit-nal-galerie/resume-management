@@ -1,31 +1,46 @@
 import { Request, Response } from 'express';
 import { Connection } from 'mysql2';
+import jwt from 'jsonwebtoken';
+
+// Hilfsfunktion: User-ID aus JWT holen
+function getUserIdFromToken(req: Request): number | null {
+  const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+  if (!token) return null;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dein_geheimes_jwt_secret') as any;
+    return decoded.loginid;
+  } catch {
+    return null;
+  }
+}
 
 export const addCompany = (db: Connection, req: Request, res: Response): void => {
-  const { name, adress, ref } = req.body;
+  const { name, adress } = req.body;
+  const loginid = getUserIdFromToken(req);
 
-  if (!name || !adress || !ref) {
-    res.status(400).send('Alle Pflichtfelder müssen ausgefüllt sein.');
+  if (!loginid || !name || !adress) {
+    res.status(400).send('backend.error.validation.missingFields');
     return;
   }
 
   const query = 'INSERT INTO companies (name, adress, ref) VALUES (?, ?, ?)';
-  db.query(query, [name, adress, ref], (err) => {
+  db.query(query, [name, adress, loginid], (err) => {
     if (err) {
       console.error('Fehler beim Hinzufügen der Firma:', err);
-      res.status(500).send('Fehler beim Hinzufügen der Firma.');
+      res.status(500).send('backend.error.server.companyAddError');
       return;
     }
 
-    res.status(201).send('Firma erfolgreich hinzugefügt.');
+    res.status(201).send('backend.success.company.added');
   });
 };
 
 export const getCompanies = (db: Connection, req: Request, res: Response): void => {
-  const { loginId, isRecruter } = req.query; // loginId und isRecruter aus der Anfrage entnehmen
-  
-  if (!loginId || isRecruter === undefined) {
-    res.status(400).send("Fehlende Parameter: loginId und/oder isRecruter.");
+  const isRecruter = req.query.isRecruter;
+  const loginid = getUserIdFromToken(req);
+
+  if (!loginid || isRecruter === undefined) {
+    res.status(400).send('backend.error.validation.missingLoginIdOrRecruiter');
     return;
   }
 
@@ -34,12 +49,10 @@ export const getCompanies = (db: Connection, req: Request, res: Response): void 
     FROM companies 
     WHERE ref = ? AND isRecruter = ?
   `;
-  //console.log("query" , query, "Parameters:", [loginId, isRecruter === "true"]);
-  db.query(query, [loginId, isRecruter === "true"], (err, results) => {
-  
+  db.query(query, [loginid, isRecruter === 'true'], (err, results) => {
     if (err) {
-      console.error("Fehler beim Abrufen der Firmen:", err);
-      res.status(500).send("Fehler beim Abrufen der Firmen.");
+      console.error('Fehler beim Abrufen der Firmen:', err);
+      res.status(500).send('backend.error.server.fetchCompaniesError');
       return;
     }
 

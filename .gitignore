@@ -6,11 +6,15 @@
 /.pnp
 .pnp.js
 .metadata
+*.zip
 # testing
 /coverage
 
 # production
-/build
+/frontend/build
+/frontend/dist
+/backend/build
+/backend/dist
 
 # misc
 .DS_Store

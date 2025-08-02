@@ -1,0 +1,100 @@
+# render.yaml
+# Dies ist eine Render Blueprint-Datei (Infrastructure as Code)
+# Speichere diese Datei im Root-Verzeichnis deines Repositories
+# (also direkt in 'dit-nal-galerie/resume-management/')
+
+services:
+  # MySQL Datenbank Service
+  - type: databases
+    name: my-mysql-database # Ein sprechender Name für deine Datenbank
+    databaseName: bewerbungs # Der Name deiner Datenbank (aus prod.json)
+    ipAllowList: [] # Erlaube alle IPs, damit Render Services darauf zugreifen können.
+    # Wichtig: Render bietet MySQL nur als Beta an und empfiehlt PostgreSQL.
+    # Für Produktivumgebungen solltest du über einen externen MySQL-Provider nachdenken
+    # oder zu PostgreSQL wechseln, wenn dein Projekt das zulässt.
+    # Die Free Tier Datenbank schläft nach einer Zeit der Inaktivität.
+
+  # Backend Service (Node.js)
+  - type: web
+    name: resume-management-backend
+    env: node
+    region: stuttgart # Wähle eine Region, die für dich und deine Nutzer am besten passt
+    # 'rootDir' gibt an, wo sich der Code für diesen Service befindet, relativ zum Repo-Root
+    rootDir: ./backend
+    # Der Build-Befehl für das Backend
+    # 'npm run build' kompiliert TypeScript nach JavaScript in 'dist/'
+    buildCommand: npm install && npm run build
+    # Der Startbefehl für den Service nach dem Build
+    # 'node dist/server.js' führt die kompilierte JS-Datei aus
+    startCommand: node dist/server.js
+    numInstances: 1 # Anzahl der Instanzen, 1 für Free Tier
+    healthCheckPath: /api/health # Beispiel für einen Health Check Endpoint
+    # Umgebungsvariablen für das Backend
+    envVars:
+      # Render wird automatisch Umgebungsvariablen für die Datenbank bereitstellen.
+      # Du musst diese hier NICHT explizit setzen, sondern sie werden vom 'databases' Block
+      # des MySQL-Services generiert und injiziert.
+      # Die Namen müssen mit denen in deiner prod.json/Konfiguration übereinstimmen.
+      - key: DB_HOST
+        fromDatabase: my-mysql-database
+        property: host
+      - key: DB_PORT
+        fromDatabase: my-mysql-database
+        property: port
+      - key: DB_USER
+        fromDatabase: my-mysql-database
+        property: user
+      - key: DB_PASSWORD
+        fromDatabase: my-mysql-database
+        property: password
+      - key: DB_NAME # Datenbankname muss explizit gesetzt werden, wenn er nicht der Standard ist
+        value: bewerbungs1
+      # Weitere Umgebungsvariablen aus deiner prod.json, die NICHT von der DB kommen:
+      - key: EMAIL_FROM
+        value: noreply@example.com # Ersetze dies mit deiner tatsächlichen E-Mail
+      - key: EMAIL_HOST
+        value: smtp.example.com # Ersetze dies mit deinem tatsächlichen SMTP-Host
+      - key: EMAIL_PORT
+        value: '587'
+      - key: EMAIL_USER
+        value: user # Ersetze dies
+      - key: EMAIL_PASSWORD
+        value: password # Ersetze dies
+      - key: EMAIL_SECURE
+        value: 'false'
+      - key: TOKEN_LENGTH
+        value: '32'
+      - key: TOKEN_EXPIRY_MINUTES
+        value: '10'
+      # FRONTEND_URL und RESET_PASSWORD_URL müssen auf die URL deines deployeden Frontends zeigen.
+      # Wir werden diese später aktualisieren, sobald dein Frontend eine URL hat.
+      # Vorerst kannst du sie auf einen Platzhalter setzen oder auf die URL des Frontends,
+      # sobald diese bekannt ist (nach dem ersten Deploy des Frontends).
+      # Für den ersten Deploy können wir sie erst mal weglassen oder auf die Render-Standard-URL verweisen.
+      # Oder du verwendest "fromService" um die URL des Frontends zu referenzieren (empfohlen)
+      - key: FRONTEND_URL
+        fromService: resume-management-frontend # Verweis auf den Frontend-Service
+        property: url
+      - key: RESET_PASSWORD_URL
+        value: # Hier müsste die vollständige URL inkl. Pfad "/reset-password" rein.
+          # Da Render nur die Basis-URL liefert, musst du das im Backend selbst zusammensetzen
+          # oder nach dem ersten Deploy manuell anpassen:
+          # z.B. https://your-frontend-url.onrender.com/reset-password
+          # Vorerst kannst du es leer lassen oder den Platzhalter verwenden.
+          # Alternativ: Setze es auf ${FRONTEND_URL}/reset-password im Backend-Code selbst.
+      # Der Port, auf dem dein Node.js-Server lauscht. Render setzt die Umgebungsvariable 'PORT'.
+      # Dein Servercode muss darauf hören: `process.env.PORT || 3001`
+      - key: PORT
+        value: 10000 # Render exposed Services auf Port 10000
+
+  # Frontend Service (TypeScript React Static Site)
+  - type: static
+    name: resume-management-frontend
+    region: frankfurt # Wähle die gleiche Region wie für das Backend für bessere Performance
+    rootDir: ./frontend # Der Build-Kontext ist das Frontend-Verzeichnis
+    # Der Build-Befehl für das Frontend
+    buildCommand: npm install && npm run build
+    # Das Verzeichnis, in dem die statischen Dateien nach dem Build landen
+    publishPath: ./frontend/build # Hier landet 'react-scripts build' die Dateien
+    # Optional: Ein Health Check für statische Seiten ist meist nicht nötig,
+    # da Render prüft, ob die Dateien vorhanden sind.

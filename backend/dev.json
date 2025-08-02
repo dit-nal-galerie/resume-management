@@ -1,5 +1,6 @@
 {
   "DB_HOST": "localhost",
+  "DB_PORT": "3001",
   "DB_USER": "root",
   "DB_PASSWORD": "root",
   "DB_NAME": "bewerbungs1",
@@ -9,6 +10,7 @@
   "EMAIL_USER": "user",
   "EMAIL_PASSWORD": "password",
   "EMAIL_SECURE": "false",
+  "FRONTEND_URL": "http://localhost:3000",
   "RESET_PASSWORD_URL": "http://localhost:3000/reset-password",
   "TOKEN_LENGTH": "32",
   "TOKEN_EXPIRY_MINUTES": "10"

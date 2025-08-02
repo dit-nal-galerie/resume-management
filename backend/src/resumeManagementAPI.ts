@@ -3,15 +3,29 @@ import mysql from 'mysql2';
 import config from './config/config';
 
 // Importiere die ausgelagerten Services
-import { createOrUpdateUser, login, getAnrede, changeAccessData } from './services/userService';
+import {
+  createOrUpdateUser,
+  login,
+  getAnrede,
+  changeAccessData,
+  getUserProfile,
+  getUserAnredeAndName,
+} from './services/userService';
 import { createOrUpdateContact, getContacts } from './services/contactService';
 import { getResumesWithUsers, getStates } from './services/resumeService';
 import { addCompany, getCompanies } from './services/companyService';
-import { addHistory,  getHistoryByResumeId } from './services/historyService';
-import {  updateOrCreateResume } from './services/saveResume';
-import { requestPasswordReset, checkPasswordResetToken, resetPassword } from './services/passwordResetService';
+import { addHistory, getHistoryByResumeId } from './services/historyService';
+import { updateOrCreateResume } from './services/saveResume';
+import {
+  requestPasswordReset,
+  checkPasswordResetToken,
+  resetPassword,
+} from './services/passwordResetService';
 
-import mysqlPromise, { Pool as PromisePool, PoolConnection as PromisePoolConnection } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
+import mysqlPromise, {
+  Pool as PromisePool,
+  PoolConnection as PromisePoolConnection,
+} from 'mysql2/promise'; // Hauptsächlich diesen verwenden
 import { changeResumeStatus, getResumeById } from './services/getResume';
 
 class ResumeManagementAPI {
@@ -33,14 +47,16 @@ class ResumeManagementAPI {
       database: config.DB_NAME,
       waitForConnections: true,
       connectionLimit: 10,
-      queueLimit: 0
+      queueLimit: 0,
     });
-    
-
   }
 
-
-
+  async getUserAnredeAndName(req: Request, res: Response): Promise<void> {
+    await getUserAnredeAndName(this.db, req, res);
+  }
+  async getUserProfile(req: Request, res: Response): Promise<void> {
+    await getUserProfile(this.db, req, res);
+  }
   async createOrUpdateUser(req: Request, res: Response): Promise<void> {
     await createOrUpdateUser(this.db, req, res);
   }

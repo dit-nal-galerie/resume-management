@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-
 import { Company } from '../../../../interfaces/Company';
+import { FormField, inputClasses } from '../ui/FormField';
+import { useTranslation } from 'react-i18next';
 
 interface CompanyFormModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
   initialData,
   onSave,
 }) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState<Company>(initialData);
 
   useEffect(() => {
@@ -22,90 +24,94 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({
   }, [initialData]);
 
   const handleChange = (field: keyof Company, value: string | boolean) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
-        <h2 className="text-xl font-semibold mb-4">
-          {initialData.companyId ? 'Firma bearbeiten' : 'Neue Firma'}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="relative w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-semibold">
+          {initialData.companyId
+            ? t('company.form.title') + ' ' + t('common.edit')
+            : t('company.select.new')}
         </h2>
 
         <form className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm">Firmenname</label>
+            <FormField label={t('common.name')} htmlFor="company-name">
               <input
+                id="company-name"
                 type="text"
-                className="w-full px-3 py-2 border rounded-lg"
+                className={inputClasses}
                 value={form.name}
-                onChange={e => handleChange('name', e.target.value)}
-                placeholder="Enter company name"
+                onChange={(e) => handleChange('name', e.target.value)}
+                placeholder={t('common.name')}
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="block text-sm">Stadt</label>
+            <FormField label={t('company.form.city')} htmlFor="company-city">
               <input
-              placeholder='Stsadt'
+                id="company-city"
                 type="text"
-                className="w-full px-3 py-2 border rounded-lg"
+                className={inputClasses}
                 value={form.city}
-                onChange={e => handleChange('city', e.target.value)}
+                onChange={(e) => handleChange('city', e.target.value)}
+                placeholder={t('company.form.city')}
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="block text-sm">Straße</label>
+            <FormField label={t('company.form.street')} htmlFor="company-street">
               <input
-              placeholder='Straße'
+                id="company-street"
                 type="text"
-                className="w-full px-3 py-2 border rounded-lg"
+                className={inputClasses}
                 value={form.street}
-                onChange={e => handleChange('street', e.target.value)}
+                onChange={(e) => handleChange('street', e.target.value)}
+                placeholder={t('company.form.street')}
               />
-            </div>
+            </FormField>
 
-            <div>
-              <label className="block text-sm">Hausnummer</label>
+            <FormField label={t('company.form.houseNumber')} htmlFor="company-houseNumber">
               <input
-              placeholder='Hausnummer'
+                id="company-houseNumber"
                 type="text"
-                className="w-full px-3 py-2 border rounded-lg"
+                className={inputClasses}
                 value={form.houseNumber}
-                onChange={e => handleChange('houseNumber', e.target.value)}
+                onChange={(e) => handleChange('houseNumber', e.target.value)}
+                placeholder={t('company.form.houseNumber')}
               />
-            </div>
+            </FormField>
 
             <div className="col-span-2">
-              <label className="block text-sm">Postleitzahl</label>
-              <input
-              placeholder='Postleitzahl'
-                type="text"
-                className="w-full px-3 py-2 border rounded-lg"
-                value={form.postalCode}
-                onChange={e => handleChange('postalCode', e.target.value)}
-              />
+              <FormField label={t('company.form.postalCode')} htmlFor="company-postalCode">
+                <input
+                  id="company-postalCode"
+                  type="text"
+                  className={inputClasses}
+                  value={form.postalCode}
+                  onChange={(e) => handleChange('postalCode', e.target.value)}
+                  placeholder={t('company.form.postalCode')}
+                />
+              </FormField>
             </div>
           </div>
 
           <div className="mt-6 flex justify-end space-x-2">
             <button
               type="button"
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg"
+              className="rounded-lg bg-gray-200 px-4 py-2 text-gray-700"
               onClick={onClose}
             >
-              Abbrechen
+              {t('common.cancel')}
             </button>
             <button
               type="button"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
               onClick={() => onSave(form)}
             >
-              Speichern
+              {t('common.save')}
             </button>
           </div>
         </form>
