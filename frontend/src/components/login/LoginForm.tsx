@@ -1,7 +1,7 @@
 import React from 'react';
 import { User } from '../../../interfaces/User';
 import { useTranslation } from 'react-i18next';
-import { FormField } from 'components/ui/FormField';
+import { FormField, inputClasses } from 'components/ui/FormField';
 
 // Wiederverwendbare FormField-Komponente
 
@@ -33,7 +33,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           value={loginname}
           onChange={(e) => onChange('loginname', e.target.value)}
           readOnly={readonlyLoginname}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className={inputClasses}
           placeholder={t('login.usernamePlaceholder')}
         />
       </FormField>
@@ -43,8 +43,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
           id="password"
           value={password}
           onChange={(e) => onChange('password', e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className={inputClasses}
           placeholder={t('login.passwordPlaceholder')}
+          required
         />
       </FormField>
       {showPassword2 && (
@@ -54,7 +55,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             id="password2"
             value={password2}
             onChange={(e) => onChange('password2', e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className={inputClasses}
             placeholder={t('passwordReset.confirmPasswordPlaceholder')}
           />
         </FormField>

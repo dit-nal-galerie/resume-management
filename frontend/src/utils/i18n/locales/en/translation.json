@@ -136,7 +136,8 @@
       "website": "Website",
       "saveSuccess": "Company saved successfully",
       "saveError": "Error saving company"
-    }
+    },
+    "createNew": "create Company"
   },
   "resumeList": {
     "title": "Applications",

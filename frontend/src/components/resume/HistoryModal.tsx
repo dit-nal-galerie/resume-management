@@ -56,7 +56,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
 
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
-      await changeResumeStatus(resumeId, refId, selectedState, formattedDate);
+      await changeResumeStatus(resumeId, selectedState, formattedDate);
       if (onStatusChanged) onStatusChanged();
       onClose();
     } catch (err) {
@@ -130,11 +130,10 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
             {currentStateId > -1 && (
               <button
                 onClick={handleChangeStatus}
-                className={`rounded px-4 py-2 text-white ${
-                  isChangeEnabled
+                className={`rounded px-4 py-2 text-white ${isChangeEnabled
                     ? 'bg-blue-600 hover:bg-blue-700'
                     : 'cursor-not-allowed bg-gray-400'
-                }`}
+                  }`}
                 disabled={!isChangeEnabled}
               >
                 {t('resume.edit.title')}

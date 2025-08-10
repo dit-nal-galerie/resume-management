@@ -25,7 +25,7 @@ const CompanySection: React.FC<CompanySectionProps> = ({
   return (
     <div className="mb-4 rounded-lg bg-gray-200 p-4">
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-gray-700">{name || t('company.notSpecified')}</p>
+      <p className="text-gray-700">{name || "---"}</p>
       <div className="mt-2 flex space-x-2">
         {exists ? (
           <button

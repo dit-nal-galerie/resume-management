@@ -42,6 +42,20 @@ const ResumeEdit: React.FC = () => {
   const [companicontactses, setContacts] = useState<Contact[]>([]);
   const [storedUser, setStoredUser] = useState<User | null>(null);
 
+  const handleSelectContact = (c: Contact) => {
+    if (!modalSectionContact) return;
+    setResumeData((rd) =>
+      rd
+        ? {
+          ...rd,
+          [modalSectionContact === 'contactCompany'
+            ? 'contactCompany'
+            : 'contactRecrutingCompany']: c,
+        }
+        : rd
+    );
+    setModalOpen(false);
+  };
   const openEditContact = (section: ModalSectionContact) => {
     setModalType('editContact');
     setModalSectionContact(section);
@@ -69,11 +83,11 @@ const ResumeEdit: React.FC = () => {
     setResumeData((rd) =>
       rd
         ? {
-            ...rd,
-            [modalSectionContact === 'contactCompany'
-              ? 'contactCompany'
-              : 'contactRecrutingCompany']: updated,
-          }
+          ...rd,
+          [modalSectionContact === 'contactCompany'
+            ? 'contactCompany'
+            : 'contactRecrutingCompany']: updated,
+        }
         : rd
     );
   };
@@ -87,6 +101,7 @@ const ResumeEdit: React.FC = () => {
       return;
     }
     const list = await getContacts(0, compId);
+    console.log(JSON.stringify(list, null, 2));
     setContacts(list);
     setModalOpen(true);
   };
@@ -131,12 +146,12 @@ const ResumeEdit: React.FC = () => {
   useEffect(() => {
     getCachedStates()
       .then(setStatusList)
-      .catch(() => {});
+      .catch(() => { });
 
     if (resumeId && resumeId !== '0') {
       getResumeById(Number(resumeId))
         .then((data) => setResumeData(data))
-        .catch(() => {});
+        .catch(() => { });
     } else {
       setResumeData({
         resumeId: 0,
@@ -183,6 +198,7 @@ const ResumeEdit: React.FC = () => {
       JSON.stringify(resumeData?.contactCompany, null, 2) +
       '\n' +
       JSON.stringify(resumeData?.contactRecrutingCompany, null, 2);
+    console.log(JSON.stringify(resumeData, null, 2));
     alert(tView);
   };
 

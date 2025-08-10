@@ -135,7 +135,8 @@
       "website": "Website",
       "saveSuccess": "Unternehmen erfolgreich gespeichert",
       "saveError": "Fehler beim Speichern des Unternehmens"
-    }
+    },
+    "createNew": "Neue eInfügen"
   },
   "contact": {
     "title": "Kontakte",
