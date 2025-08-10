@@ -19,15 +19,14 @@ class ContactController
     public function createOrUpdateContact(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
-        $result = $this->service->createOrUpdateContact($data);
+        $result = $this->service->createOrUpdateContact($data, $response);
         $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function getContacts(Request $request, Response $response): Response
+    public function getContacts(Request $request, Response $response, array $args): Response
     {
-        $result = $this->service->getContacts();
-        $response->getBody()->write(json_encode($result));
-        return $response->withHeader('Content-Type', 'application/json');
+        // WICHTIG: direkt das Response aus dem Service zurückgeben.
+        return $this->service->getContacts($request, $response);
     }
 }

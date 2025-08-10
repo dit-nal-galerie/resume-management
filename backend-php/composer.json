@@ -16,5 +16,10 @@
     "psr-4": {
       "App\\": "src/"
     }
+  },
+  "config": {
+    "allow-plugins": {
+      "tuupola/cors-middleware": true
+    }
   }
 }

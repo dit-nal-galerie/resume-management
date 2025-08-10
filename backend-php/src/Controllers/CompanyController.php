@@ -16,18 +16,18 @@ class CompanyController
         $this->service = new CompanyService($db);
     }
 
-    public function addCompany(Request $request, Response $response): Response
-    {
-        $data = $request->getParsedBody();
-        $result = $this->service->addCompany($data);
-        $response->getBody()->write(json_encode($result));
-        return $response->withHeader('Content-Type', 'application/json');
-    }
-
-    public function getCompanies(Request $request, Response $response): Response
-    {
-        $result = $this->service->getCompanies();
-        $response->getBody()->write(json_encode($result));
-        return $response->withHeader('Content-Type', 'application/json');
-    }
+    // public function addCompany(Request $request, Response $response): Response
+    // {
+    //     $data = $request->getParsedBody();
+    //     $result = $this->service->addCompany($data, $response);
+    //     $response->getBody()->write(json_encode($result));
+    //     return $response->withHeader('Content-Type', 'application/json');
+    // }
+public function addCompany(Request $request, Response $response): Response
+{
+    return $this->service->addCompany($request, $response);
+}
+    public function getCompanies(Request $req, Response $res, array $args): Response {
+    return $this->service->getCompanies($req, $res); // NICHTS zusätzlich schreiben!
+}
 }

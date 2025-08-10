@@ -1,44 +1,40 @@
 <?php
-use Slim\Factory\AppFactory;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-use Dotenv\Dotenv;
+declare(strict_types=1);
 
+// 1) Development-Fehler anzeigen
+ini_set('display_errors','1');
+ini_set('display_startup_errors','1');
+error_reporting(E_ALL);
+
+// 2) Composer-Autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
-// Загружаем .env
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+use Dotenv\Dotenv;
+use Slim\Factory\AppFactory;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
 
-// Создаём приложение
+// 3) .env laden
+Dotenv::createImmutable(__DIR__ . '/../')->load();
+
+// 4) Slim-App erstellen
 $app = AppFactory::create();
 
-// 1) Обрабатываем preflight-запросы и сразу возвращаем нужные заголовки
-$app->options('/{routes:.+}', function (Request $request, Response $response) {
-    return $response
-        ->withHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
-        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-        ->withHeader('Access-Control-Allow-Credentials', 'true');
-});
+// 5) Routing-Middleware (damit Slim deine Routen kennt)
+$app->addRoutingMiddleware();
 
-// 2) Оборачиваем всё в мидлвар, чтобы подставить CORS-заголовки в **каждый** ответ
-$app->add(function (Request $request, RequestHandler $handler): Response {
-    /** @var Response $response */
-    $response = $handler->handle($request);
-    return $response
-        ->withHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
-        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-        ->withHeader('Access-Control-Allow-Credentials', 'true');
-});
+// 6) Error-Middleware (zeigt Exceptions und Stacktraces)
+$app->addErrorMiddleware(
+    true,   // displayErrorDetails
+    true,   // logErrors
+    true    // logErrorDetails
+);
 
-// JSON-парсер для PUT/POST
+// 7) Body-Parser für JSON-Requests
 $app->addBodyParsingMiddleware();
 
-// Подключаем ваши маршруты
+// 8) Deine Routen einbinden
 (require __DIR__ . '/../src/Routes/api.php')($app);
 
-// Запускаем приложение
+// 9) App starten
 $app->run();

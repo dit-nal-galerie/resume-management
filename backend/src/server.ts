@@ -28,7 +28,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Erstelle eine Instanz der API-Klasse
 const api = new ResumeManagementAPI();
-app.get('/me/anrede', (req, res) => api.getUserAnredeAndName(req, res));
+app.get('/meanrede', (req, res) => api.getUserAnredeAndName(req, res));
 app.get('/me', (req, res) => api.getUserProfile(req, res));
 // Definiere die Routen
 app.post('/createOrUpdateUser', (req: Request, res: Response) => api.createOrUpdateUser(req, res));

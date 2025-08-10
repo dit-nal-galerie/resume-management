@@ -1,10 +1,27 @@
-# Установка переменной среды (окружение)
-SetEnv APP_ENV dev
+# Устанавливаем окружение
+<IfModule mod_env.c>
+  SetEnv APP_ENV dev
+</IfModule>
 
-# Включить mod_rewrite (если не включён — проверь в Apache)
-RewriteEngine On
+<IfModule mod_headers.c>
+  # CORS-Header: nur hier in Apache
+  Header always set Access-Control-Allow-Origin  "http://localhost:3000"
+  Header always set Access-Control-Allow-Methods "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+  Header always set Access-Control-Allow-Credentials "true"
+</IfModule>
 
-# Если файл или директория не существует — перенаправить на index.php
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Preflight OPTIONS → 200 OK
+  RewriteCond %{REQUEST_METHOD} OPTIONS
+  RewriteRule ^(.*)$ $1 [R=200,L]
+
+  # Existierende Dateien/Ordner direkt ausliefern
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Alles andere an index.php weiterleiten
+  RewriteRule ^ index.php [QSA,L]
+</IfModule>
