@@ -378,7 +378,16 @@ export const createOrUpdateUser = async (
          WHERE loginid = ?`,
         [name, email, anrede, city, street, houseNumber, postalCode, phone, mobile, loginid],
         (err) => {
-          if (err) return res.status(500).send('backend.error.server.updateError');
+          if (err) {
+            console.log(
+              `UPDATE users SET 
+          name = ?, email = ?, anrede = ?, city = ?, street = ?, 
+          houseNumber = ?, postalCode = ?, phone = ?, mobile = ?
+         WHERE loginid = ?`,
+              [name, email, anrede, city, street, houseNumber, postalCode, phone, mobile, loginid]
+            );
+            return res.status(500).send('backend.error.server.updateError');
+          }
           res.send('backend.success.user.dataUpdated');
         }
       );

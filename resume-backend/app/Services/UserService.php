@@ -13,22 +13,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserService
 {
-    public function getUserIdFromToken(Request $request): ?int
-    {
-        $token = $request->cookie('token') ?? ($request->bearerToken());
-        if (!$token) return null;
-
-        try {
-            $decoded = JWT::decode($token, new Key(env('JWT_SECRET', 'dein_geheimes_jwt_secret'), 'HS256'));
-            return $decoded->loginid ?? null;
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
 
     public function getUserAnredeAndName(Request $request)
     {
-        $loginid = $this->getUserIdFromToken($request);
+        $loginid = AuthService::getUserIdFromToken($request);
 
         if (!$loginid) {
             return response()->json(['message' => 'backend.error.auth.unauthorized'], 401);
@@ -50,7 +38,7 @@ class UserService
 
     public function getUserProfile(Request $request)
     {
-        $loginid = $this->getUserIdFromToken($request);
+        $loginid = AuthService::getUserIdFromToken($request);
 
         if (!$loginid) {
             return response()->json(['message' => 'backend.error.auth.unauthorized'], 401);

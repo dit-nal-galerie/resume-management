@@ -4,11 +4,12 @@ import { Resume } from '../../../interfaces/Resume';
 
 import { User } from '../../../interfaces/User';
 import { useNavigate } from 'react-router-dom';
-import { HistoryModal } from './resume/HistoryModal';
-import { StatusModal } from './resume/StatusModal';
+
 import { useTranslation } from 'react-i18next';
 import PageHeader from './ui/PageHeader';
 import { PageId } from './ui/PageId';
+import { HistoryModal } from './resume/modals/HistoryModal';
+import { StatusModal } from './resume/modals/StatusModal';
 
 const ResumeList: React.FC = () => {
   const { t } = useTranslation();

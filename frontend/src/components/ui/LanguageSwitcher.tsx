@@ -1,4 +1,4 @@
-import { t } from 'i18next';
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +10,7 @@ const LanguageSwitcher: React.FC = () => {
     i18n.changeLanguage(lng);
     localStorage.setItem('i18nextLng', lng);
   };
-
+  const { t } = useTranslation();
   return (
     <div className="flex items-center">
       <label htmlFor="language-switcher" className="sr-only">
