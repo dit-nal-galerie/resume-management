@@ -60,12 +60,12 @@ const ChangeAccessData: React.FC = () => {
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
     if (!formData.loginname) newErrors.loginname = t('login.usernameRequired');
-    if (!formData.email) newErrors.email = t('profile.emailRequired') || 'E-Mail ist erforderlich';
+    if (!formData.email) newErrors.email = t('profile.emailRequired');
     if (!formData.oldPassword) newErrors.oldPassword = t('login.passwordRequired');
     if (formData.changePassword) {
-      if (!formData.password) newErrors.password = t('passwordReset.newPasswordRequired') || 'Neues Passwort ist erforderlich';
-      if (!formData.password2) newErrors.password2 = t('passwordReset.confirmPasswordRequired') || 'Bestätigung ist erforderlich';
-      if (formData.password !== formData.password2) newErrors.password2 = t('passwordReset.passwordsDontMatch') || 'Passwörter stimmen nicht überein';
+      if (!formData.password) newErrors.password = t('passwordReset.newPasswordRequired');
+      if (!formData.password2) newErrors.password2 = t('passwordReset.confirmPasswordRequired');
+      if (formData.password !== formData.password2) newErrors.password2 = t('passwordReset.passwordsDontMatch');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
