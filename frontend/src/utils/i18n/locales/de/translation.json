@@ -15,7 +15,12 @@
     "name": "Name",
     "close": "Schließen",
     "about": "Über",
-    "logout": "Ausloggen\n"
+    "logout": "Ausloggen\n",
+    "saving": "Speichern…",
+    "sending": "Senden…",
+    "processing": "Wird verarbeitet…",
+    "pleaseWait": "Bitte warten…",
+    "remove": "Löschen"
   },
   "navigation": {
     "login": "Anmelden",
@@ -220,7 +225,6 @@
     "recruiterContact": "Recruiter Kontakt",
     "company": "Firma",
     "companyContact": "Firmenkontakt",
-    "selectCompanyFirst": "Bitte zuerst eine Firma auswählen",
     "confirmDeleteContact": "Möchten Sie diesen Kontakt wirklich löschen?",
     "requiredFields": "Bitte alle Pflichtfelder ausfüllen",
     "saveSuccessNew": "Bewerbung erfolgreich angelegt",
@@ -228,7 +232,15 @@
     "saveError": "Fehler beim Speichern der Bewerbung",
     "loading": "Lade",
     "history": "Historie",
-    "backToList": "Zurück zur Liste"
+    "backToList": "Zurück zur Liste",
+    "selectCompany": "Firma auswählen",
+    "newCompany": "Neue Firma",
+    "noCompanySelected": "Keine Firma ausgewählt.",
+    "selectContact": "Kontakt auswählen",
+    "newContact": "Neuer Kontakt",
+    "noContactSelected": "Kein Kontakt ausgewählt.",
+    "contactWithoutName": "Ohne Namen",
+    "selectCompanyFirst": "Bitte zuerst eine Firma auswählen."
   },
   "api": {
     "error": {

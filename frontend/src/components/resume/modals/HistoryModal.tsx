@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { changeResumeStatus, getHistoryByResumeId } from '../../services/api';
+
 import { HistoryEntry } from '../../../../interfaces/histori';
 import DatePicker from 'react-datepicker';
-import { StatusModalProps } from './ResumeEditModals.types';
+
 import { useTranslation } from 'react-i18next';
-import { FormField, inputClasses } from '../ui/FormField';
-import { getCachedStates } from '../../utils/storage';
+import { getCachedStates } from '../../../utils/storage';
+import { changeResumeStatus, getHistoryByResumeId } from '../../../services/api';
+import { FormField, inputClasses } from '../../ui/FormField';
+import { StatusModalProps } from '../ResumeEditModals.types';
+
+
 
 interface StateOption {
   stateid: number;
@@ -131,8 +135,8 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
               <button
                 onClick={handleChangeStatus}
                 className={`rounded px-4 py-2 text-white ${isChangeEnabled
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'cursor-not-allowed bg-gray-400'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'cursor-not-allowed bg-gray-400'
                   }`}
                 disabled={!isChangeEnabled}
               >

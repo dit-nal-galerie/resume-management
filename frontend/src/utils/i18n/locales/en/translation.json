@@ -1,6 +1,5 @@
 {
   "common": {
-    "loading": "Loading...",
     "error": "An error occurred. Please try again.",
     "serverError": "Server error. Please try again later.",
     "back": "Back",
@@ -15,7 +14,13 @@
     "name": "Name",
     "close": "Close",
     "about": "About",
-    "logout": "Logout"
+    "logout": "Logout",
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "sending": "Sending…",
+    "processing": "Processing…",
+    "pleaseWait": "Please wait…",
+    "remove": "Remove"
   },
   "navigation": {
     "login": "Login",
@@ -177,7 +182,6 @@
     "recruiterContact": "Recruiter Contact",
     "company": "Company",
     "companyContact": "Company Contact",
-    "selectCompanyFirst": "Please select a company first.",
     "confirmDeleteContact": "Are you sure you want to delete this contact?",
     "requiredFields": "Please fill in all required fields.",
     "saveSuccessNew": "Application created successfully.",
@@ -185,7 +189,15 @@
     "saveError": "Error saving application.",
     "loading": "Loading...",
     "history": "History",
-    "backToList": "Back to list"
+    "backToList": "Back to list",
+    "selectCompany": "Select company",
+    "newCompany": "New company",
+    "noCompanySelected": "No company selected.",
+    "selectContact": "Select contact",
+    "newContact": "New contact",
+    "noContactSelected": "No contact selected.",
+    "contactWithoutName": "No name",
+    "selectCompanyFirst": "Please select a company first."
   },
   "contact": {
     "title": "Contacts",

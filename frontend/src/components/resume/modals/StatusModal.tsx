@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { changeResumeStatus } from '../../services/api';
-import { StatusModalProps } from './ResumeEditModals.types';
+
 import { useTranslation } from 'react-i18next';
-import { FormField, inputClasses } from '../ui/FormField';
-import { getCachedStates } from '../../utils/storage';
+import { getCachedStates } from '../../../utils/storage';
+import { changeResumeStatus } from '../../../services/api';
+import { FormField, inputClasses } from '../../ui/FormField';
+import { StatusModalProps } from '../ResumeEditModals.types';
+
 
 interface StateOption {
   stateid: number;
