@@ -15,7 +15,7 @@
 /frontend/dist
 /backend/build
 /backend/dist
-
+/test-results
 # misc
 .DS_Store
 .env.local
