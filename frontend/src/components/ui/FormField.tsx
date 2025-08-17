@@ -6,11 +6,10 @@ export interface AnredeOption {
 }
 
 // Gemeinsame Props für alle Formularfelder (für die Wiederverwendbarkeit)
-export interface FormFieldProps {
-  label: string;
+interface FormFieldProps {
+  label: React.ReactNode; // vorher: string
   htmlFor: string;
-  placeholder?: string;
-  children: React.ReactNode; // Das eigentliche Input/Select-Element
+  children: React.ReactNode;
 }
 export interface ProfileFormProps {
   formData: User;

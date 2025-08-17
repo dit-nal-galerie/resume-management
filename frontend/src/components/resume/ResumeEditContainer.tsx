@@ -1,0 +1,400 @@
+// src/components/resume/ResumeEditContainer.tsx
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+import { Resume } from '../../../../interfaces/Resume';
+import { Company } from '../../../../interfaces/Company';
+import { Contact } from '../../../../interfaces/Contact';
+import { User } from '../../../../interfaces/User';
+
+import {
+    getCompanies,
+    getContacts,
+    getResumeById,
+    getUserProfile,
+    updateOrCreateResume,
+} from '../../services/api';
+import { getCachedStates } from '../../utils/storage';
+
+import ResumeEditForm from './ResumeEditForm';
+import ContactSelectModal from '../contact/ContactSelectModal';
+import ContactFormModal from '../contact/ContactFormModal';
+import { CompanyFormModal, CompanySelectModal } from 'components/company';
+
+import {
+    ModalSectionCompany,
+    ModalSectionContact,
+    ModalType,
+} from './ResumeEditModals.types';
+import { HistoryModal } from './modals/HistoryModal';
+import Loader from '../ui/Loader';
+
+type RouteParams = { resumeId?: string };
+type StatusItem = { stateid: number; text: string };
+
+export default function ResumeEditContainer({ initial }: { initial: Resume | null }) {
+    const EMPTY_COMPANY: Company = {
+        companyId: 0,
+        name: '',
+        city: '',
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        isRecruter: false,
+        ref: 0,
+    };
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { resumeId } = useParams<RouteParams>();
+
+    // Hauptdaten
+    const [resumeData, setResumeData] = React.useState<Resume | null>(initial);
+    const [statusList, setStatusList] = React.useState<StatusItem[]>([]);
+    const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+    const [storedUser, setStoredUser] = React.useState<User | null>(null);
+
+    // Modals
+    const [modalOpen, setModalOpen] = React.useState(false);
+    const [modalType, setModalType] = React.useState<ModalType | null>(null);
+    const [modalSectionCompany, setModalSectionCompany] =
+        React.useState<ModalSectionCompany | null>(null);
+    const [modalSectionContact, setModalSectionContact] =
+        React.useState<ModalSectionContact | null>(null);
+
+    // Datenquellen für Auswahl
+    const [companies, setCompanies] = React.useState<Company[]>([]);
+    const [contacts, setContacts] = React.useState<Contact[]>([]);
+
+    // History Modal
+    const [isHistoryOpen, setIsHistoryOpen] = React.useState(false);
+
+    // User laden (optional)
+    React.useEffect(() => {
+        getUserProfile()
+            .then(setStoredUser)
+            .catch(() => setStoredUser(null));
+    }, []);
+
+    // Statusliste cachen/laden + Resume laden/initialisieren
+    React.useEffect(() => {
+        getCachedStates()
+            .then(setStatusList)
+            .catch(() => { });
+
+        if (resumeId && resumeId !== '0' && resumeId !== 'new') {
+            const id = Number(resumeId);
+            if (Number.isNaN(id)) {
+                setResumeData(null);
+                return;
+            }
+            let cancelled = false;
+            (async () => {
+                try {
+                    const data = await getResumeById(id);
+                    if (!cancelled) setResumeData(data);
+                } catch {
+                    if (!cancelled) setResumeData(null);
+                }
+            })();
+            return () => {
+                cancelled = true;
+            };
+        }
+
+        // Neu anlegen
+        setResumeData({
+            resumeId: 0,
+            ref: 0,
+            position: '',
+            stateId: 0,
+            stateText: '',
+            link: '',
+            comment: '',
+            created: new Date().toISOString().split('T')[0],
+            company: null,
+            recrutingCompany: null,
+            contactCompany: null,
+            contactRecrutingCompany: null,
+        });
+    }, [resumeId]);
+
+    // Helpers für aktuellen Kontext aus Contact-Section
+    const getCurrentContact = React.useCallback((): Contact | null => {
+        if (!resumeData || !modalSectionContact) return null;
+        return modalSectionContact === 'contactCompany'
+            ? (resumeData.contactCompany as Contact | null)
+            : (resumeData.contactRecrutingCompany as Contact | null);
+    }, [resumeData, modalSectionContact]);
+
+    const getCurrentCompanyId = React.useCallback((): number | undefined => {
+        if (!resumeData || !modalSectionContact) return undefined;
+        return modalSectionContact === 'contactCompany'
+            ? resumeData.company?.companyId
+            : resumeData.recrutingCompany?.companyId;
+    }, [resumeData, modalSectionContact]);
+
+    // ===== Company Handlers =====
+    const handleOpenEditCompany = (section: ModalSectionCompany) => {
+        setModalType('edit');
+        setModalSectionCompany(section);
+        setModalOpen(true);
+    };
+
+    const handleOpenSelectCompany = async (section: ModalSectionCompany) => {
+        const list = await getCompanies(0, section === 'recrutingCompany');
+        setCompanies(list);
+        setModalType('select');
+        setModalSectionCompany(section);
+        setModalOpen(true);
+    };
+
+    const handleRemoveCompany = (section: ModalSectionCompany) => {
+        setResumeData((rd) => (rd ? { ...rd, [section]: null } : rd));
+    };
+
+    const handleSaveCompany = (comp: Company) => {
+        if (!modalSectionCompany) return;
+        const patched: Company = {
+            ...comp,
+            isRecruter: modalSectionCompany === 'recrutingCompany',
+            companyId: comp.companyId || 0,
+        };
+        setResumeData((rd) => (rd ? { ...rd, [modalSectionCompany]: patched } : rd));
+        setModalOpen(false);
+        setModalType(null);
+        setModalSectionCompany(null);
+    };
+
+    const handleSelectCompany = (comp: Company) => {
+        if (!modalSectionCompany) return;
+        setResumeData((rd) => (rd ? { ...rd, [modalSectionCompany]: comp } : rd));
+        setModalOpen(false);
+        setModalType(null);
+        setModalSectionCompany(null);
+    };
+
+    // ===== Contact Handlers =====
+    const handleOpenEditContact = (section: ModalSectionContact) => {
+        setModalType('editContact');
+        setModalSectionContact(section);
+        setModalOpen(true);
+    };
+
+    const handleOpenSelectContact = async (section: ModalSectionContact) => {
+        setModalType('selectContact');
+        setModalSectionContact(section);
+
+        const compId =
+            resumeData?.[section === 'contactCompany' ? 'company' : 'recrutingCompany']?.companyId;
+
+        if (!compId) {
+            alert(t('resumeEdit.selectCompanyFirst'));
+            setModalType(null);
+            setModalSectionContact(null);
+            return;
+        }
+
+        const list = await getContacts(0, compId);
+        setContacts(list);
+        setModalOpen(true);
+    };
+
+    const handleRemoveContact = (section: ModalSectionContact) => {
+        if (!resumeData) return;
+        const key =
+            section === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
+        const contact =
+            section === 'contactCompany'
+                ? resumeData?.contactCompany
+                : resumeData?.contactRecrutingCompany;
+        if (!contact?.contactid) return;
+
+        if (!window.confirm(t('resumeEdit.confirmDeleteContact'))) return;
+        setResumeData((prev) => (prev ? { ...prev, [key]: null } : prev));
+    };
+
+    const handleSelectContact = (c: Contact) => {
+        if (!modalSectionContact) return;
+        const key =
+            modalSectionContact === 'contactCompany'
+                ? 'contactCompany'
+                : 'contactRecrutingCompany';
+        setResumeData((rd) => (rd ? { ...rd, [key]: c } : rd));
+        setModalOpen(false);
+        setModalType(null);
+        setModalSectionContact(null);
+    };
+
+    const handleSaveContact = (updated: Contact) => {
+        if (!modalSectionContact) return;
+
+        const keyCompany = modalSectionContact === 'contactCompany' ? 'company' : 'recrutingCompany';
+        const companyId = resumeData?.[keyCompany]?.companyId || 0;
+
+        const safe: Contact = {
+            ...updated,
+            anrede: updated.anrede || 0,
+            company: companyId,
+            contactid: updated.contactid || 0,
+        };
+
+        const key =
+            modalSectionContact === 'contactCompany'
+                ? 'contactCompany'
+                : 'contactRecrutingCompany';
+
+        setResumeData((rd) => (rd ? { ...rd, [key]: safe } : rd));
+        setModalOpen(false);
+        setModalType(null);
+        setModalSectionContact(null);
+    };
+
+    // ===== History =====
+    const openHistoryModal = () => setIsHistoryOpen(true);
+    const closeHistoryModal = () => setIsHistoryOpen(false);
+
+    // ===== Save / Back / View =====
+    const handleSave = async () => {
+        if (!resumeData) return;
+        if (!resumeData.position) {
+            setErrorMessage(t('resumeEdit.requiredFields'));
+            return;
+        }
+        try {
+            await updateOrCreateResume(resumeData);
+            alert(
+                resumeData.resumeId === 0
+                    ? t('resumeEdit.saveSuccessNew')
+                    : t('resumeEdit.saveSuccessUpdate')
+            );
+            navigate('/resumes');
+        } catch {
+            setErrorMessage(t('resumeEdit.saveError'));
+        }
+    };
+
+    const handleBack = () => navigate('/resumes');
+
+    const handleView = () => {
+        console.log(JSON.stringify(resumeData, null, 2));
+        const tView =
+            JSON.stringify(resumeData?.contactCompany, null, 2) +
+            '\n' +
+            JSON.stringify(resumeData?.contactRecrutingCompany, null, 2);
+        alert(tView);
+    };
+
+    const initialCompanyData: Company =
+        modalSectionCompany
+            ? (modalSectionCompany === 'company'
+                ? (resumeData?.company ?? EMPTY_COMPANY)
+                : (resumeData?.recrutingCompany ?? EMPTY_COMPANY))
+            : EMPTY_COMPANY;
+
+    // Initialer Kontakt für ContactFormModal (neu/bearbeiten)
+    const initialContact: Contact = React.useMemo(() => {
+        const ref = resumeData?.ref ?? 0;
+        const section = modalSectionContact;
+
+        const companyId =
+            section
+                ? resumeData?.[
+                    section === 'contactCompany' ? 'company' : 'recrutingCompany'
+                ]?.companyId ?? 0
+                : 0;
+
+        const current: Contact | undefined =
+            section === 'contactCompany'
+                ? (resumeData?.contactCompany ?? undefined)
+                : section === 'contactRecrutingCompany'
+                    ? (resumeData?.contactRecrutingCompany ?? undefined)
+                    : undefined;
+
+        return (
+            current ?? {
+                contactid: 0,
+                vorname: '',
+                name: '',
+                email: '',
+                anrede: 0,
+                title: '',
+                zusatzname: '',
+                phone: '',
+                mobile: '',
+                company: companyId,
+                ref,
+            }
+        );
+    }, [modalSectionContact, resumeData]);
+
+    // Guard, bis Daten geladen/initialisiert sind
+    if (!resumeData) {
+        return <Loader />
+    }
+
+    return (
+        <>
+            <ResumeEditForm
+                resume={resumeData}
+                statusList={statusList}
+                errorMessage={errorMessage}
+                setResume={setResumeData}
+                onOpenEditCompany={handleOpenEditCompany}
+                onOpenSelectCompany={handleOpenSelectCompany}
+                onRemoveCompany={handleRemoveCompany}
+                onOpenEditContact={handleOpenEditContact}
+                onOpenSelectContact={handleOpenSelectContact}
+                onRemoveContact={handleRemoveContact}
+                onSave={handleSave}
+                onBack={handleBack}
+                onView={handleView}
+                onOpenHistory={resumeData.resumeId > 0 ? openHistoryModal : undefined}
+            />
+
+            {/* Company: Edit */}
+            <CompanyFormModal
+                isOpen={modalOpen && modalType === 'edit'}
+                onClose={() => setModalOpen(false)}
+                initialData={initialCompanyData}
+                onSave={handleSaveCompany}
+            />
+
+            {/* Company: Select */}
+            <CompanySelectModal
+                isOpen={modalOpen && modalType === 'select'}
+                onClose={() => setModalOpen(false)}
+                companies={companies}
+                onSelect={handleSelectCompany}
+            />
+
+            {/* Contact: Select */}
+            <ContactSelectModal
+                isOpen={modalOpen && modalType === 'selectContact'}
+                onClose={() => setModalOpen(false)}
+                contacts={contacts}
+                onSelect={handleSelectContact}
+            />
+
+            {/* Contact: Edit/Create */}
+            <ContactFormModal
+                isOpen={modalOpen && modalType === 'editContact'}
+                onClose={() => setModalOpen(false)}
+                contact={initialContact}
+                onSave={handleSaveContact}
+            />
+
+            {/* History */}
+            {isHistoryOpen && resumeData && (
+                <HistoryModal
+                    isOpen={isHistoryOpen}
+                    onClose={closeHistoryModal}
+                    resumeId={resumeData.resumeId}
+                    refId={0}
+                    resumeTitle={resumeData.position || ''}
+                    currentStateId={-1}
+                />
+            )}
+        </>
+    );
+}

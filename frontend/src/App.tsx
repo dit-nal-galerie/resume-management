@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ResumeEdit from './components/resume/ResumeEdit';
+
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Profile from 'components/profile/Profile';
@@ -10,6 +10,7 @@ import RequestPasswordReset from 'components/login/RequestPasswordReset';
 import ResetPassword from 'components/login/ResetPassword';
 import ResumeList from 'components/ResumeList';
 import ChangeAccessData from 'components/profile/ChangeAccessData';
+import ResumeEditContainer from './components/resume/ResumeEditContainer';
 
 /**
  * Die Haupt-App-Komponente, die das Routing und die globale Layout-Elemente verwaltet.
@@ -30,7 +31,7 @@ const App: React.FC = () => (
       {/* Route für die Anzeige der Liste der Lebensläufe */}
       <Route path="/resumes" element={<ResumeList />} />
       {/* Route für die Bearbeitung eines spezifischen Lebenslaufs, mit einem dynamischen Parameter ':resumeId' */}
-      <Route path="/resume/:resumeId" element={<ResumeEdit />} />
+      <Route path="/resume/:resumeId" element={<ResumeEditContainer initial={null} />} />
 
       {/* Route zum Ändern von Zugangsdaten */}
       <Route path="/changeaccess" element={<ChangeAccessData />} />

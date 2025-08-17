@@ -50,25 +50,27 @@ const Login: React.FC = () => {
       const userData: User | null = await login(loginname, password);
 
       if (userData) {
+        console.log('Login response:', JSON.stringify(userData));
         goToResume();
       } else {
+
         setServerError(t('login.invalidCredentials'));
         setErrors({
           loginname: t('login.checkUsername'),
           password: t('login.checkPassword'),
         });
-        loginInputRef.current?.focus();
+        // loginInputRef.current?.focus();
       }
     } catch (error) {
       setServerError(t('common.serverError'));
-      loginInputRef.current?.focus();
+      // loginInputRef.current?.focus();
     }
   };
 
   const handleBlur = () => {
     setErrors({});
   };
-  console.log(i18n);
+  console.log(i18n)
 
   return (
     <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
@@ -81,11 +83,10 @@ const Login: React.FC = () => {
               <input
                 id="loginname"
                 type="text"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.loginname
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.loginname
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 placeholder={t('login.usernamePlaceholder')}
                 value={loginname}
                 onChange={(e) => setLoginname(e.target.value)}
@@ -100,11 +101,10 @@ const Login: React.FC = () => {
               <input
                 id="password"
                 type="password"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.password
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.password
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 placeholder={t('login.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

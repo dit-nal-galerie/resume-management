@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
 import { getCachedAnrede } from '../../utils/storage';
 
-interface ContactFormModalProps {
+type ContactFormModalProps = {
   isOpen: boolean;
   contact: Contact;
   onSave: (contact: Contact) => void;
