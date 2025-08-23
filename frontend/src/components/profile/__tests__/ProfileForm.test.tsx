@@ -1,8 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ProfileForm from '../ProfileForm';
-import { User } from '../../../../interfaces/User';
+
 import 'utils/i18n/i18n';
+import { User } from '../../../../../interfaces';
+
 
 const defaultUser: User = {
   loginname: '',

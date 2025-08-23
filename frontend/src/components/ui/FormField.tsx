@@ -1,5 +1,6 @@
 import React from 'react';
-import { User } from '@interfaces/User';
+import { User } from '../../../../interfaces';
+
 export interface AnredeOption {
   id: number;
   text: string;

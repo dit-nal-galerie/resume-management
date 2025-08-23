@@ -83,7 +83,8 @@
     "street": "Street",
     "houseNumber": "House number",
     "saveSuccess": "Profile saved successfully",
-    "saveError": "Error saving profile"
+    "saveError": "Error saving profile",
+    "emailRequired": "Please enter your email."
   },
   "resume": {
     "list": {

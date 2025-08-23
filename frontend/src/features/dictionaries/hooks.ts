@@ -1,7 +1,7 @@
 // src/features/dictionaries/hooks.ts
 import { useQuery } from '@tanstack/react-query';
 import { dictionariesKeys } from './queryKeys';
-import * as api from '@/shared/api/queries';
+import * as api from '../../shared/api/queries';
 
 const TEN_MIN = 1000 * 60 * 10;
 const THIRTY_MIN = 1000 * 60 * 30;

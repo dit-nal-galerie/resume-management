@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getResumesWithUsers, getUserAnredeAndName } from '../services/api';
-import { Resume } from '../../../interfaces/Resume';
 
-import { User } from '../../../interfaces/User';
+import { Resume } from '../../../interfaces';
 import { useNavigate } from 'react-router-dom';
 
 import { useTranslation } from 'react-i18next';
@@ -10,6 +8,7 @@ import PageHeader from './ui/PageHeader';
 import { PageId } from './ui/PageId';
 import { HistoryModal } from './resume/modals/HistoryModal';
 import { StatusModal } from './resume/modals/StatusModal';
+import { getResumesWithUsers, getUserAnredeAndName } from '../shared/api/queries';
 
 const ResumeList: React.FC = () => {
   const { t } = useTranslation();

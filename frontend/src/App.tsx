@@ -3,13 +3,13 @@ import React from 'react';
 
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Profile from 'components/profile/Profile';
-import Login from 'components/login/Login';
+import Profile from './components/profile/Profile';
+import Login from './components/login/Login';
 
-import RequestPasswordReset from 'components/login/RequestPasswordReset';
-import ResetPassword from 'components/login/ResetPassword';
-import ResumeList from 'components/ResumeList';
-import ChangeAccessData from 'components/profile/ChangeAccessData';
+import RequestPasswordReset from './components/login/RequestPasswordReset';
+import ResetPassword from './components/login/ResetPassword';
+import ResumeList from './components/ResumeList';
+import ChangeAccessData from './components/profile/ChangeAccessData';
 import ResumeEditContainer from './components/resume/ResumeEditContainer';
 
 /**

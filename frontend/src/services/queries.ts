@@ -1,4 +1,4 @@
-import { API_URL } from './api';
+import { API_URL } from '../shared/api/queries';
 
 const fetchStates = async (): Promise<{ stateid: number; text: string }[]> => {
   const response = await fetch(`${API_URL}/getStates`, {

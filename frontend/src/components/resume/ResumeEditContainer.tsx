@@ -3,24 +3,9 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { Resume } from '../../../../interfaces/Resume';
-import { Company } from '../../../../interfaces/Company';
-import { Contact } from '../../../../interfaces/Contact';
-import { User } from '../../../../interfaces/User';
-
-import {
-    getCompanies,
-    getContacts,
-    getResumeById,
-    getUserProfile,
-    updateOrCreateResume,
-} from '../../services/api';
-import { getCachedStates } from '../../utils/storage';
-
 import ResumeEditForm from './ResumeEditForm';
 import ContactSelectModal from '../contact/ContactSelectModal';
 import ContactFormModal from '../contact/ContactFormModal';
-import { CompanyFormModal, CompanySelectModal } from 'components/company';
 
 import {
     ModalSectionCompany,
@@ -29,6 +14,22 @@ import {
 } from './ResumeEditModals.types';
 import { HistoryModal } from './modals/HistoryModal';
 import Loader from '../ui/Loader';
+
+import {
+    getCompanies,
+    getContacts,
+    getUserProfile,
+    updateOrCreateResume,
+    getStates,
+} from '../../shared/api/queries';
+import { useResumeById } from '../../features/resumes/hooks'; // 👈 Hook nutzen!
+
+import { CompanyFormModal, CompanySelectModal } from '../company';
+
+import { Company } from '../../../../interfaces/Company';
+import { Resume } from '../../../../interfaces/Resume';
+import { Contact } from '../../../../interfaces/Contact';
+import { User } from '../../../../interfaces/User';
 
 type RouteParams = { resumeId?: string };
 type StatusItem = { stateid: number; text: string };
@@ -44,9 +45,17 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
         isRecruter: false,
         ref: 0,
     };
+
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { resumeId } = useParams<RouteParams>();
+
+    // Parsed ID
+    const parsedId = React.useMemo(() => {
+        if (!resumeId || resumeId === '0' || resumeId === 'new') return 0;
+        const n = Number(resumeId);
+        return Number.isFinite(n) && n > 0 ? n : 0;
+    }, [resumeId]);
 
     // Hauptdaten
     const [resumeData, setResumeData] = React.useState<Resume | null>(initial);
@@ -76,63 +85,48 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
             .catch(() => setStoredUser(null));
     }, []);
 
-    // Statusliste cachen/laden + Resume laden/initialisieren
+    // States laden
     React.useEffect(() => {
-        getCachedStates()
+        getStates()
             .then(setStatusList)
             .catch(() => { });
+    }, []);
 
-        if (resumeId && resumeId !== '0' && resumeId !== 'new') {
-            const id = Number(resumeId);
-            if (Number.isNaN(id)) {
-                setResumeData(null);
-                return;
+    // === Resume laden: via Hook (robust + Loading/Error-Handling) ===
+    const {
+        data: fetchedResume,
+        isLoading: isLoadingResume,
+        error: resumeError,
+    } = useResumeById(parsedId, 0, parsedId > 0); // enabled nur wenn echte ID
+
+    // Form-State setzen, wenn Daten aus dem Hook kommen
+    React.useEffect(() => {
+        if (parsedId > 0) {
+            console.log('Resume aus Hook:', fetchedResume, isLoadingResume, resumeError);
+            if (fetchedResume) {
+                setResumeData(fetchedResume);
+            } else if (!isLoadingResume && resumeError) {
+                console.error('Resume laden fehlgeschlagen:', resumeError);
+                setErrorMessage(t('resumeEdit.loadError')); // i18n-Key anpassen
             }
-            let cancelled = false;
-            (async () => {
-                try {
-                    const data = await getResumeById(id);
-                    if (!cancelled) setResumeData(data);
-                } catch {
-                    if (!cancelled) setResumeData(null);
-                }
-            })();
-            return () => {
-                cancelled = true;
-            };
+        } else {
+            // Neu anlegen
+            setResumeData({
+                resumeId: 0,
+                ref: 0,
+                position: '',
+                stateId: 0,
+                stateText: '',
+                link: '',
+                comment: '',
+                created: new Date().toISOString().split('T')[0],
+                company: null,
+                recrutingCompany: null,
+                contactCompany: null,
+                contactRecrutingCompany: null,
+            });
         }
-
-        // Neu anlegen
-        setResumeData({
-            resumeId: 0,
-            ref: 0,
-            position: '',
-            stateId: 0,
-            stateText: '',
-            link: '',
-            comment: '',
-            created: new Date().toISOString().split('T')[0],
-            company: null,
-            recrutingCompany: null,
-            contactCompany: null,
-            contactRecrutingCompany: null,
-        });
-    }, [resumeId]);
-
-    // Helpers für aktuellen Kontext aus Contact-Section
-    const getCurrentContact = React.useCallback((): Contact | null => {
-        if (!resumeData || !modalSectionContact) return null;
-        return modalSectionContact === 'contactCompany'
-            ? (resumeData.contactCompany as Contact | null)
-            : (resumeData.contactRecrutingCompany as Contact | null);
-    }, [resumeData, modalSectionContact]);
-
-    const getCurrentCompanyId = React.useCallback((): number | undefined => {
-        if (!resumeData || !modalSectionContact) return undefined;
-        return modalSectionContact === 'contactCompany'
-            ? resumeData.company?.companyId
-            : resumeData.recrutingCompany?.companyId;
-    }, [resumeData, modalSectionContact]);
+    }, [parsedId, fetchedResume, isLoadingResume, resumeError, t]);
 
     // ===== Company Handlers =====
     const handleOpenEditCompany = (section: ModalSectionCompany) => {
@@ -142,7 +136,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
     };
 
     const handleOpenSelectCompany = async (section: ModalSectionCompany) => {
-        const list = await getCompanies(0, section === 'recrutingCompany');
+        const list = await getCompanies(section === 'recrutingCompany');
         setCompanies(list);
         setModalType('select');
         setModalSectionCompany(section);
@@ -195,19 +189,16 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
             return;
         }
 
-        const list = await getContacts(0, compId);
+        const list = await getContacts({ refId: 0, companyId: compId });
         setContacts(list);
         setModalOpen(true);
     };
 
     const handleRemoveContact = (section: ModalSectionContact) => {
         if (!resumeData) return;
-        const key =
-            section === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
+        const key = section === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
         const contact =
-            section === 'contactCompany'
-                ? resumeData?.contactCompany
-                : resumeData?.contactRecrutingCompany;
+            section === 'contactCompany' ? resumeData?.contactCompany : resumeData?.contactRecrutingCompany;
         if (!contact?.contactid) return;
 
         if (!window.confirm(t('resumeEdit.confirmDeleteContact'))) return;
@@ -216,10 +207,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
 
     const handleSelectContact = (c: Contact) => {
         if (!modalSectionContact) return;
-        const key =
-            modalSectionContact === 'contactCompany'
-                ? 'contactCompany'
-                : 'contactRecrutingCompany';
+        const key = modalSectionContact === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
         setResumeData((rd) => (rd ? { ...rd, [key]: c } : rd));
         setModalOpen(false);
         setModalType(null);
@@ -239,10 +227,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
             contactid: updated.contactid || 0,
         };
 
-        const key =
-            modalSectionContact === 'contactCompany'
-                ? 'contactCompany'
-                : 'contactRecrutingCompany';
+        const key = modalSectionContact === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
 
         setResumeData((rd) => (rd ? { ...rd, [key]: safe } : rd));
         setModalOpen(false);
@@ -264,12 +249,11 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
         try {
             await updateOrCreateResume(resumeData);
             alert(
-                resumeData.resumeId === 0
-                    ? t('resumeEdit.saveSuccessNew')
-                    : t('resumeEdit.saveSuccessUpdate')
+                resumeData.resumeId === 0 ? t('resumeEdit.saveSuccessNew') : t('resumeEdit.saveSuccessUpdate')
             );
             navigate('/resumes');
-        } catch {
+        } catch (e) {
+            console.error('updateOrCreateResume failed', e);
             setErrorMessage(t('resumeEdit.saveError'));
         }
     };
@@ -287,22 +271,18 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
 
     const initialCompanyData: Company =
         modalSectionCompany
-            ? (modalSectionCompany === 'company'
+            ? modalSectionCompany === 'company'
                 ? (resumeData?.company ?? EMPTY_COMPANY)
-                : (resumeData?.recrutingCompany ?? EMPTY_COMPANY))
+                : (resumeData?.recrutingCompany ?? EMPTY_COMPANY)
             : EMPTY_COMPANY;
 
-    // Initialer Kontakt für ContactFormModal (neu/bearbeiten)
     const initialContact: Contact = React.useMemo(() => {
         const ref = resumeData?.ref ?? 0;
         const section = modalSectionContact;
 
-        const companyId =
-            section
-                ? resumeData?.[
-                    section === 'contactCompany' ? 'company' : 'recrutingCompany'
-                ]?.companyId ?? 0
-                : 0;
+        const companyId = section
+            ? resumeData?.[section === 'contactCompany' ? 'company' : 'recrutingCompany']?.companyId ?? 0
+            : 0;
 
         const current: Contact | undefined =
             section === 'contactCompany'
@@ -328,10 +308,9 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
         );
     }, [modalSectionContact, resumeData]);
 
-    // Guard, bis Daten geladen/initialisiert sind
-    if (!resumeData) {
-        return <Loader />
-    }
+    // Guards
+    if (parsedId > 0 && isLoadingResume) return <Loader />;
+    if (!resumeData) return <Loader />;
 
     return (
         <>

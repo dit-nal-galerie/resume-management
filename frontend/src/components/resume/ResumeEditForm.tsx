@@ -2,14 +2,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Resume } from '../../../../interfaces/Resume';
-import { Contact } from '../../../../interfaces/Contact';
-
+import { Resume, Contact } from '../../../../interfaces';
 import { FormField, inputClasses } from '../ui/FormField';
-import PageHeader from 'components/ui/PageHeader';
-import { PageId } from 'components/ui/PageId';
-import { CompanySection } from 'components/company';
+
 import ContactSection from '../contact/ContactSection';
+import PageHeader from '../ui/PageHeader';
+import { PageId } from '../ui/PageId';
+import { CompanySection } from '../company';
 
 type StatusItem = { stateid: number; text: string };
 

@@ -1,12 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../../interfaces/User';
+
 import { useTranslation } from 'react-i18next';
-import { getUserAnredeAndName, login } from 'services/api';
+
 import { FormField } from '../ui/FormField';
-import { PageId } from 'components/ui/PageId';
-import PageHeader from 'components/ui/PageHeader';
-import i18n from 'utils/i18n/i18n';
+import i18n from '../../utils/i18n/i18n';
+import PageHeader from '../ui/PageHeader';
+import { getUserAnredeAndName, login } from '../../shared/api/queries';
+import { PageId } from '../ui/PageId';
+import { User } from '../../../../interfaces';
+
+
+
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
@@ -47,8 +52,8 @@ const Login: React.FC = () => {
     }
 
     try {
-      const userData: User | null = await login(loginname, password);
 
+      const userData: User | null = await login({ loginname, password });
       if (userData) {
         console.log('Login response:', JSON.stringify(userData));
         goToResume();
@@ -63,6 +68,7 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       setServerError(t('common.serverError'));
+      console.log('Login error:', error);
       // loginInputRef.current?.focus();
     }
   };

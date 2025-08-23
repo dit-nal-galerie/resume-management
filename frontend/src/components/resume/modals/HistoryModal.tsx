@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 
-import { HistoryEntry } from '../../../../interfaces/histori';
+
 import DatePicker from 'react-datepicker';
 
 import { useTranslation } from 'react-i18next';
-import { getCachedStates } from '../../../utils/storage';
-import { changeResumeStatus, getHistoryByResumeId } from '../../../services/api';
+
 import { FormField, inputClasses } from '../../ui/FormField';
 import { StatusModalProps } from '../ResumeEditModals.types';
-
-
-
+import { changeResumeStatus, getHistoryByResumeId } from '../../../shared/api/queries';
+import { useStates } from '../../../features/dictionaries/hooks';
+import { HistoryEntry } from '../../../../../interfaces';
 interface StateOption {
   stateid: number;
   text: string;
@@ -33,16 +32,23 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
   const [states, setStates] = useState<StateOption[]>([]);
   const [selectedState, setSelectedState] = useState<number>(currentStateId);
 
+  // NEW: States via React Query Hook
+  const { data: statesData } = useStates();
   useEffect(() => {
-    getCachedStates().then(setStates).catch(console.error);
+    if (statesData) setStates(statesData);
+  }, [statesData]);
+
+  // Reset Datum wenn Resume wechselt
+  useEffect(() => {
     setSelectedDate(new Date());
   }, [resumeId]);
 
+  // History laden (neue Signatur: Objekt mit resumeId/refId)
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getHistoryByResumeId(resumeId, refId);
+        const data = await getHistoryByResumeId({ resumeId, refId });
         setHistory(data);
       } catch (err) {
         console.error(t('resume.edit.saveError'), err);
@@ -52,16 +58,18 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
     };
 
     fetchData();
-  }, []);
+  }, [resumeId, refId, t]);
 
   const isChangeEnabled = selectedState !== currentStateId;
+
   const handleChangeStatus = async () => {
     if (!selectedDate) return alert(t('validation.required'));
 
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
-      await changeResumeStatus(resumeId, selectedState, formattedDate);
-      if (onStatusChanged) onStatusChanged();
+      // NEW: neue Signatur: ein Objekt
+      await changeResumeStatus({ resumeId, stateId: selectedState, date: formattedDate });
+      onStatusChanged?.();
       onClose();
     } catch (err) {
       console.error(t('resume.edit.saveError'), err);
@@ -134,9 +142,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
             {currentStateId > -1 && (
               <button
                 onClick={handleChangeStatus}
-                className={`rounded px-4 py-2 text-white ${isChangeEnabled
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'cursor-not-allowed bg-gray-400'
+                className={`rounded px-4 py-2 text-white ${isChangeEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-400'
                   }`}
                 disabled={!isChangeEnabled}
               >

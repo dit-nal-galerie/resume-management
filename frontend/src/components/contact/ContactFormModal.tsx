@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-import { Anrede, Contact } from '../../../../interfaces/Contact';
+import { Anrede, Contact } from '../../../../interfaces';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
-import { getCachedAnrede } from '../../utils/storage';
+import { getAnrede } from '../../shared/api/queries';
 
 type ContactFormModalProps = {
   isOpen: boolean;
@@ -25,7 +25,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
   useEffect(() => {
     const fetchAnreden = async () => {
       try {
-        const result = await getCachedAnrede();
+        const result = await getAnrede();
         setAnreden(result);
       } catch (error) {
         console.error(t('common.error'), error);

@@ -83,7 +83,8 @@
     "street": "Straße",
     "houseNumber": "Hausnummer",
     "saveSuccess": "Profil erfolgreich gespeichert",
-    "saveError": "Fehler beim Speichern des Profils"
+    "saveError": "Fehler beim Speichern des Profils",
+    "emailRequired": "Bitte geben Sie Ihren Email ein"
   },
   "resume": {
     "list": {
