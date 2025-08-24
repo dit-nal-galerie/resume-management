@@ -35,7 +35,7 @@ export function useUpsertResume() {
   return useMutation({
     mutationFn: updateOrCreateResume,
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: resumesKeys.list() });
+      void qc.invalidateQueries({ queryKey: resumesKeys.list() });
     },
   });
 }
@@ -56,11 +56,10 @@ export function useChangeResumeStatus() {
     onSuccess: (_data, variables) => {
       // variables enthält { resumeId, stateId, date }
       if (variables) {
-        const resumeId = variables.resumeId;
         // refId ist nicht bekannt -> invalidiere alle Detail- und History-Queries
-        qc.invalidateQueries({ queryKey: resumesKeys.all });
+        void qc.invalidateQueries({ queryKey: resumesKeys.all });
       } else {
-        qc.invalidateQueries({ queryKey: resumesKeys.all });
+        void qc.invalidateQueries({ queryKey: resumesKeys.all });
       }
     },
   });

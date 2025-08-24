@@ -20,7 +20,12 @@
     "sending": "Sending…",
     "processing": "Processing…",
     "pleaseWait": "Please wait…",
-    "remove": "Remove"
+    "remove": "Remove",
+    "update": "Update",
+    "search": "search",
+    "selectAll": "select all",
+    "clear": "none",
+    "noResults": "no results found"
   },
   "navigation": {
     "login": "Login",
@@ -158,7 +163,8 @@
     "viewEdit": "View/Edit",
     "changeStatus": "Change Status",
     "history": "History",
-    "loadError": "Error loading applications"
+    "loadError": "Error loading applications",
+    "filterPlaceholder": "all state"
   },
   "statusModal": {
     "selectDate": "Please select a date.",

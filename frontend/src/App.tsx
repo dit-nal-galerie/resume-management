@@ -11,6 +11,7 @@ import ResetPassword from './components/login/ResetPassword';
 import ResumeList from './components/ResumeList';
 import ChangeAccessData from './components/profile/ChangeAccessData';
 import ResumeEditContainer from './components/resume/ResumeEditContainer';
+import { PageLoader } from './components/ui/Loader';
 
 /**
  * Die Haupt-App-Komponente, die das Routing und die globale Layout-Elemente verwaltet.
@@ -40,8 +41,7 @@ const App: React.FC = () => (
       <Route path="/restore" element={<RequestPasswordReset />} />
 
       {/* Route zum Zurücksetzen des Passworts nach Anforderung */}
-      <Route path="/reset-password" element={<ResetPassword />} />
-    </Routes>
+      <Route path="/reset-password" element={<ResetPassword />} />    </Routes>
   </BrowserRouter>
 );
 

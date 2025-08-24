@@ -37,7 +37,7 @@ const gapMap: Record<LoaderSize, string> = {
     lg: 'gap-4',
 };
 
-export default function Loader({
+function Loader({
     labelKey = 'common.loading',
     label,
     variant = 'spinner',
@@ -46,7 +46,7 @@ export default function Loader({
     fullscreen = false,
     className = '',
     labelPosition = 'right',
-    ariaLive = 'polite',
+
 }: LoaderProps) {
     const { t } = useTranslation();
 

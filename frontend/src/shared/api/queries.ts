@@ -228,7 +228,6 @@ export async function getResumeById(params: { resumeId: number; refId: number })
     { method: 'POST', url: `${API_URL}/getResumeById`, body: { resumeId, refId } },
   ];
 
-  let lastText = '';
   for (const attempt of tries) {
     try {
       const res = await fetch(attempt.url, {
@@ -241,7 +240,6 @@ export async function getResumeById(params: { resumeId: number; refId: number })
       const text = await res.text();
       // eslint-disable-next-line no-console
       console.log('getResumeById attempt:', attempt.method, attempt.url, res.status, text);
-      lastText = text;
 
       if (!res.ok) {
         // 404/401/500 → nächstes Muster probieren
@@ -287,7 +285,6 @@ export async function getHistoryByResumeId(params: {
     { method: 'POST', url: `${API_URL}/getHistoryByResumeId`, body: { resumeId, refId } },
   ];
 
-  let lastText = '';
   for (const attempt of tries) {
     try {
       const res = await fetch(attempt.url, {
@@ -299,7 +296,6 @@ export async function getHistoryByResumeId(params: {
 
       const text = await res.text();
       console.log('getHistoryByResumeId attempt:', attempt.method, attempt.url, res.status, text);
-      lastText = text;
 
       if (!res.ok) continue;
 
@@ -344,7 +340,7 @@ export async function createOrUpdateContact(payload: Contact): Promise<Contact> 
   return parseJsonResponse<Contact>(res, 'createOrUpdateContact');
 }
 
-export async function getCompanies(isRecruter: boolean = false): Promise<Company[]> {
+export async function getCompanies(isRecruter = false): Promise<Company[]> {
   const res = await fetch(`${API_URL}/companies?isRecruter=${isRecruter || false}`, {
     method: 'GET',
     credentials: 'include',

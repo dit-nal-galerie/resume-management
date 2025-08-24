@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 import { Resume } from '../../../interfaces';
 import { useNavigate } from 'react-router-dom';
@@ -10,43 +10,65 @@ import { HistoryModal } from './resume/modals/HistoryModal';
 import { StatusModal } from './resume/modals/StatusModal';
 import { getResumesWithUsers, getUserAnredeAndName } from '../shared/api/queries';
 
+
+import { useStates } from '../features/dictionaries/hooks';
+import MultiSelectStatusPopover from './common/MultiSelectStatusPopover';
+
+type StatusItem = { stateid: number; text: string };
+
 const ResumeList: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
-  // const [userLoginName] = useState(storedUser.name || storedUser.loginname);
+  // Daten
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [storedUser, setStoredUser] = useState<{ name: string; anredeText: string } | null>(null);
+
+  // Modale
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedResume, setSelectedResume] = useState<Resume | null>(null);
   const [isModalStatusOpen, setIisModalStatusOpen] = useState(false);
+
+  // Refresh
   const [refresh, setRefresh] = useState(false);
 
-  // Dropdown state
+  // Dropdown state (bestehende Logik)
   const [menuOpen, setMenuOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({
-    top: 0,
-    left: 0,
-  });
-  const [storedUser, setStoredUser] = useState<{ name: string; anredeText: string } | null>(null);
 
+  // const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({
+  //   top: 0,
+  //   left: 0,
+  // });
+  // Status-Filter
+  const { data: states = [] } = useStates();
+  const [selectedStatusIds, setSelectedStatusIds] = useState<number[]>([]);
+
+  // User-Header
   useEffect(() => {
     getUserAnredeAndName()
       .then(setStoredUser)
       .catch(() => setStoredUser(null));
   }, []);
 
-  const navigate = useNavigate();
-
+  // Resumes laden (ohne Backend-Filter)
   useEffect(() => {
     getResumesWithUsers()
       .then((data) => setResumes(data))
       .catch((err) => console.error(t('resumeList.loadError'), err));
   }, [refresh, t]);
 
+  // Client-seitige Filterung
+  const displayResumes = useMemo(() => {
+    if (!selectedStatusIds.length) return resumes;
+    const setIds = new Set(selectedStatusIds);
+    return resumes.filter((r) => (r.stateId ? setIds.has(r.stateId) : false));
+  }, [resumes, selectedStatusIds]);
+
+  // Menü-Handling (bestehend)
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      // Prüfe, ob Klick außerhalb von Menü UND Button war
       if (
         menuOpen &&
         menuRef.current &&
@@ -62,18 +84,17 @@ const ResumeList: React.FC = () => {
       return () => document.removeEventListener('mousedown', handleClick);
     }
   }, [menuOpen]);
-  // Position menu below button
-  const handleMenuOpen = () => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setMenuPosition({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
-    }
-    setMenuOpen(true);
-  };
 
-  // Close menu on outside click
+  // const handleMenuOpen = () => {
+  //   if (buttonRef.current) {
+  //     const rect = buttonRef.current.getBoundingClientRect();
+  //     setMenuPosition({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
+  //   }
+  //   setMenuOpen(true);
+  // };
+
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
+    const handleClick = () => {
       if (menuOpen) setMenuOpen(false);
     };
     if (menuOpen) {
@@ -82,18 +103,25 @@ const ResumeList: React.FC = () => {
     }
   }, [menuOpen]);
 
+  // Filter-UI events
+  // const handleStatusChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
+  //   const values = Array.from(e.target.selectedOptions).map((opt) => Number(opt.value));
+  //   setSelectedStatusIds(values);
+  // };
+
+  // Modals
   const openHistoryModal = (resume: Resume) => {
     setSelectedResume(resume);
     setIsModalOpen(true);
+  };
+  const closeHistoryModal = () => {
+    setIsModalOpen(false);
+    setSelectedResume(null);
   };
   const handleStatusChanged = () => setRefresh((prev) => !prev);
   const openStatusModal = (resume: Resume) => {
     setSelectedResume(resume);
     setIisModalStatusOpen(true);
-  };
-  const closeHistoryModal = () => {
-    setIsModalOpen(false);
-    setSelectedResume(null);
   };
 
   const pageTitle = `${t('resumeList.title')} - ${storedUser?.anredeText ? t(storedUser?.anredeText) : ''} ${storedUser?.name || ''}`;
@@ -101,9 +129,25 @@ const ResumeList: React.FC = () => {
   return (
     <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
       <PageHeader pageTitle={pageTitle} pageId={PageId.ResumeList} />
+
+      {/* Filterleiste */}
+      <div className="mb-4 flex flex-col items-start gap-3 md:flex-row md:items-end">
+        <div className="min-w-[280px]">
+          <MultiSelectStatusPopover
+            label={t('common.status')}
+            options={states as StatusItem[]}
+            value={selectedStatusIds}
+            onChange={setSelectedStatusIds}
+
+            placeholder={t('resumeList.filterPlaceholder') /* z.B. „Alle Status“ */}
+            searchPlaceholder={t('common.search')}
+          />
+        </div>
+      </div>
+
+      {/* Kartenliste */}
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        {resumes.map((resume) => (
-          // console.log('Rendering resume:', JSON.stringify(resume, null, 2)),
+        {displayResumes.map((resume) => (
           <div key={resume.resumeId} className="relative rounded-lg bg-gray-100 p-4 shadow-md">
             <h3 className="text-lg font-semibold">{resume.position}</h3>
             <p className="text-gray-600">
@@ -121,7 +165,7 @@ const ResumeList: React.FC = () => {
 
             <div className="sticky bottom-0 mt-4 flex space-x-2">
               <button
-                onClick={() => navigate(`/resume/${resume.resumeId}`)}
+                onClick={() => void navigate(`/resume/${resume.resumeId}`)}
                 className="rounded-md bg-green-500 px-3 py-1 text-white hover:bg-green-700"
               >
                 {t('resumeList.viewEdit')}
@@ -132,7 +176,7 @@ const ResumeList: React.FC = () => {
               >
                 {t('resumeList.changeStatus')}
               </button>
-              {resume && resume.resumeId > 0 && (
+              {!!resume.resumeId && (
                 <button
                   onClick={() => openHistoryModal(resume)}
                   className="rounded-md bg-gray-600 px-3 py-1 text-white hover:bg-gray-800"
@@ -144,6 +188,8 @@ const ResumeList: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* HistoryModal */}
       {isModalOpen && selectedResume && (
         <HistoryModal
           isOpen={isModalOpen}

@@ -20,7 +20,12 @@
     "sending": "Senden…",
     "processing": "Wird verarbeitet…",
     "pleaseWait": "Bitte warten…",
-    "remove": "Löschen"
+    "remove": "Löschen",
+    "update": "Aktualisieren",
+    "search": "suchen",
+    "selectAll": "alle auswählen",
+    "clear": "keine",
+    "noResults": "keine Ergebnisse gefunden"
   },
   "navigation": {
     "login": "Anmelden",
@@ -201,7 +206,9 @@
     "viewEdit": "Anschauen/Ändern",
     "changeStatus": "Status ändern",
     "history": "Historie",
-    "loadError": "Fehler beim Laden der Bewerbungen"
+    "loadError": "Fehler beim Laden der Bewerbungen",
+    "filterHint": "Mehrfachauswahl",
+    "filterPlaceholder": "alle Statuse"
   },
   "statusModal": {
     "selectDate": "Bitte ein Datum wählen",
