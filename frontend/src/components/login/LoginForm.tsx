@@ -1,7 +1,7 @@
 import React from 'react';
-import { User } from '../../../interfaces/User';
 import { useTranslation } from 'react-i18next';
-import { FormField, inputClasses } from 'components/ui/FormField';
+import { FormField, inputClasses } from '../ui/FormField';
+
 
 // Wiederverwendbare FormField-Komponente
 

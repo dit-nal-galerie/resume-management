@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { updateUserData, createOrUpdateUser, getUserProfile } from '../../services/api';
-import { User } from '../../../interfaces/User';
-import { getCachedAnrede } from '../../utils/storage';
+
 
 import ProfileForm from './ProfileForm';
-import LoginForm from 'components/login/LoginForm';
-import PageHeader from 'components/ui/PageHeader';
-import { PageId } from 'components/ui/PageId';
+import { createOrUpdateUser, getAnrede, getUserProfile, updateUserData } from '../../shared/api/queries';
+import LoginForm from '../login/LoginForm';
+import PageHeader from '../ui/PageHeader';
+import { PageId } from '../ui/PageId';
+import { User } from '../../../../interfaces';
 
 const Profile = () => {
   const checkIsNew = () => {
@@ -43,7 +43,7 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const anredeData = await getCachedAnrede();
+      const anredeData = await getAnrede();
       setAnredeOptions(anredeData);
       const data = await getUserProfile();
       setFormData(data);

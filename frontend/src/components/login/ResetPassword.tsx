@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
-import PageHeader from 'components/ui/PageHeader';
-import { PageId } from 'components/ui/PageId';
+import PageHeader from '../ui/PageHeader';
+import { PageId } from '../ui/PageId';
+
 
 const ResetPassword: React.FC = () => {
   const { t } = useTranslation();
@@ -118,11 +119,10 @@ const ResetPassword: React.FC = () => {
               <input
                 id="newPassword"
                 type="password"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.newPassword
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.newPassword
                     ? 'border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                  }`}
                 placeholder={t('passwordReset.newPasswordPlaceholder')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -139,11 +139,10 @@ const ResetPassword: React.FC = () => {
               <input
                 id="confirmPassword"
                 type="password"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.confirmPassword
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.confirmPassword
                     ? 'border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                  }`}
                 placeholder={t('passwordReset.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -159,9 +158,8 @@ const ResetPassword: React.FC = () => {
             <div className="mt-6 flex items-center justify-between">
               <button
                 type="submit"
-                className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                  isLoading ? 'cursor-not-allowed opacity-70' : ''
-                }`}
+                className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? 'cursor-not-allowed opacity-70' : ''
+                  }`}
                 disabled={isLoading || !token}
               >
                 {isLoading ? t('common.loading') : t('passwordReset.resetPassword')}

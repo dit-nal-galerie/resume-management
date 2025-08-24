@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 
 import { ModalSectionContact, ModalType } from '../ResumeEditModals.types';
-import { getContacts } from '../../../services/api';
-import { Contact } from '../../../../../interfaces/Contact';
-import { Resume } from '../../../../../interfaces/Resume';
+
+import { getContacts } from '../../../shared/api/queries';
+import { Resume, Contact } from '../../../../../interfaces';
 
 export function useResumeEdit(initial: Resume | null) {
   const [resumeData, setResumeData] = useState<Resume | null>(initial);
@@ -20,7 +20,7 @@ export function useResumeEdit(initial: Resume | null) {
       const compId =
         resumeData?.[section === 'contactCompany' ? 'company' : 'recrutingCompany']?.companyId;
       if (!compId) return; // UI zeigt vorher schon Hinweis
-      const list = await getContacts(0, compId);
+      const list = await getContacts({ refId: 0, companyId: compId });
       setContacts(list);
       setModalOpen(true);
     },

@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import config from '../config/config';
-// import { PasswordResetValidation, PasswordResetResponse } from '../../../interfaces/PasswordReset';
 
 // Конфигурация для токенов восстановления пароля
 const TOKEN_LENGTH = 32; // Длина токена

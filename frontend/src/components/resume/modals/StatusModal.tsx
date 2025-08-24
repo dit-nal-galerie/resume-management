@@ -4,11 +4,10 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { useTranslation } from 'react-i18next';
-import { getCachedStates } from '../../../utils/storage';
-import { changeResumeStatus } from '../../../services/api';
 import { FormField, inputClasses } from '../../ui/FormField';
 import { StatusModalProps } from '../ResumeEditModals.types';
-
+import { changeResumeStatus } from '../../../shared/api/queries';
+import { useStates } from '../../../features/dictionaries/hooks'; // 👈 Hook nutzen
 
 interface StateOption {
   stateid: number;
@@ -29,18 +28,21 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   const [states, setStates] = useState<StateOption[]>([]);
   const [selectedState, setSelectedState] = useState<number>(currentStateId);
 
+  // NEW: States via React Query Hook
+  const { data: statesData } = useStates();
   useEffect(() => {
-    getCachedStates().then(setStates).catch(console.error);
+    if (statesData) setStates(statesData);
     setSelectedDate(new Date());
-  }, [resumeId]);
+  }, [resumeId, statesData]);
 
   const handleChangeStatus = async () => {
     if (!selectedDate) return alert(t('statusModal.selectDate'));
 
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0];
-      await changeResumeStatus(resumeId, selectedState, formattedDate);
-      if (onStatusChanged) onStatusChanged();
+      // NEW: neue Signatur: Objekt
+      await changeResumeStatus({ resumeId, stateId: selectedState, date: formattedDate });
+      onStatusChanged?.();
       onClose();
     } catch (err) {
       console.error('❌ Fehler beim Ändern des Status:', err);

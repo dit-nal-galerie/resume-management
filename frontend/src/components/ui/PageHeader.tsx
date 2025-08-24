@@ -3,12 +3,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
-import { AboutModal } from 'components/AboutModal';
+
 import { useNavigate } from 'react-router-dom';
 import { PageId } from './PageId';
-
-import { getUserAnredeAndName, getUserProfile, logout } from '../../services/api';
-
+import { AboutModal } from '../AboutModal';
+import { getUserAnredeAndName, logout } from '../../shared/api/queries';
 interface PageHeaderProps {
   pageTitle: string;
   pageId: PageId;
@@ -41,9 +40,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/resume/0')}
-              className={`${
-                active ? 'bg-gray-100' : ''
-              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${active ? 'bg-gray-100' : ''
+                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('resumeList.newResume')}
             </button>
@@ -55,9 +53,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/resumes')}
-              className={`${
-                active ? 'bg-gray-100' : ''
-              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${active ? 'bg-gray-100' : ''
+                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('navigation.resumes')}
             </button>
@@ -69,9 +66,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/profile')}
-              className={`${
-                active ? 'bg-gray-100' : ''
-              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${active ? 'bg-gray-100' : ''
+                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('resumeList.editProfile')}
             </button>
@@ -115,9 +111,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
                     {({ active }) => (
                       <button
                         onClick={() => handleLogout()}
-                        className={`${
-                          active ? 'bg-gray-100' : ''
-                        } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+                        className={`${active ? 'bg-gray-100' : ''
+                          } block w-full px-4 py-2 text-left text-sm text-gray-700`}
                       >
                         {t('common.logout')}
                       </button>

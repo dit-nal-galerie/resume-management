@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
-import { requestPasswordReset } from 'services/api';
+import { requestPasswordReset } from '../../shared/api/queries';
+
 
 const RequestPasswordReset: React.FC = () => {
   const { t } = useTranslation();
@@ -42,7 +43,7 @@ const RequestPasswordReset: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const result = await requestPasswordReset(loginname, email);
+      const result = await requestPasswordReset(email);
       if (result.success) {
         setIsSuccess(true);
       } else {
@@ -93,11 +94,10 @@ const RequestPasswordReset: React.FC = () => {
               <input
                 id="loginname"
                 type="text"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.loginname
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.loginname
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 placeholder={t('passwordReset.usernamePlaceholder')}
                 value={loginname}
                 onChange={(e) => setLoginname(e.target.value)}
@@ -112,11 +112,10 @@ const RequestPasswordReset: React.FC = () => {
               <input
                 id="email"
                 type="email"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
-                  errors.email
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.email
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 placeholder={t('passwordReset.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -130,9 +129,8 @@ const RequestPasswordReset: React.FC = () => {
             <div className="mt-6 flex items-center justify-between">
               <button
                 type="submit"
-                className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                  isLoading ? 'cursor-not-allowed opacity-70' : ''
-                }`}
+                className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? 'cursor-not-allowed opacity-70' : ''
+                  }`}
                 disabled={isLoading}
               >
                 {isLoading ? t('common.loading') : t('passwordReset.sendResetLink')}

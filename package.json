@@ -17,14 +17,12 @@
     "format": "npm run format:frontend && npm run format:backend",
     "format:frontend": "prettier --write \"frontend/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "format:backend": "prettier --write \"backend/**/*.{js,ts,json,md}\"",
-    "lint": "npm run lint:frontend && npm run lint:backend",
-    "lint:frontend": "eslint \"frontend/**/*.{js,jsx,ts,tsx}\" --fix",
-    "lint:backend": "eslint \"backend/**/*.{js,ts}\" --fix"
+    "lint": "eslint .",
+    "lint:frontend": "eslint frontend --ext .js,.jsx,.ts,.tsx --fix",
+    "lint:backend": "eslint backend --ext .js,.ts --fix"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.9",
-    "@typescript-eslint/eslint-plugin": "^8.33.0",
-    "@typescript-eslint/parser": "^8.33.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.5",
@@ -32,7 +30,8 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "prettier": "^3.5.3",
     "prettier-plugin-curly": "^0.3.2",
-    "prettier-plugin-tailwindcss": "^0.6.12"
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "typescript-eslint": "^8"
   },
   "keywords": [
     "monorepo",

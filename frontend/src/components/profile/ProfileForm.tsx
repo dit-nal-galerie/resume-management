@@ -1,5 +1,4 @@
 import React from 'react';
-import { User } from '../../../interfaces/User';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses, ProfileFormProps } from '../ui/FormField';
 

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { User } from '../../../interfaces/User';
+
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-import { getUserProfile, updateAccessData } from 'services/api';
 import { FormField, inputClasses } from '../ui/FormField';
-import PageHeader from 'components/ui/PageHeader';
-import { PageId } from 'components/ui/PageId';
+import { getUserProfile, updateAccessData } from '../../shared/api/queries';
+import PageHeader from '../ui/PageHeader';
+import { PageId } from '../ui/PageId';
+import { User } from '../../../../interfaces';
 
 const ChangeAccessData: React.FC = () => {
   const { t } = useTranslation();
@@ -63,7 +63,7 @@ const ChangeAccessData: React.FC = () => {
     if (!formData.email) newErrors.email = t('profile.emailRequired');
     if (!formData.oldPassword) newErrors.oldPassword = t('login.passwordRequired');
     if (formData.changePassword) {
-      if (!formData.password) newErrors.password = t('passwordReset.newPasswordRequired');
+      if (!formData.password) newErrors.password = t('login.passwordRequired');
       if (!formData.password2) newErrors.password2 = t('passwordReset.confirmPasswordRequired');
       if (formData.password !== formData.password2) newErrors.password2 = t('passwordReset.passwordsDontMatch');
     }
@@ -74,7 +74,7 @@ const ChangeAccessData: React.FC = () => {
   const handleSave = async () => {
     if (!validate()) return;
     try {
-      const response = await updateAccessData({ ...formData, userId: 0 });
+      const response = await updateAccessData({ ...formData });
       if (response.success) {
         localStorage.setItem('user', JSON.stringify(response.user));
         alert(t('profile.saveSuccess'));

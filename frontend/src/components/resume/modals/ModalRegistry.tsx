@@ -1,15 +1,12 @@
-import React from 'react';
-import { Company } from '../../../../../interfaces/Company';
-import { Contact } from '../../../../../interfaces/Contact';
-import { Resume } from '../../../../../interfaces/Resume';
-import { CompanyFormModal, CompanySelectModal } from 'components/company';
-import ContactFormModal from 'components/contact/ContactFormModal';
-import ContactSelectModal from 'components/contact/ContactSelectModal';
 import {
   ModalType,
   ModalSectionCompany,
   ModalSectionContact,
 } from '../ResumeEditModals.types';
+import { CompanyFormModal, CompanySelectModal } from '../../company';
+import ContactSelectModal from '../../contact/ContactSelectModal';
+import ContactFormModal from '../../contact/ContactFormModal';
+import { Contact, Company, Resume } from '../../../../../interfaces';
 
 /**
  * Renders exactly one modal based on `modalType`.
@@ -38,7 +35,7 @@ type Props = {
   onContactSaved?: (c: Contact) => void;
 };
 
-const noop = () => {};
+const noop = () => { };
 
 function emptyCompany(): Company {
   return {
@@ -88,7 +85,6 @@ export default function ModalRegistry({
 
   switch (modalType) {
     case 'select':
-      // Company selection
       return (
         <CompanySelectModal
           isOpen={isOpen}
@@ -99,11 +95,9 @@ export default function ModalRegistry({
       );
 
     case 'edit': {
-      // Company create/edit – CompanyFormModal expects { initialData, onSave }
       const selected: Company | null =
         modalSectionCompany && resume
-          ? // index by union key; TS doesn't infer this well, so cast
-            ((resume as any)[modalSectionCompany] as Company | null)
+          ? ((resume as any)[modalSectionCompany] as Company | null)
           : null;
 
       return (
@@ -117,7 +111,6 @@ export default function ModalRegistry({
     }
 
     case 'selectContact':
-      // Contact selection for either company or recruiting company
       return (
         <ContactSelectModal
           isOpen={isOpen}
@@ -128,7 +121,6 @@ export default function ModalRegistry({
       );
 
     case 'editContact': {
-      // Contact create/edit; ContactFormModal expects a full `contact` object
       const current = getCurrentContact(resume, modalSectionContact);
       const companyId = getCurrentCompanyId(resume, modalSectionContact) ?? 0;
       const ref = resume?.ref ?? 0;

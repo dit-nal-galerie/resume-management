@@ -20,7 +20,12 @@
     "sending": "Sending…",
     "processing": "Processing…",
     "pleaseWait": "Please wait…",
-    "remove": "Remove"
+    "remove": "Remove",
+    "update": "Update",
+    "search": "search",
+    "selectAll": "select all",
+    "clear": "none",
+    "noResults": "no results found"
   },
   "navigation": {
     "login": "Login",
@@ -83,7 +88,8 @@
     "street": "Street",
     "houseNumber": "House number",
     "saveSuccess": "Profile saved successfully",
-    "saveError": "Error saving profile"
+    "saveError": "Error saving profile",
+    "emailRequired": "Please enter your email."
   },
   "resume": {
     "list": {
@@ -157,7 +163,8 @@
     "viewEdit": "View/Edit",
     "changeStatus": "Change Status",
     "history": "History",
-    "loadError": "Error loading applications"
+    "loadError": "Error loading applications",
+    "filterPlaceholder": "all state"
   },
   "statusModal": {
     "selectDate": "Please select a date.",
