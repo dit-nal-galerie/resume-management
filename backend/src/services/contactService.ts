@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { Connection } from 'mysql2';
-import jwt from 'jsonwebtoken';
 import { getUserIdFromToken } from './userService';
 
 // Hilfsfunktion: User-ID aus JWT holen

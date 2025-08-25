@@ -29,15 +29,15 @@ export default [
   // TypeScript (empfohlen, *mit* Type-Checking über Project Service)
   // Falls dir das zu langsam ist oder du (noch) keine tsconfig hast,
   // tausche "recommendedTypeChecked" gegen "recommended".
-  ...tseslint.configs.recommendedTypeChecked,
 
+  ...tseslint.configs.recommended,
   // Gemeinsame Einstellungen/Regeln für beide Workspaces
   {
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
         // Project Service erkennt automatisch tsconfig.* in Unterordnern
-        projectService: true,
+
         tsconfigRootDir: __dirname,
         ecmaVersion: 'latest',
         sourceType: 'module',

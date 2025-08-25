@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Pool, PoolConnection } from 'mysql2/promise';
+import { Pool } from 'mysql2/promise';
 import { changeResumeStatus } from '../../../src/services/getResume';
 
 // Mock the console.error to prevent clutter during tests

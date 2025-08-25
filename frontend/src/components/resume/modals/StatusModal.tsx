@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../../ui/FormField';
 import { StatusModalProps } from '../ResumeEditModals.types';
 import { changeResumeStatus } from '../../../shared/api/queries';
-import { useStates } from '../../../features/dictionaries/hooks'; // 👈 Hook nutzen
+import { useStates } from '../../../features/dictionaries/hooks';
 
 interface StateOption {
   stateid: number;
@@ -18,7 +18,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
   isOpen,
   onClose,
   resumeId,
-  refId,
+
   resumeTitle,
   currentStateId,
   onStatusChanged,

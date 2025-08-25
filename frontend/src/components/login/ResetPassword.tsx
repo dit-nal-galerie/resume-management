@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FormField, inputClasses } from '../ui/FormField';
+import { FormField } from '../ui/FormField';
 import PageHeader from '../ui/PageHeader';
 import { PageId } from '../ui/PageId';
 

@@ -2,7 +2,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors'; // Importiere CORS
 import ResumeManagementAPI from './resumeManagementAPI'; // Importiere die API-Klasse
-import { getUserAnredeAndName } from './services';
 import config from './config/config';
 import cookieParser from 'cookie-parser';
 import { logout } from './services/logoutService';

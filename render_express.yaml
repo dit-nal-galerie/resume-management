@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: resume-backend-php
+    env: docker
+    plan: free
+    branch: main
+    rootDir: backend-php
+    dockerfilePath: ./backend-php/Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: '3306'
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # optional
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: APP_URL
+        sync: false
