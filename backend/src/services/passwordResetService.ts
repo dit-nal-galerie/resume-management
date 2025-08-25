@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Connection, Pool, OkPacket, RowDataPacket } from 'mysql2/promise';
+import { Pool, OkPacket, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
+import { Pool, PoolConnection } from 'mysql2/promise';
 import { getResumeById } from '../../../src/services/getResume';
 
 // Mock the console.log and console.error to prevent clutter during tests

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useTranslation } from 'react-i18next';
-import { FormField, inputClasses } from '../ui/FormField';
+import { FormField } from '../ui/FormField';
 import { requestPasswordReset } from '../../shared/api/queries';
 
 
@@ -51,6 +51,7 @@ const RequestPasswordReset: React.FC = () => {
       }
     } catch (error) {
       setServerError(t('common.serverError'));
+      console.error('Password reset request failed:', error);
     } finally {
       setIsLoading(false);
     }

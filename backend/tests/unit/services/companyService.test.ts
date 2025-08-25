@@ -1,5 +1,5 @@
 // tests/unit/services/companyService.test.ts
-import { addCompany, getCompanies } from '../../../src/services/companyService';
+import { addCompany } from '../../../src/services/companyService';
 import { Request, Response } from 'express';
 import { Connection } from 'mysql2';
 

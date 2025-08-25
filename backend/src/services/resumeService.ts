@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Connection, ResultSetHeader, RowDataPacket } from 'mysql2';
+import { Connection, RowDataPacket } from 'mysql2';
 import { getUserIdFromToken } from './userService';
 
 export const getResumesWithUsers = (db: Connection, req: Request, res: Response): void => {

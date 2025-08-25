@@ -24,7 +24,6 @@ import {
 
 import mysqlPromise, {
   Pool as PromisePool,
-  PoolConnection as PromisePoolConnection,
 } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
 import { changeResumeStatus, getResumeById } from './services/getResume';
 
