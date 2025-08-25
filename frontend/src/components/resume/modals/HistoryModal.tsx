@@ -17,7 +17,7 @@ interface StateOption {
 }
 
 export const HistoryModal: React.FC<StatusModalProps> = ({
-  isOpen,
+
   onClose,
   resumeId,
   refId,
