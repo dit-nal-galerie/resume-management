@@ -4,13 +4,9 @@ import * as tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
 import unusedImports from 'eslint-plugin-unused-imports';
 import prettier from 'eslint-config-prettier';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default [
-  // Globale Ignorierliste
+  // 0) Ignorierliste
   {
     ignores: [
       '**/node_modules/**',
@@ -20,52 +16,40 @@ export default [
       '**/.next/**',
       '**/.vercel/**',
       '**/public/**',
+      '**/*.min.js',
+      'backend-php/**',
+      'vendor/**',
     ],
   },
 
-  // JS-Basisregeln
+  // 1) Basis
   js.configs.recommended,
-
-  // TypeScript (empfohlen, *mit* Type-Checking über Project Service)
-  // Falls dir das zu langsam ist oder du (noch) keine tsconfig hast,
-  // tausche "recommendedTypeChecked" gegen "recommended".
-
   ...tseslint.configs.recommended,
-  // Gemeinsame Einstellungen/Regeln für beide Workspaces
+
+  // 2) Gemeinsame Regeln
   {
     languageOptions: {
       parser: tseslint.parser,
-      parserOptions: {
-        // Project Service erkennt automatisch tsconfig.* in Unterordnern
-
-        tsconfigRootDir: __dirname,
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
+      parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
     },
     plugins: {
       'react-hooks': reactHooks,
       'unused-imports': unusedImports,
     },
     rules: {
-      // React Hooks (wir nutzen nur das Plugin im Frontend-Override schärfer)
-      'react-hooks/rules-of-hooks': 'off',
-      'react-hooks/exhaustive-deps': 'off',
-
-      // Unused imports/vars
+      'no-console': 'off',
+      'no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'warn',
       'unused-imports/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-
-      // Klassische ESLint-Kleinigkeiten
-      'no-unused-vars': 'off', // wird von unused-imports übernommen
-      'no-console': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 
-  // Frontend-Override (Browser + TS/JSX)
+  // 3) Frontend
   {
     files: ['frontend/**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
@@ -77,25 +61,57 @@ export default [
       },
     },
     rules: {
-      // Hier Hooks aktivieren
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
 
-  // Backend-Override (Node)
+  // 4) Optional: D3 global erlauben (falls noch ohne Import)
+  {
+    files: ['frontend/src/**/*.{ts,tsx,js,jsx}'],
+    languageOptions: {
+      globals: { d3: 'readonly' },
+    },
+  },
+
+  // 5) Backend
   {
     files: ['backend/**/*.{ts,js}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
+  },
+
+  // 6) Tests – any ist erlaubt!
+  {
+    files: ['**/tests/**/*.{ts,tsx,js,jsx}', '**/backend/**/*.{ts,tsx,js,jsx}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off', // ✅ any in Tests erlaubt
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  },
+
+  // 7) Config-Dateien (Node Globals)
+  {
+    files: [
+      '**/tailwind.config.{js,cjs,mjs,ts}',
+      '**/postcss.config.{js,cjs,mjs,ts}',
+      '**/vite.config.{js,cjs,mjs,ts}',
+      '**/*.config.{js,cjs,mjs,ts}',
+    ],
     languageOptions: {
       globals: {
-        process: 'readonly',
-        __dirname: 'readonly',
         module: 'readonly',
         require: 'readonly',
+        __dirname: 'readonly',
+        process: 'readonly',
       },
     },
   },
 
-  // Prettier am Ende, um Format-Konflikte zu neutralisieren
+  // 8) Prettier
   prettier,
 ];

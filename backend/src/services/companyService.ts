@@ -7,7 +7,9 @@ function getUserIdFromToken(req: Request): number | null {
   const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
   if (!token) return null;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dein_geheimes_jwt_secret') as any;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dein_geheimes_jwt_secret') as {
+      loginid: number;
+    };
     return decoded.loginid;
   } catch {
     return null;
