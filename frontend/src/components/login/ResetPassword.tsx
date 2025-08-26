@@ -29,7 +29,7 @@ const ResetPassword: React.FC = () => {
     }
   }, [location, t]);
 
-  const resetPassword = async (token: string, newPassword: string) => {
+  const resetPassword = async () => {
     return new Promise<boolean>((resolve) => {
       setTimeout(() => {
         resolve(true);
@@ -66,7 +66,7 @@ const ResetPassword: React.FC = () => {
     }
     try {
       setIsLoading(true);
-      const result = await resetPassword(token, newPassword);
+      const result = await resetPassword();
       if (result) {
         setIsSuccess(true);
         setTimeout(() => {
@@ -77,6 +77,7 @@ const ResetPassword: React.FC = () => {
       }
     } catch (error) {
       setServerError(t('common.serverError'));
+      console.error('Reset password error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -120,8 +121,8 @@ const ResetPassword: React.FC = () => {
                 id="newPassword"
                 type="password"
                 className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.newPassword
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
                   }`}
                 placeholder={t('passwordReset.newPasswordPlaceholder')}
                 value={newPassword}
@@ -140,8 +141,8 @@ const ResetPassword: React.FC = () => {
                 id="confirmPassword"
                 type="password"
                 className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.confirmPassword
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
                   }`}
                 placeholder={t('passwordReset.confirmPasswordPlaceholder')}
                 value={confirmPassword}

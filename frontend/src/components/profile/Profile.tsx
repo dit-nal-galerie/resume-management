@@ -36,7 +36,7 @@ const Profile = () => {
     mobile: '',
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,10 +52,6 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -88,7 +84,7 @@ const Profile = () => {
     if (!formData.password) {
       newErrors.password = t('validation.required');
     }
-    setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -123,6 +119,7 @@ const Profile = () => {
       }, 3000);
     } catch (error) {
       setServerError(t('common.serverError'));
+      console.error('Error updating profile:', error);
     } finally {
       setIsLoading(false);
     }

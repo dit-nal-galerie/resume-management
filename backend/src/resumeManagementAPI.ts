@@ -22,9 +22,7 @@ import {
   resetPassword,
 } from './services/passwordResetService';
 
-import mysqlPromise, {
-  Pool as PromisePool,
-} from 'mysql2/promise'; // Hauptsächlich diesen verwenden
+import mysqlPromise, { Pool as PromisePool } from 'mysql2/promise'; // Hauptsächlich diesen verwenden
 import { changeResumeStatus, getResumeById } from './services/getResume';
 
 class ResumeManagementAPI {
