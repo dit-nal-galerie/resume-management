@@ -75,7 +75,7 @@ async function handleContact(
     vorname = '',
     name,
     email = '',
-    anrede = 0,
+
     title = '',
     zusatzname = '',
     phone = '',
