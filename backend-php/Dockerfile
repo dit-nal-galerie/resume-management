@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y \
  && docker-php-ext-install pdo_mysql intl zip \
  && a2enmod rewrite headers
 
-# Render erwartet, dass wir auf $PORT lauschen
-ENV PORT=10000
+# Render gibt automatisch $PORT vor -> NICHT fix auf 10000 setzen!
+# Passe Apache an, damit er auf $PORT hört
 RUN sed -ri -e 's/Listen 80/Listen ${PORT}/' /etc/apache2/ports.conf \
  && sed -ri -e 's!<VirtualHost \*:80>!<VirtualHost \*:${PORT}>!' /etc/apache2/sites-available/000-default.conf
 
@@ -29,6 +29,9 @@ RUN composer install --no-interaction --prefer-dist --no-dev --optimize-autoload
  && php artisan config:clear || true \
  && php artisan route:clear || true \
  && php artisan view:clear || true
+
+# Port für Render freigeben
+EXPOSE ${PORT}
 
 # Optional Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD curl -fsS http://localhost:${PORT}/health || exit 1
