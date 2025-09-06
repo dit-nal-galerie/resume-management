@@ -31,6 +31,7 @@ async function handleCompany(
         company.isRecruter || false,
         userId,
       ]);
+
       if (result.insertId) {
         return result.insertId;
       } else {
@@ -42,7 +43,8 @@ async function handleCompany(
         SET name = ?, city = ?, street = ?, houseNumber = ?, postalCode = ?, isrecruter = ?
         WHERE companyId = ?
       `;
-      const [result] = await db.query<ResultSetHeader>(updateQuery, [
+
+      await db.query<ResultSetHeader>(updateQuery, [
         company.name,
         company.city,
         company.street,
@@ -51,6 +53,7 @@ async function handleCompany(
         company.isRecruter || false,
         company.companyId,
       ]);
+
       return company.companyId;
     } else {
       return null;
@@ -107,6 +110,7 @@ async function handleContact(
         companyId,
         userId,
       ]);
+
       if (result.insertId) {
         return result.insertId;
       } else {
@@ -118,7 +122,8 @@ async function handleContact(
         SET vorname = ?, name = ?, email = ?, anrede = ?, title = ?, zusatzname = ?, phone = ?, mobile = ?, company = ?
         WHERE contactid = ?
       `;
-      const [result] = await db.query<ResultSetHeader>(updateQuery, [
+
+      await db.query<ResultSetHeader>(updateQuery, [
         vorname,
         name,
         email,
@@ -130,6 +135,7 @@ async function handleContact(
         companyId,
         contactid,
       ]);
+
       return contactid;
     } else {
       return null;
@@ -152,6 +158,7 @@ async function saveHistory(
         INSERT INTO history (resumeid, date, stateid)
         VALUES (?, CURDATE(), ?)
       `;
+
       await db.query(insertHistoryQuery, [resumeId, newStateId]);
     } else {
       const getLastStateQuery = `
@@ -162,8 +169,10 @@ async function saveHistory(
       `;
       const [lastStateRows] = await db.query<RowDataPacket[]>(getLastStateQuery, [resumeId]);
       let needsInsert = true;
+
       if (lastStateRows.length > 0) {
         const lastStateId = lastStateRows[0].stateid;
+
         if (lastStateId === newStateId) {
           needsInsert = false;
         }
@@ -173,6 +182,7 @@ async function saveHistory(
           INSERT INTO history (resumeid, date, stateid)
           VALUES (?, CURDATE(), ?)
         `;
+
         await db.query(insertHistoryQuery, [resumeId, newStateId]);
       }
     }
@@ -201,6 +211,7 @@ export const updateOrCreateResume = async (
     resume.stateId === null
   ) {
     res.status(400).send('backend.error.validation.missingResumeData');
+
     return;
   }
 
@@ -243,6 +254,7 @@ export const updateOrCreateResume = async (
         contactCompanyId,
         contactParentCompanyId,
       ]);
+
       if (!result.insertId) {
         throw new Error('Fehler beim Einfügen des Resumes: Keine insertId erhalten.');
       }
@@ -269,6 +281,7 @@ export const updateOrCreateResume = async (
         finalResumeId,
         userId,
       ]);
+
       if (result.affectedRows === 0) {
         // Optional: Warnung oder Fehlerbehandlung
       }

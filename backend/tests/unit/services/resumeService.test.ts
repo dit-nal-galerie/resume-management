@@ -70,6 +70,7 @@ describe('resumeService', () => {
           contactParentCompanyName: null,
         },
       ];
+
       (db.query as jest.Mock).mockImplementation((_q, _v, cb) => cb(null, mockResults));
 
       getResumesWithUsers(db as Connection, req as Request, res as Response);
@@ -117,6 +118,7 @@ describe('resumeService', () => {
         { stateid: 1, text: 'Offen' },
         { stateid: 2, text: 'Abgelehnt' },
       ];
+
       (db.query as jest.Mock).mockImplementation((_q, cb) => cb(null, mockStates));
       getStates(db as Connection, {} as Request, res as Response);
       expect(jsonMock).toHaveBeenCalledWith(mockStates);

@@ -56,20 +56,25 @@ function getCurrentCompanyId(
 ): number | undefined {
   if (!resume || !section) return undefined;
   if (section === 'contactCompany') return resume.company?.companyId;
+
   return resume.recrutingCompany?.companyId;
 }
 const COMPANY_KEYS = ['company', 'recrutingCompany'] as const;
+
 type CompanyKey = typeof COMPANY_KEYS[number];
+
 function getCurrentContact(
   resume: Resume | null,
   section: ModalSectionContact | null
 ): Contact | null {
   if (!resume || !section) return null;
+
   return section === 'contactCompany' ? resume.contactCompany : resume.contactRecrutingCompany;
 }
 const isCompanyKey = (key: string): key is CompanyKey => {
   return (COMPANY_KEYS as readonly string[]).includes(key);
 }
+
 export default function ModalRegistry({
   isOpen,
   modalType,

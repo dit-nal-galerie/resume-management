@@ -16,8 +16,10 @@ export const getResumeById = async (dbPool: Pool, req: Request, res: Response): 
 
   // Verbesserte Validierung der ID
   const id = parseInt(resumeId, 10);
+
   if (isNaN(id) || id <= 0) {
     res.status(400).send('backend.error.validation.invalidResumeId');
+
     return;
   }
 
@@ -69,6 +71,7 @@ export const getResumeById = async (dbPool: Pool, req: Request, res: Response): 
     if (results.length === 0) {
       console.log(`[getResumeById] Resume mit ID ${id} nicht gefunden.`);
       res.status(404).send('backend.error.notFound.resumeNotFound');
+
       return; // Frühzeitiger Ausstieg
     }
 
@@ -204,6 +207,7 @@ export const changeResumeStatus = async (db: Pool, req: Request, res: Response) 
     return res.status(200).send('backend.success.status.changed');
   } catch (err) {
     console.error('Fehler:', err);
+
     return res.status(500).send('backend.error.server.internalServerError');
   }
 };

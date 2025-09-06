@@ -18,8 +18,9 @@
     "format:frontend": "prettier --write \"frontend/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "format:backend": "prettier --write \"backend/**/*.{js,ts,json,md}\"",
     "lint": "eslint .",
-    "lint:frontend": "eslint frontend --ext .js,.jsx,.ts,.tsx --fix",
-    "lint:backend": "eslint backend --ext .js,.ts --fix"
+    "lint:fix": "eslint . --fix",
+    "lint:frontend": "eslint frontend --fix",
+    "lint:backend": "eslint backend --fix"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.9",

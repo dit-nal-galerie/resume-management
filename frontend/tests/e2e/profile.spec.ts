@@ -42,6 +42,7 @@ test.describe('Profil', () => {
     await page.getByLabel(/Loginname/i).fill('maxi');
     // Checkbox "Passwort bearbeiten" (Text kann variieren)
     const toggle = page.getByText(/Passwort.*bearbeiten|ändern/i);
+
     if (await toggle.isVisible()) await toggle.click();
     await page.getByLabel(/Neues Passwort/i).fill('Passw0rt!');
     await page.getByLabel(/Passwort wiederholen/i).fill('Passw0rt!');

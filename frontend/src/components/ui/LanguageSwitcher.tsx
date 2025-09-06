@@ -7,10 +7,12 @@ const LanguageSwitcher: React.FC = () => {
 
   const changeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const lng = e.target.value;
+
     i18n.changeLanguage(lng);
     localStorage.setItem('i18nextLng', lng);
   };
   const { t } = useTranslation();
+
   return (
     <div className="flex items-center">
       <label htmlFor="language-switcher" className="sr-only">

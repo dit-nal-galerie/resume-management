@@ -38,12 +38,14 @@ const RequestPasswordReset: React.FC = () => {
     }
     if (hasErrors) {
       setErrors(newErrors);
+
       return;
     }
 
     try {
       setIsLoading(true);
       const result = await requestPasswordReset(email);
+
       if (result.success) {
         setIsSuccess(true);
       } else {

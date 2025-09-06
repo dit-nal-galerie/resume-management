@@ -15,6 +15,7 @@ test.describe('Resume anlegen & editieren', () => {
     await page.getByLabel(/Position/i).fill('Frontend Entwickler');
     // "Status auswählen" könnte Label- oder Placeholdertext sein
     const statusSelect = page.getByLabel(/Status auswählen|Status/i).or(page.getByRole('combobox'));
+
     await statusSelect.selectOption({ label: 'Eingetragen' });
     await page.getByLabel(/Link/i).fill('https://example.com/jobs/123');
     await page.getByLabel(/Kommentar/i).fill('Klingt spannend');

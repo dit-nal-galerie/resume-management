@@ -38,14 +38,31 @@ export default [
     },
     rules: {
       'no-console': 'off',
-      'no-unused-vars': 'off',
+      'no-unused-vars': 'off', // wir nutzen unused-imports stattdessen
       'unused-imports/no-unused-imports': 'warn',
       'unused-imports/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/rules-of-hooks': 'off', // wird nur im Frontend gebraucht
       'react-hooks/exhaustive-deps': 'off',
+      'no-multiple-empty-lines': ['error', { max: 1 }],
+      'padding-line-between-statements': [
+        'error',
+        // immer Leerzeile vor return
+        { blankLine: 'always', prev: '*', next: 'return' },
+
+        // immer Leerzeile nach imports
+        { blankLine: 'always', prev: 'import', next: '*' },
+        { blankLine: 'any', prev: 'import', next: 'import' }, // zwischen Imports keine Leerzeile nötig
+
+        // immer Leerzeile vor function-Definitionen
+        { blankLine: 'always', prev: '*', next: 'function' },
+
+        // immer Leerzeile nach variable-Block (let/const/var), außer wenn direkt noch eine Deklaration folgt
+        { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' },
+        { blankLine: 'any', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] },
+      ],
     },
   },
 
@@ -66,7 +83,7 @@ export default [
     },
   },
 
-  // 4) Optional: D3 global erlauben (falls noch ohne Import)
+  // 4) Optional: D3 global erlauben
   {
     files: ['frontend/src/**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
@@ -84,9 +101,9 @@ export default [
 
   // 6) Tests – any ist erlaubt!
   {
-    files: ['**/tests/**/*.{ts,tsx,js,jsx}', '**/backend/**/*.{ts,tsx,js,jsx}'],
+    files: ['**/tests/**/*.{ts,tsx,js,jsx}'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off', // ✅ any in Tests erlaubt
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },

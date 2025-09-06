@@ -65,6 +65,9 @@ export default function ResumeEditForm({
     const title =
         resume.resumeId === 0 ? t('resumeEdit.createTitle') : t('resumeEdit.editTitle');
 
+    const recrutingCompanyId = resume.recrutingCompany?.companyId;
+    const companyId = resume.company?.companyId
+
     return (
         <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
             <PageHeader pageTitle={title} pageId={PageId.ResumeEdit} />
@@ -150,7 +153,7 @@ export default function ResumeEditForm({
                 <ContactSection
                     title={t('resumeEdit.recruiterContact')}
                     contact={resume.contactRecrutingCompany as Contact | null}
-                    companyId={resume.recrutingCompany?.companyId}
+                    companyId={recrutingCompanyId}
                     onEdit={() => onOpenEditContact('contactRecrutingCompany')}
                     onSelect={() => onOpenSelectContact('contactRecrutingCompany')}
                     onRemove={() => onRemoveContact('contactRecrutingCompany')}
@@ -171,7 +174,7 @@ export default function ResumeEditForm({
                 <ContactSection
                     title={t('resumeEdit.companyContact')}
                     contact={resume.contactCompany as Contact | null}
-                    companyId={resume.company?.companyId}
+                    companyId={companyId}
                     onEdit={() => onOpenEditContact('contactCompany')}
                     onSelect={() => onOpenSelectContact('contactCompany')}
                     onRemove={() => onRemoveContact('contactCompany')}

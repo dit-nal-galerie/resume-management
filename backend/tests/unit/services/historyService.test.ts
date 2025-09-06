@@ -82,6 +82,7 @@ describe('historyService', () => {
     it('should return history entries if everything is ok', () => {
       mockReq = { query: { resumeId: '1', refId: '2' } };
       const dbRows = [{ date: '2024-01-01', status: 'Gesendet' }];
+
       // First call: validation ok, Second call: history ok
       mockDb.query
         .mockImplementationOnce((_q: any, _p: any, cb: any) => cb(null, [{}]))

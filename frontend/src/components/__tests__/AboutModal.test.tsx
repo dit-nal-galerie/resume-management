@@ -18,6 +18,7 @@ describe('AboutModal', () => {
 
   it('rendered nicht wenn geschlossen', () => {
     const { container } = render(<AboutModal isOpen={false} onClose={() => {}} />);
+
     expect(container).toBeEmptyDOMElement();
   });
 });

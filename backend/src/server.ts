@@ -5,6 +5,7 @@ import ResumeManagementAPI from './resumeManagementAPI'; // Importiere die API-K
 import config from './config/config';
 import cookieParser from 'cookie-parser';
 import { logout } from './services/logoutService';
+
 export const app = express();
 
 app.use(cookieParser());
@@ -27,6 +28,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Erstelle eine Instanz der API-Klasse
 const api = new ResumeManagementAPI();
+
 app.get('/meanrede', (req, res) => api.getUserAnredeAndName(req, res));
 app.get('/me', (req, res) => api.getUserProfile(req, res));
 // Definiere die Routen

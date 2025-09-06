@@ -5,6 +5,7 @@ import * as api from '@/shared/api/queries';
 
 export function useLogin() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: api.login,
     onSuccess: () => {
@@ -16,6 +17,7 @@ export function useLogin() {
 
 export function useLogout() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: api.logout,
     onSuccess: () => {
@@ -34,6 +36,7 @@ export function useUserProfile() {
 
 export function useUpdateUserData() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: api.updateUserData,
     onSuccess: () => {

@@ -27,5 +27,8 @@
   "typescript.suggest.autoImports": true,
   "files.exclude": {
     "**/node_modules": true
+  },
+  "[php]": {
+    "editor.defaultFormatter": "DEVSENSE.phptools-vscode"
   }
 }

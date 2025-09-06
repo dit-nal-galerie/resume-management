@@ -50,6 +50,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
     const parsedId = React.useMemo(() => {
         if (!resumeId || resumeId === '0' || resumeId === 'new') return 0;
         const n = Number(resumeId);
+
         return Number.isFinite(n) && n > 0 ? n : 0;
     }, [resumeId]);
 
@@ -134,6 +135,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
     const handleOpenSelectCompany = (section: ModalSectionCompany) => {
         (async () => {
             const list = await getCompanies(section === 'recrutingCompany');
+
             setCompanies(list);
             setModalType('select');
             setModalSectionCompany(section);
@@ -152,6 +154,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
             isRecruter: modalSectionCompany === 'recrutingCompany',
             companyId: comp.companyId || 0,
         };
+
         setResumeData((rd) => (rd ? { ...rd, [modalSectionCompany]: patched } : rd));
         setModalOpen(false);
         setModalType(null);
@@ -188,10 +191,12 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
                 alert(t('resumeEdit.selectCompanyFirst'));
                 setModalType(null);
                 setModalSectionContact(null);
+
                 return;
             }
 
             const list = await getContacts({ refId: 0, companyId: compId });
+
             setContacts(list);
             setModalOpen(true);
         })().catch(console.error);
@@ -202,6 +207,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
         const key = section === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
         const contact =
             section === 'contactCompany' ? resumeData?.contactCompany : resumeData?.contactRecrutingCompany;
+
         if (!contact?.contactid) return;
 
         if (!window.confirm(t('resumeEdit.confirmDeleteContact'))) return;
@@ -211,6 +217,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
     const handleSelectContact = (c: Contact) => {
         if (!modalSectionContact) return;
         const key = modalSectionContact === 'contactCompany' ? 'contactCompany' : 'contactRecrutingCompany';
+
         setResumeData((rd) => (rd ? { ...rd, [key]: c } : rd));
         setModalOpen(false);
         setModalType(null);
@@ -250,6 +257,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
             if (!resumeData) return;
             if (!resumeData.position) {
                 setErrorMessage(t('resumeEdit.requiredFields'));
+
                 return;
             }
             try {
@@ -278,6 +286,7 @@ export default function ResumeEditContainer({ initial }: { initial: Resume | nul
             JSON.stringify(resumeData?.contactCompany, null, 2) +
             '\n' +
             JSON.stringify(resumeData?.contactRecrutingCompany, null, 2);
+
         alert(tView);
     };
 

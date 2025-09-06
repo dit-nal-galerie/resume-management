@@ -63,6 +63,7 @@ const ResumeList: React.FC = () => {
   const displayResumes = useMemo(() => {
     if (!selectedStatusIds.length) return resumes;
     const setIds = new Set(selectedStatusIds);
+
     return resumes.filter((r) => (r.stateId ? setIds.has(r.stateId) : false));
   }, [resumes, selectedStatusIds]);
 
@@ -79,8 +80,10 @@ const ResumeList: React.FC = () => {
         setMenuOpen(false);
       }
     };
+
     if (menuOpen) {
       setTimeout(() => document.addEventListener('mousedown', handleClick), 0);
+
       return () => document.removeEventListener('mousedown', handleClick);
     }
   }, [menuOpen]);
@@ -97,8 +100,10 @@ const ResumeList: React.FC = () => {
     const handleClick = () => {
       if (menuOpen) setMenuOpen(false);
     };
+
     if (menuOpen) {
       setTimeout(() => document.addEventListener('mousedown', handleClick), 0);
+
       return () => document.removeEventListener('mousedown', handleClick);
     }
   }, [menuOpen]);

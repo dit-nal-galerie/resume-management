@@ -26,13 +26,16 @@ const anredeOptions = [
 describe('ProfileForm', () => {
   it('ruft onChange beim Tippen auf', () => {
     const onChange = jest.fn();
+
     render(<ProfileForm formData={defaultUser} anredeOptions={anredeOptions} onChange={onChange} />);
 
     const nameInput = screen.getByLabelText(/name/i);
+
     fireEvent.change(nameInput, { target: { value: 'Max Mustermann' } });
     expect(onChange).toHaveBeenCalledWith('name', 'Max Mustermann');
 
     const emailInput = screen.getByLabelText(/e-?mail/i);
+
     fireEvent.change(emailInput, { target: { value: 'max@example.com' } });
     expect(onChange).toHaveBeenCalledWith('email', 'max@example.com');
   });

@@ -270,6 +270,7 @@ describe('getAnrede', () => {
       { id: 1, text: 'Herr' },
       { id: 2, text: 'Frau' },
     ];
+
     (mockConnection.query as jest.Mock).mockImplementationOnce((sql, callback) => {
       expect(sql).toBe('SELECT * FROM anrede');
       callback(null, mockAnrede);
@@ -556,6 +557,7 @@ describe('Helper Functions', () => {
         callback(null, [{ password: 'hashed_pw_123' }] as RowDataPacket[]);
       });
       const password = await getPasswordForLoginId(mockConnection, 1);
+
       expect(password).toBe('hashed_pw_123');
       expect(mockConnection.query).toHaveBeenCalledWith(
         'SELECT password FROM authentification WHERE id = ?',
@@ -569,6 +571,7 @@ describe('Helper Functions', () => {
         callback(null, [] as RowDataPacket[]);
       });
       const password = await getPasswordForLoginId(mockConnection, 999);
+
       expect(password).toBeNull();
     });
 
@@ -586,6 +589,7 @@ describe('Helper Functions', () => {
         callback(null, [{ count: 1 }] as RowDataPacket[]);
       });
       const exists = await emailExistsForOtherUser(mockConnection, 'test@example.com', 1);
+
       expect(exists).toBe(true);
       expect(mockConnection.query).toHaveBeenCalledWith(
         'SELECT COUNT(*) AS count FROM users WHERE email = ? AND loginid != ?',
@@ -599,6 +603,7 @@ describe('Helper Functions', () => {
         callback(null, [{ count: 0 }] as RowDataPacket[]);
       });
       const exists = await emailExistsForOtherUser(mockConnection, 'new@example.com', 1);
+
       expect(exists).toBe(false);
     });
 
@@ -619,6 +624,7 @@ describe('Helper Functions', () => {
         callback(null, { insertId: 200 } as OkPacket);
       });
       const insertId = await createAuthEntry(mockConnection, 'newuser', 'newpassword');
+
       expect(bcrypt.hash).toHaveBeenCalledWith('newpassword', 10);
       expect(mockConnection.query).toHaveBeenCalledWith(
         'INSERT INTO authentification (loginname, password) VALUES (?, ?)',

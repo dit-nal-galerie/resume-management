@@ -12,4 +12,5 @@ export interface User {
   postalCode: string;
   phone?: string;
   mobile?: string;
+  isNew?: boolean;
 }

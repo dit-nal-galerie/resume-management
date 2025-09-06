@@ -96,6 +96,7 @@ function Loader({
 
 function Spinner({ size }: { size: LoaderSize }) {
     const dim = sizeMap[size];
+
     return (
         <svg className={['animate-spin text-gray-600', dim].join(' ')} viewBox="0 0 24 24" aria-hidden="true">
             {/* Track */}

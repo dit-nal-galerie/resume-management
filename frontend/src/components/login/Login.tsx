@@ -21,6 +21,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ loginname?: string; password?: string }>({});
   const navigate = useNavigate();
   const loginInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     getUserAnredeAndName()
       .then(goToResume)
@@ -48,12 +49,14 @@ const Login: React.FC = () => {
         loginname: !loginname ? t('login.usernameRequired') : undefined,
         password: !password ? t('login.passwordRequired') : undefined,
       });
+
       return;
     }
 
     try {
 
       const userData: User | null = await login({ loginname, password });
+
       if (userData) {
         console.log('Login response:', JSON.stringify(userData));
         goToResume();
@@ -76,6 +79,7 @@ const Login: React.FC = () => {
   const handleBlur = () => {
     setErrors({});
   };
+
   console.log(i18n)
 
   return (

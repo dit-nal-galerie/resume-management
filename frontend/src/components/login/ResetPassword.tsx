@@ -22,6 +22,7 @@ const ResetPassword: React.FC = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tokenFromUrl = searchParams.get('token');
+
     if (!tokenFromUrl) {
       setServerError(t('passwordReset.invalidToken'));
     } else {
@@ -58,15 +59,18 @@ const ResetPassword: React.FC = () => {
     }
     if (hasErrors) {
       setErrors(newErrors);
+
       return;
     }
     if (!token) {
       setServerError(t('passwordReset.invalidToken'));
+
       return;
     }
     try {
       setIsLoading(true);
       const result = await resetPassword();
+
       if (result) {
         setIsSuccess(true);
         setTimeout(() => {

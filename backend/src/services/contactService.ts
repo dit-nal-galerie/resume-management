@@ -27,6 +27,7 @@ export const createOrUpdateContact = async (
 
     if (!vorname || !name || !email || !anrede || !company || !loginid) {
       res.status(400).json({ message: 'backend.error.validation.missingFields' });
+
       return;
     }
 
@@ -34,12 +35,14 @@ export const createOrUpdateContact = async (
       const insertQuery = `
         INSERT INTO contacts (vorname, name, email, anrede, title, zusatzname, phone, mobile, company, ref)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
       db.query(
         insertQuery,
         [vorname, name, email, anrede, title, zusatzname, phone, mobile, company, loginid],
         (err) => {
           if (err) {
             res.status(500).json({ message: 'backend.error.server.serverError' });
+
             return;
           }
           res.status(201).json({ message: 'backend.success.contact.added' });
@@ -50,6 +53,7 @@ export const createOrUpdateContact = async (
         UPDATE contacts
         SET vorname = ?, name = ?, email = ?, anrede = ?, title = ?, zusatzname = ?, phone = ?, mobile = ?, company = ?, ref = ?
         WHERE contactid = ?`;
+
       db.query(
         updateQuery,
         [
@@ -68,6 +72,7 @@ export const createOrUpdateContact = async (
         (err) => {
           if (err) {
             res.status(500).json({ message: 'backend.error.server.serverError' });
+
             return;
           }
           res.status(200).json({ message: 'backend.success.contact.updated' });
@@ -86,6 +91,7 @@ export const getContacts = (db: Connection, req: Request, res: Response): void =
 
   if (!loginid || !company) {
     res.status(400).send('backend.error.validation.missingRefOrCompany');
+
     return;
   }
 
@@ -110,6 +116,7 @@ export const getContacts = (db: Connection, req: Request, res: Response): void =
     if (err) {
       console.error('Fehler beim Abrufen der Kontakte:', err);
       res.status(500).send('backend.error.server.fetchContactsError');
+
       return;
     }
 

@@ -30,6 +30,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 
   // NEW: States via React Query Hook
   const { data: statesData } = useStates();
+
   useEffect(() => {
     if (statesData) setStates(statesData);
     setSelectedDate(new Date());
@@ -40,6 +41,7 @@ export const StatusModal: React.FC<StatusModalProps> = ({
 
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0];
+
       // NEW: neue Signatur: Objekt
       await changeResumeStatus({ resumeId, stateId: selectedState, date: formattedDate });
       onStatusChanged?.();

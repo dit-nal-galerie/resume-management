@@ -73,7 +73,8 @@
     "usernamePlaceholder": "Enter username",
     "emailPlaceholder": "Enter email address",
     "newPasswordPlaceholder": "Enter new password",
-    "confirmPasswordPlaceholder": "Confirm password"
+    "confirmPasswordPlaceholder": "Confirm password",
+    "passwordsDontMatch": "The passwords do not match."
   },
   "profile": {
     "title": "Profile",

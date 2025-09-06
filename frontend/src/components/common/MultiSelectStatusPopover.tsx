@@ -31,12 +31,15 @@ export default function MultiSelectStatusPopover({
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
+
         if (!q) return options;
+
         return options.filter((o) => t(o.text).toLowerCase().includes(q));
     }, [options, query, t]);
 
     const selectedItems = useMemo(() => {
         const map = new Map(options.map((o) => [o.stateid, t(o.text)]));
+
         return value
             .map((id) => ({ id, label: map.get(id) }))
             .filter((x): x is { id: number; label: string } => Boolean(x.label));
@@ -51,6 +54,7 @@ export default function MultiSelectStatusPopover({
 
     const selectAllFiltered = () => {
         const set = new Set(value);
+
         filtered.forEach((o) => set.add(o.stateid));
         onChange(Array.from(set));
     };
@@ -137,6 +141,7 @@ export default function MultiSelectStatusPopover({
                                     {filtered.map((o) => {
                                         const checked = selectedSet.has(o.stateid);
                                         const id = `status-${o.stateid}`;
+
                                         return (
                                             <li key={o.stateid}>
                                                 <label

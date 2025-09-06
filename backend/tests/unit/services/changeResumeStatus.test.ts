@@ -120,6 +120,7 @@ describe('changeResumeStatus', () => {
   test('should return 500 on database error during update/insert', async () => {
     mockRequest.body = { resumeId: 1, userId: 1, stateId: 2, date: '2025-06-07' };
     const errorMessage = 'Database write error';
+
     (mockDbPool.query as jest.Mock)
       .mockResolvedValueOnce([[{ ref: 1, stateid: 1 }]]) // Initial state
       .mockRejectedValueOnce(new Error(errorMessage)); // Simulate error during UPDATE or INSERT

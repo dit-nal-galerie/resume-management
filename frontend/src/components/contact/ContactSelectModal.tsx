@@ -10,6 +10,7 @@ type Props = {
 
 const ContactSelectModal: React.FC<Props> = ({ isOpen, onClose, contacts, onSelect }) => {
   if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-lg rounded-lg bg-white p-4 shadow-lg">

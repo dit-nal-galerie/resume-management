@@ -32,6 +32,7 @@ export function useResumeById(resumeId: number, refId: number, enabled = true) {
 
 export function useUpsertResume() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: updateOrCreateResume,
     onSuccess: () => {
@@ -51,6 +52,7 @@ export function useResumeHistory(resumeId: number, refId: number, enabled = true
 
 export function useChangeResumeStatus() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: changeResumeStatus,
     onSuccess: (_data, variables) => {

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageId } from './PageId';
 import { AboutModal } from '../AboutModal';
 import { getUserAnredeAndName, logout } from '../../shared/api/queries';
+
 interface PageHeaderProps {
   pageTitle: string;
   pageId: PageId;
@@ -34,6 +35,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
     if (!storedUser || pageId === PageId.Login) {
       return [];
     }
+
     return [
       pageId !== PageId.ResumeEdit && (
         <MenuItem>
@@ -90,6 +92,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
   };
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const dynamischenMenuItems = menuItems(pageId);
+
   return (
     <>
       <div className="sticky top-0 z-10 flex items-center justify-between rounded-lg bg-gray-800 p-4 text-white">

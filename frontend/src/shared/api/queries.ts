@@ -5,6 +5,7 @@ import { Resume, HistoryEntry, Contact, User, Company } from '../../../../interf
 
 // ENV
 const API_TYPE = process.env.REACT_APP_API_TYPE ?? 'php';
+
 export const API_URL =
   API_TYPE === 'php'
     ? (process.env.REACT_APP_API_URL_PHP ?? 'http://localhost:8888')
@@ -13,6 +14,7 @@ export const API_URL =
 // Hilfsparser
 async function parseJsonResponse<T>(res: Response, ctx: string): Promise<T> {
   const text = await res.text();
+
   console.log(`Response body ${ctx}:`, API_URL, text);
   try {
     return JSON.parse(text) as T;
@@ -40,12 +42,14 @@ export async function login(payload: {
   });
 
   const text = await res.text();
+
   console.log('Login response:', res.status, text);
 
   // Server sendet bei Fehler {success:false,error:...} + 400/401/404
   if (!res.ok) {
     try {
       const err = JSON.parse(text) as { error?: string; message?: string };
+
       throw new Error(err.error || err.message || 'api.error.login_failed');
     } catch {
       throw new Error('api.error.login_failed');
@@ -62,6 +66,7 @@ export async function logout(): Promise<void> {
     method: 'POST',
     credentials: 'include',
   });
+
   console.log('Response status logout:', API_URL, res.status);
 }
 
@@ -71,7 +76,9 @@ export async function getUserProfile(): Promise<User> {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.user_fetch_failed');
+
   return parseJsonResponse<User>(res, 'getUserProfile');
 }
 
@@ -82,13 +89,19 @@ export async function updateUserData(user: User): Promise<User> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(user),
   });
-  if (!res.ok) throw new Error('api.error.user_save_failed');
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+    // throw new Error('api.error.user_save_failed');
+  }
+
   return parseJsonResponse<User>(res, 'updateUserData');
 }
 
-export async function createOrUpdateUser(user: User): Promise<User> {
-  return updateUserData(user);
-}
+// export async function createOrUpdateUser(user: User): Promise<User> {
+//   user.isNew = true;
+//   return updateUserData(user);
+// }
 
 export async function requestPasswordReset(email: string): Promise<ApiResponse> {
   const res = await fetch(`${API_URL}/request-password-reset`, {
@@ -96,7 +109,9 @@ export async function requestPasswordReset(email: string): Promise<ApiResponse> 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
   });
+
   if (!res.ok) throw new Error('api.error.password_reset_request_failed');
+
   return parseJsonResponse<ApiResponse>(res, 'requestPasswordReset');
 }
 
@@ -109,7 +124,9 @@ export async function resetPassword(payload: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('api.error.password_reset_failed');
+
   return parseJsonResponse<ApiResponse>(res, 'resetPassword');
 }
 
@@ -118,7 +135,9 @@ export async function validateToken(token: string): Promise<ApiResponse> {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.token_invalid');
+
   return parseJsonResponse<ApiResponse>(res, 'validateToken');
 }
 
@@ -130,19 +149,24 @@ export interface UpdateAccessDataResponse {
 
 export async function updateAccessData(payload: Partial<User>): Promise<UpdateAccessDataResponse> {
   try {
-    const res = await fetch(`${API_URL}/updateAccessData`, {
+    const res = await fetch(`${API_URL}/changeAccessData`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     const data = await parseJsonResponse<UpdateAccessDataResponse>(res, 'updateAccessData');
+
     if (!res.ok) {
+      console.log('updateAccessData failed:', res.status, data);
+
       return { success: false, message: 'api.error.access_save_failed' };
     }
+
     return data;
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'api.error.server';
+
     return { success: false, message };
   }
 }
@@ -156,7 +180,9 @@ export async function getUserAnredeAndName(): Promise<UserAnredeName> {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.user_fetch_failed');
+
   return parseJsonResponse<UserAnredeName>(res, 'getUserAnredeAndName');
 }
 
@@ -170,7 +196,9 @@ export async function getStates(): Promise<StateDto[]> {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.server');
+
   return parseJsonResponse<StateDto[]>(res, 'getStates');
 }
 
@@ -179,7 +207,9 @@ export async function getAnrede(): Promise<AnredeDto[]> {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.server');
+
   return parseJsonResponse<AnredeDto[]>(res, 'getAnrede');
 }
 
@@ -191,7 +221,9 @@ export async function getResumesWithUsers(): Promise<Resume[]> {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.resume_fetch_failed');
+
   return parseJsonResponse<Resume[]>(res, 'getResumesWithUsers');
 }
 
@@ -238,6 +270,7 @@ export async function getResumeById(params: { resumeId: number; refId: number })
       });
 
       const text = await res.text();
+
       // eslint-disable-next-line no-console
       console.log('getResumeById attempt:', attempt.method, attempt.url, res.status, text);
 
@@ -269,7 +302,9 @@ export async function updateOrCreateResume(payload: Resume): Promise<Resume> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('api.error.resume_save_failed');
+
   return parseJsonResponse<Resume>(res, 'updateOrCreateResume');
 }
 
@@ -295,6 +330,7 @@ export async function getHistoryByResumeId(params: {
       });
 
       const text = await res.text();
+
       console.log('getHistoryByResumeId attempt:', attempt.method, attempt.url, res.status, text);
 
       if (!res.ok) continue;
@@ -323,7 +359,9 @@ export async function changeResumeStatus(payload: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('api.error.status_change_failed');
+
   return parseJsonResponse<ApiResponse>(res, 'changeResumeStatus');
 }
 
@@ -336,7 +374,9 @@ export async function createOrUpdateContact(payload: Contact): Promise<Contact> 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+
   if (!res.ok) throw new Error('api.error.contact_save_failed');
+
   return parseJsonResponse<Contact>(res, 'createOrUpdateContact');
 }
 
@@ -346,7 +386,9 @@ export async function getCompanies(isRecruter = false): Promise<Company[]> {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.company_fetch_failed');
+
   return parseJsonResponse<Company[]>(res, 'getCompanies');
 }
 
@@ -360,6 +402,8 @@ export async function getContacts(params: {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
   });
+
   if (!res.ok) throw new Error('api.error.contact_fetch_failed');
+
   return parseJsonResponse<Contact[]>(res, 'getContacts');
 }

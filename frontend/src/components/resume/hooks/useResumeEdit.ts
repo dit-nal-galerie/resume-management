@@ -19,8 +19,10 @@ export function useResumeEdit(initial: Resume | null) {
 
       const compId =
         resumeData?.[section === 'contactCompany' ? 'company' : 'recrutingCompany']?.companyId;
+
       if (!compId) return; // UI zeigt vorher schon Hinweis
       const list = await getContacts({ refId: 0, companyId: compId });
+
       setContacts(list);
       setModalOpen(true);
     },

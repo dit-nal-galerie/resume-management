@@ -73,7 +73,8 @@
     "usernamePlaceholder": "Benutzername eingeben",
     "emailPlaceholder": "E-Mail-Adresse eingeben",
     "newPasswordPlaceholder": "Neues Passwort eingeben",
-    "confirmPasswordPlaceholder": "Passwort bestätigen"
+    "confirmPasswordPlaceholder": "Passwort bestätigen",
+    "passwordsDontMatch": "Die Passwörter sind nicht identisch."
   },
   "profile": {
     "title": "Profil",

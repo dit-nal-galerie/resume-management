@@ -26,11 +26,13 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
     const fetchAnreden = async () => {
       try {
         const result = await getAnrede();
+
         setAnreden(result);
       } catch (error) {
         console.error(t('common.error'), error);
       }
     };
+
     fetchAnreden();
   }, []);
 
@@ -42,6 +44,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setContactData((prev) => ({ ...prev, [name]: value }));
   };
 

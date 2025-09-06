@@ -11,6 +11,7 @@ import { StatusModalProps } from '../ResumeEditModals.types';
 import { changeResumeStatus, getHistoryByResumeId } from '../../../shared/api/queries';
 import { useStates } from '../../../features/dictionaries/hooks';
 import { HistoryEntry } from '../../../../../interfaces';
+
 interface StateOption {
   stateid: number;
   text: string;
@@ -34,6 +35,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
 
   // NEW: States via React Query Hook
   const { data: statesData } = useStates();
+
   useEffect(() => {
     if (statesData) setStates(statesData);
   }, [statesData]);
@@ -49,6 +51,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
       try {
         setLoading(true);
         const data = await getHistoryByResumeId({ resumeId, refId });
+
         setHistory(data);
       } catch (err) {
         console.error(t('resume.edit.saveError'), err);
@@ -67,6 +70,7 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
 
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
       // NEW: neue Signatur: ein Objekt
       await changeResumeStatus({ resumeId, stateId: selectedState, date: formattedDate });
       onStatusChanged?.();

@@ -8,6 +8,7 @@ export const getResumesWithUsers = (db: Connection, req: Request, res: Response)
 
   if (!loginid) {
     res.status(401).send('backend.error.auth.unauthorized');
+
     return;
   }
 
@@ -63,6 +64,7 @@ WHERE r.ref = ?
     if (err) {
       console.error('Fehler beim Abrufen der Bewerbungen:', err);
       res.status(500).send('backend.error.server.serverError');
+
       return;
     }
 
@@ -109,6 +111,7 @@ WHERE r.ref = ?
         });
       }
       const resume = resumeMap.get(row.resumeId);
+
       if (row.contactCompanyId) {
         resume.contactCompany = {
           contactId: row.contactCompanyId,
@@ -134,6 +137,7 @@ export const getStates = (db: Connection, req: Request, res: Response): void => 
     if (err) {
       console.error('Fehler beim Abrufen der Status:', err);
       res.status(500).send('backend.error.server.serverError');
+
       return;
     }
 

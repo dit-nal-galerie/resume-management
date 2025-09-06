@@ -144,6 +144,7 @@ describe('contactService', () => {
           ref: 'abc',
         },
       ];
+
       (db.query as jest.Mock).mockImplementation((_q, _v, cb) => cb(null, mockResults));
       getContacts(db as Connection, req as Request, res as Response);
       expect(jsonMock).toHaveBeenCalledWith(mockResults);
