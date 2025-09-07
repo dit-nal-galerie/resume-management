@@ -46,7 +46,7 @@ const App: React.FC = () => (
         {/* Route zum Zurücksetzen des Passworts nach Anforderung */}
         <Route path="/reset-password" element={<ResetPassword />} />    </Routes>
     </BrowserRouter>
-    <ReactQueryDevtools initialIsOpen={false} />
+    <ReactQueryDevtools initialIsOpen={process.env.NODE_ENV !== 'production'} />
   </QueryClientProvider>
 );
 
