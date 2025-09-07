@@ -9,7 +9,7 @@ class DB
 {
     public static function connect(): PDO
     {
-        $env = getenv('APP_ENV') ?: 'dev';
+        $env =getenv('APP_ENV') ?? 'production';
         $config = ConfigLoader::load($env);
 
         try {
