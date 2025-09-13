@@ -47,7 +47,8 @@ export function useUpdateUserData() {
 
 export function useRequestPasswordReset() {
   return useMutation({
-    mutationFn: api.requestPasswordReset,
+    mutationFn: ({ email, loginname }: { email: string; loginname: string }) =>
+      api.requestPasswordReset(email, loginname),
   });
 }
 

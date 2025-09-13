@@ -44,7 +44,7 @@ const RequestPasswordReset: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const result = await requestPasswordReset(email);
+      const result = await requestPasswordReset(email, loginname);
 
       if (result.success) {
         setIsSuccess(true);
