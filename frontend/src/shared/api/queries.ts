@@ -103,11 +103,11 @@ export async function updateUserData(user: User): Promise<User> {
 //   return updateUserData(user);
 // }
 
-export async function requestPasswordReset(email: string): Promise<ApiResponse> {
+export async function requestPasswordReset(email: string, loginname: string): Promise<ApiResponse> {
   const res = await fetch(`${API_URL}/request-password-reset`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, loginname }),
   });
 
   if (!res.ok) throw new Error('api.error.password_reset_request_failed');

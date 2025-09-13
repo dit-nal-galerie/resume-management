@@ -13,16 +13,30 @@ class PasswordResetController
     public function __construct()
     {
         $db = DB::connect();
-        $this->service = new PasswordResetService($db);
+
+        $env = getenv('APP_ENV') ?: 'production';
+        $config = \App\Config\ConfigLoader::load($env);
+
+        $this->service = new PasswordResetService($db, $config);
     }
 
     public function sendResetEmail(Request $request, Response $response): Response
     {
         $data = $request->getParsedBody();
-        $result = $this->service->sendResetEmail($data['email']);
+
+        if (empty($data['email']) || empty($data['loginname'])) {
+            $response->getBody()->write(json_encode([
+                'success' => false,
+                'error' => 'Email and loginname are required.'
+            ]));
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        }
+
+        $result = $this->service->sendResetEmail($data['email'], $data['loginname']);
         $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json');
     }
+
 
     public function resetPassword(Request $request, Response $response, array $args): Response
     {
