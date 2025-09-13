@@ -6,7 +6,6 @@ class ConfigLoader
 {
     public static function load(string $env = 'dev'): array
     {
-        // $filename = __DIR__ . "/../../config/{$env}.json";
         $filename = __DIR__ . "/../../../config/{$env}.json";
         if (!file_exists($filename)) {
             throw new \Exception("Config file not found: {$filename}");
