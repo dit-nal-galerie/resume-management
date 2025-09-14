@@ -4,12 +4,12 @@
 import { Resume, HistoryEntry, Contact, User, Company } from '../../../../interfaces';
 
 // ENV
-const API_TYPE = process.env.REACT_APP_API_TYPE ?? 'php';
+const API_TYPE = import.meta.env.VITE_API_TYPE ?? 'php';
 
 export const API_URL =
   API_TYPE === 'php'
-    ? (process.env.REACT_APP_API_URL_PHP ?? 'http://localhost:8888')
-    : (process.env.REACT_APP_API_URL_NODE ?? 'http://localhost:3001');
+    ? (import.meta.env.VITE_API_URL_PHP ?? 'http://localhost:8888')
+    : (import.meta.env.VITE_API_URL_NODE ?? 'http://localhost:3001');
 
 // Hilfsparser
 async function parseJsonResponse<T>(res: Response, ctx: string): Promise<T> {
