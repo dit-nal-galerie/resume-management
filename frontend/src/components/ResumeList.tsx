@@ -10,7 +10,6 @@ import { HistoryModal } from './resume/modals/HistoryModal';
 import { StatusModal } from './resume/modals/StatusModal';
 import { getResumesWithUsers, getUserAnredeAndName } from '../shared/api/queries';
 
-
 import { useStates } from '../features/dictionaries/hooks';
 import MultiSelectStatusPopover from './common/MultiSelectStatusPopover';
 
@@ -143,7 +142,6 @@ const ResumeList: React.FC = () => {
             options={states as StatusItem[]}
             value={selectedStatusIds}
             onChange={setSelectedStatusIds}
-
             placeholder={t('resumeList.filterPlaceholder') /* z.B. „Alle Status“ */}
             searchPlaceholder={t('common.search')}
           />

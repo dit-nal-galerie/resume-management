@@ -2,15 +2,21 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Login', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/login', async route => {
+    await page.route('**/login', async (route) => {
       const req = route.request();
       const body = await req.postDataJSON();
 
       if (body.loginname === 'demo' && body.password === 'demo') {
-        return route.fulfill({ status: 200, body: JSON.stringify({ success: true, token: 'jwt-demo' }) });
+        return route.fulfill({
+          status: 200,
+          body: JSON.stringify({ success: true, token: 'jwt-demo' }),
+        });
       }
 
-      return route.fulfill({ status: 401, body: JSON.stringify({ success: false, error: 'login.invalidCredentials' }) });
+      return route.fulfill({
+        status: 401,
+        body: JSON.stringify({ success: false, error: 'login.invalidCredentials' }),
+      });
     });
   });
 

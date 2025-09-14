@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
 
-
 // Wiederverwendbare FormField-Komponente
 
 interface LoginFormProps {

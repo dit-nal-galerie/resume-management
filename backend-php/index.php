@@ -18,17 +18,14 @@ $app->addErrorMiddleware(true, true, true);
 $app->addBodyParsingMiddleware();
 
 // **NUR DIE EIGENE CORS-MIDDLEWARE EINBINDEN**
-$app->add(new CorsMiddleware([
-    'https://bewerbungs.itprofi-4u.de',
-    'http://localhost:3000'
-]));
+$app->add(new CorsMiddleware(['https://bewerbungs.itprofi-4u.de', 'http://localhost:3000']));
 
 // OPTIONS-Route für Preflight
 $app->options('/{routes:.+}', function ($request, $response) {
-    return $response;
+  return $response;
 });
 
 // Routen einbinden
-(require __DIR__ . '/src/Routes/api.php')($app);
+require __DIR__ . ('/src/Routes/api.php')($app);
 
 $app->run();

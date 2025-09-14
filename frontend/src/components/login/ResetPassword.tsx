@@ -5,7 +5,6 @@ import { FormField } from '../ui/FormField';
 import PageHeader from '../ui/PageHeader';
 import { PageId } from '../ui/PageId';
 
-
 const ResetPassword: React.FC = () => {
   const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState('');
@@ -92,12 +91,13 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-
     <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
       <PageHeader pageTitle={t('resumeList.changeAccess')} pageId={PageId.Login} />
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
-          <h2 className="mb-6 text-center text-2xl font-semibold">{t('passwordReset.resetTitle')}</h2>
+          <h2 className="mb-6 text-center text-2xl font-semibold">
+            {t('passwordReset.resetTitle')}
+          </h2>
 
           {isSuccess ? (
             <div className="text-center">
@@ -126,10 +126,11 @@ const ResetPassword: React.FC = () => {
                 <input
                   id="newPassword"
                   type="password"
-                  className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.newPassword
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                    }`}
+                  className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                    errors.newPassword
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                   placeholder={t('passwordReset.newPasswordPlaceholder')}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -146,10 +147,11 @@ const ResetPassword: React.FC = () => {
                 <input
                   id="confirmPassword"
                   type="password"
-                  className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.confirmPassword
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500'
-                    }`}
+                  className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                    errors.confirmPassword
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                   placeholder={t('passwordReset.confirmPasswordPlaceholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -165,8 +167,9 @@ const ResetPassword: React.FC = () => {
               <div className="mt-6 flex items-center justify-between">
                 <button
                   type="submit"
-                  className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? 'cursor-not-allowed opacity-70' : ''
-                    }`}
+                  className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                    isLoading ? 'cursor-not-allowed opacity-70' : ''
+                  }`}
                   disabled={isLoading || !token}
                 >
                   {isLoading ? t('common.loading') : t('passwordReset.resetPassword')}

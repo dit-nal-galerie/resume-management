@@ -5,7 +5,6 @@ import ProfileForm from '../ProfileForm';
 import 'utils/i18n/i18n';
 import { User } from '../../../../../interfaces';
 
-
 const defaultUser: User = {
   loginname: '',
   name: '',
@@ -27,7 +26,9 @@ describe('ProfileForm', () => {
   it('ruft onChange beim Tippen auf', () => {
     const onChange = jest.fn();
 
-    render(<ProfileForm formData={defaultUser} anredeOptions={anredeOptions} onChange={onChange} />);
+    render(
+      <ProfileForm formData={defaultUser} anredeOptions={anredeOptions} onChange={onChange} />
+    );
 
     const nameInput = screen.getByLabelText(/name/i);
 
