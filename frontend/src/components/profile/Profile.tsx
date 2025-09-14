@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-
 import ProfileForm from './ProfileForm';
 import { getAnrede, getUserProfile, updateUserData } from '../../shared/api/queries';
 import LoginForm from '../login/LoginForm';
@@ -37,7 +36,6 @@ const Profile = () => {
     mobile: '',
   });
 
-
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +55,6 @@ const Profile = () => {
 
     fetchProfile();
   }, []);
-
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -86,27 +83,21 @@ const Profile = () => {
       // if (!formData.name) {
       //   newErrors.name = t('validation.required');
       // }
-
       // if (!formData.anrede) {
       //   newErrors.anrede = t('validation.required');
       // }
-
       // if (!formData.city) {
       //   newErrors.city = t('validation.required');
       // }
-
       // if (!formData.postalCode) {
       //   newErrors.postalCode = t('validation.required');
       // }
-
       // if (!formData.street) {
       //   newErrors.street = t('validation.required');
       // }
-
       // if (!formData.houseNumber) {
       //   newErrors.houseNumber = t('validation.required');
       // }
-
     }
 
     setFormErrors(newErrors); // Fehler speichern!
@@ -126,9 +117,8 @@ const Profile = () => {
     try {
       setIsLoading(true);
       // console.log('formData', JSON.stringify(formData));
-      formData.isNew = isNew
+      formData.isNew = isNew;
       await updateUserData(formData);
-
 
       setTimeout(() => {
         setIsSuccess(false);
@@ -202,8 +192,9 @@ const Profile = () => {
 
             <button
               type="submit"
-              className={`rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? 'cursor-not-allowed opacity-70' : ''
-                }`}
+              className={`rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                isLoading ? 'cursor-not-allowed opacity-70' : ''
+              }`}
               disabled={isLoading}
             >
               {isLoading ? t('common.loading') : t('common.save')}

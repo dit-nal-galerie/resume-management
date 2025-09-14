@@ -99,8 +99,9 @@ export const StatusModal: React.FC<StatusModalProps> = ({
             </button>
             <button
               onClick={handleChangeStatus}
-              className={`rounded px-4 py-2 text-white ${isChangeEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-400'
-                }`}
+              className={`rounded px-4 py-2 text-white ${
+                isChangeEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-400'
+              }`}
               disabled={!isChangeEnabled}
               type="button"
             >

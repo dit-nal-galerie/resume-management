@@ -84,9 +84,7 @@ export default function ContactSection({
           </div>
         ) : (
           <span className="text-gray-400">
-            {hasCompany
-              ? t('resumeEdit.noContactSelected')
-              : t('resumeEdit.selectCompanyFirst')}
+            {hasCompany ? t('resumeEdit.noContactSelected') : t('resumeEdit.selectCompanyFirst')}
           </span>
         )}
       </div>

@@ -10,7 +10,7 @@ type ContactFormModalProps = {
   contact: Contact;
   onSave: (contact: Contact) => void;
   onClose: () => void;
-}
+};
 
 const ContactFormModal: React.FC<ContactFormModalProps> = ({
   isOpen,

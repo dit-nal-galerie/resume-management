@@ -18,7 +18,6 @@ export interface ProfileFormProps {
   anredeOptions: AnredeOption[];
   onChange: (field: keyof User, value: string | number) => void;
   errors?: Record<string, string>;
-
 }
 export const inputClasses =
   'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition duration-200 ease-in-out text-gray-800 placeholder-gray-400';
@@ -31,7 +30,7 @@ export const FormField: React.FC<FormFieldProps> = ({ errors, label, htmlFor, ch
         {label}
       </label>
       {children}
-      {errors?.[htmlFor] && <div className="text-red-600 text-sm">{errors?.[htmlFor]}</div>}
+      {errors?.[htmlFor] && <div className="text-sm text-red-600">{errors?.[htmlFor]}</div>}
     </div>
   );
 };

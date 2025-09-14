@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 
-
 import DatePicker from 'react-datepicker';
 
 import { useTranslation } from 'react-i18next';
@@ -18,7 +17,6 @@ interface StateOption {
 }
 
 export const HistoryModal: React.FC<StatusModalProps> = ({
-
   onClose,
   resumeId,
   refId,
@@ -146,8 +144,11 @@ export const HistoryModal: React.FC<StatusModalProps> = ({
             {currentStateId > -1 && (
               <button
                 onClick={handleChangeStatus}
-                className={`rounded px-4 py-2 text-white ${isChangeEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-400'
-                  }`}
+                className={`rounded px-4 py-2 text-white ${
+                  isChangeEnabled
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'cursor-not-allowed bg-gray-400'
+                }`}
                 disabled={!isChangeEnabled}
               >
                 {t('resume.edit.title')}

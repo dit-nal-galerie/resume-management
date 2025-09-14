@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('Passwort anfordern & zurücksetzen', async ({ page }) => {
-  await page.route('**/request-password-reset', route =>
+  await page.route('**/request-password-reset', (route) =>
     route.fulfill({ status: 200, body: JSON.stringify({ success: true, message: 'ok' }) })
   );
 

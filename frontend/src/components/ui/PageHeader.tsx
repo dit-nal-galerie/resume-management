@@ -42,8 +42,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/resume/0')}
-              className={`${active ? 'bg-gray-100' : ''
-                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${
+                active ? 'bg-gray-100' : ''
+              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('resumeList.newResume')}
             </button>
@@ -55,8 +56,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/resumes')}
-              className={`${active ? 'bg-gray-100' : ''
-                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${
+                active ? 'bg-gray-100' : ''
+              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('navigation.resumes')}
             </button>
@@ -68,8 +70,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
           {({ active }) => (
             <button
               onClick={() => navigate('/profile')}
-              className={`${active ? 'bg-gray-100' : ''
-                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+              className={`${
+                active ? 'bg-gray-100' : ''
+              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
             >
               {t('resumeList.editProfile')}
             </button>
@@ -114,8 +117,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
                     {({ active }) => (
                       <button
                         onClick={() => handleLogout()}
-                        className={`${active ? 'bg-gray-100' : ''
-                          } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+                        className={`${
+                          active ? 'bg-gray-100' : ''
+                        } block w-full px-4 py-2 text-left text-sm text-gray-700`}
                       >
                         {t('common.logout')}
                       </button>

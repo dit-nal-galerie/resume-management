@@ -2,12 +2,20 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Resume anlegen & editieren', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/getStates', r => r.fulfill({ status: 200, body: JSON.stringify([
-      { stateid: 1, text: 'Eingetragen' }, { stateid: 2, text: 'Gesendet' }
-    ])}));
-    await page.route('**/companies**', r => r.fulfill({ status: 200, body: JSON.stringify([])}));
-    await page.route('**/contacts**', r => r.fulfill({ status: 200, body: JSON.stringify([])}));
-    await page.route('**/updateOrCreateResume', r => r.fulfill({ status: 200, body: JSON.stringify({ resumeId: 123 })}));
+    await page.route('**/getStates', (r) =>
+      r.fulfill({
+        status: 200,
+        body: JSON.stringify([
+          { stateid: 1, text: 'Eingetragen' },
+          { stateid: 2, text: 'Gesendet' },
+        ]),
+      })
+    );
+    await page.route('**/companies**', (r) => r.fulfill({ status: 200, body: JSON.stringify([]) }));
+    await page.route('**/contacts**', (r) => r.fulfill({ status: 200, body: JSON.stringify([]) }));
+    await page.route('**/updateOrCreateResume', (r) =>
+      r.fulfill({ status: 200, body: JSON.stringify({ resumeId: 123 }) })
+    );
   });
 
   test('Neues Resume inkl. neuer Firma & neuem Kontakt', async ({ page }) => {

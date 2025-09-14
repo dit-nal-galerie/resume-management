@@ -10,10 +10,10 @@ describe('LoginForm', () => {
 
     render(<LoginForm loginname="" password="" onChange={onChange} />);
 
-    await userEvent.type(screen.getByLabelText(/Loginname/i), 'dt');   // ⬅️ ohne setup()
+    await userEvent.type(screen.getByLabelText(/Loginname/i), 'dt'); // ⬅️ ohne setup()
     expect(onChange).toHaveBeenCalledWith('loginname', 'demo');
 
-    await userEvent.type(screen.getByLabelText(/Passwort/i), 'dt');       // ⬅️ ohne setup()
+    await userEvent.type(screen.getByLabelText(/Passwort/i), 'dt'); // ⬅️ ohne setup()
     expect(onChange).toHaveBeenCalledWith('password', 'x');
   });
 });

@@ -1,8 +1,4 @@
-import {
-  ModalType,
-  ModalSectionCompany,
-  ModalSectionContact,
-} from '../ResumeEditModals.types';
+import { ModalType, ModalSectionCompany, ModalSectionContact } from '../ResumeEditModals.types';
 import { CompanyFormModal, CompanySelectModal } from '../../company';
 import ContactSelectModal from '../../contact/ContactSelectModal';
 import ContactFormModal from '../../contact/ContactFormModal';
@@ -35,7 +31,7 @@ type Props = {
   onContactSaved?: (c: Contact) => void;
 };
 
-const noop = () => { };
+const noop = () => {};
 
 function emptyCompany(): Company {
   return {
@@ -61,7 +57,7 @@ function getCurrentCompanyId(
 }
 const COMPANY_KEYS = ['company', 'recrutingCompany'] as const;
 
-type CompanyKey = typeof COMPANY_KEYS[number];
+type CompanyKey = (typeof COMPANY_KEYS)[number];
 
 function getCurrentContact(
   resume: Resume | null,
@@ -73,7 +69,7 @@ function getCurrentContact(
 }
 const isCompanyKey = (key: string): key is CompanyKey => {
   return (COMPANY_KEYS as readonly string[]).includes(key);
-}
+};
 
 export default function ModalRegistry({
   isOpen,
@@ -133,20 +129,19 @@ export default function ModalRegistry({
       const companyId = getCurrentCompanyId(resume, modalSectionContact) ?? 0;
       const ref = resume?.ref ?? 0;
 
-      const initialContact: Contact =
-        current ?? {
-          contactid: 0,
-          vorname: '',
-          name: '',
-          email: '',
-          anrede: 0,
-          title: '',
-          zusatzname: '',
-          phone: '',
-          mobile: '',
-          company: companyId,
-          ref,
-        };
+      const initialContact: Contact = current ?? {
+        contactid: 0,
+        vorname: '',
+        name: '',
+        email: '',
+        anrede: 0,
+        title: '',
+        zusatzname: '',
+        phone: '',
+        mobile: '',
+        company: companyId,
+        ref,
+      };
 
       return (
         <ContactFormModal
