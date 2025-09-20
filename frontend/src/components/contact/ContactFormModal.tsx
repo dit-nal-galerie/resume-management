@@ -100,6 +100,30 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   className={inputClasses}
                 />
               </FormField>
+              <FormField label={t('common.additionalName')} htmlFor="zusatzname">
+                <input
+                  id="zusatzname"
+                  type="text"
+                  name="zusatzname"
+                  value={contactData.zusatzname}
+                  onChange={handleChange}
+                  className={inputClasses}
+                  placeholder={t('contact.namePlaceholder')}
+                  required
+                />
+              </FormField>
+              <FormField label={t('common.vorname')} htmlFor="vorname">
+                <input
+                  id="vorname"
+                  type="text"
+                  name="vorname"
+                  value={contactData.vorname}
+                  onChange={handleChange}
+                  className={inputClasses}
+                  placeholder={t('contact.namePlaceholder')}
+                  required
+                />
+              </FormField>
 
               <FormField label={t('common.name')} htmlFor="name">
                 <input

@@ -25,7 +25,9 @@
     "search": "search",
     "selectAll": "select all",
     "clear": "none",
-    "noResults": "no results found"
+    "noResults": "no results found",
+    "vorname": "Firstname",
+    "additionalName": "additional name"
   },
   "navigation": {
     "login": "Login",
@@ -208,7 +210,7 @@
     "selectCompanyFirst": "Please select a company first."
   },
   "contact": {
-    "title": "Contacts",
+    "title": "Title",
     "position": "Position",
     "phone": "Phone",
     "email": "Email",

@@ -473,24 +473,30 @@ class ResumeService
    * Speichern/Update eines Resumes (inkl. Companies/Contacts).
    * ref kommt NUR aus JWT.
    */
+  /*
+   * Speichern/Update eines Resumes (inkl. Companies/Contacts).
+   * ref kommt NUR aus JWT.
+   */
   public function updateOrCreateResume(Request $request, Response $response): Response
   {
     $loginid = AuthService::getUserIdFromToken($request);
     if ($loginid === null) {
-      $response
-        ->getBody()
-        ->write(json_encode(['success' => false, 'error' => 'backend.error.auth.unauthorized']));
+      $response->getBody()->write(json_encode([
+        'success' => false,
+        'error' => 'backend.error.auth.unauthorized'
+      ]));
       return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
     $ids = $this->resolveUserIds((int) $loginid);
     if (!$ids) {
-      $response
-        ->getBody()
-        ->write(json_encode(['success' => false, 'error' => 'backend.error.auth.unauthorized']));
+      $response->getBody()->write(json_encode([
+        'success' => false,
+        'error' => 'backend.error.auth.unauthorized'
+      ]));
       return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
-    $userid = $ids['userid']; // resumes.ref
-    $loginid = $ids['loginid']; // companies.ref / contacts.ref
+    $userid = $ids['userid'];   // resumes.ref
+    $loginid = $ids['loginid'];  // companies.ref / contacts.ref
 
     $data = (array) $request->getParsedBody();
 
@@ -500,7 +506,7 @@ class ResumeService
     $contactRecrutingCompany = $data['contactRecrutingCompany'] ?? null;
 
     $position = $data['position'] ?? null;
-    $stateId = isset($data['stateId']) ? (int) $data['stateId'] : 0; // immer Zahl, Default 0
+    $stateId = isset($data['stateId']) ? (int) $data['stateId'] : 0;
     $link = $data['link'] ?? null;
     $comment = $data['comment'] ?? null;
 
@@ -508,82 +514,73 @@ class ResumeService
 
     $this->db->beginTransaction();
     try {
+      // Firmen + Kontakte aktualisieren / anlegen
       $companyId = $this->upsertCompany($company, $loginid);
-      $parentCompanyId = $this->upsertCompany($recrutingCompany, $loginid);
+      $recrutingCompanyId = $this->upsertCompany($recrutingCompany, $loginid);
 
       $contactCompanyId = $this->upsertContact($contactCompany, $companyId, $loginid);
-      $contactParentCompanyId = $this->upsertContact(
-        $contactRecrutingCompany,
-        $parentCompanyId,
-        $loginid,
-      );
+      $contactRecrutingId = $this->upsertContact($contactRecrutingCompany, $recrutingCompanyId, $loginid);
 
       if ($resumeId > 0) {
-        $st = $this->db->prepare('SELECT stateid FROM resumes WHERE resumeId=:id');
-        $st->execute(['id' => $resumeId]);
-        $old = $st->fetch(PDO::FETCH_ASSOC);
-        $oldState = $old !== false ? (int) $old['stateid'] : null;
-
+        // Update
         $sql = "UPDATE resumes
-                        SET ref=:ref, position=:position, stateid=:stateid, link=:link, comment=:comment,
-                            companyId=:companyId, parentCompanyId=:parentCompanyId,
-                            contactCompanyId=:contactCompanyId, contactParentCompanyId=:contactParentCompanyId
-                        WHERE resumeId=:resumeId";
+                       SET position=:position,
+                           link=:link,
+                           comment=:comment,
+                           companyId=:companyId,
+                           parentCompanyId=:recrutingCompanyId,
+                           contactCompanyId=:contactCompanyId,
+                           contactParentCompanyId=:contactRecrutingId
+                     WHERE resumeId=:resumeId AND ref=:userid";
         $st = $this->db->prepare($sql);
         $st->execute([
-          'ref' => $userid,
           'position' => $position,
-          'stateid' => $stateId,
           'link' => $link,
           'comment' => $comment,
           'companyId' => $companyId,
-          'parentCompanyId' => $parentCompanyId,
+          'recrutingCompanyId' => $recrutingCompanyId,
           'contactCompanyId' => $contactCompanyId,
-          'contactParentCompanyId' => $contactParentCompanyId,
+          'contactRecrutingId' => $contactRecrutingId,
           'resumeId' => $resumeId,
+          'userid' => $userid,
         ]);
-
-        if ($oldState === null || $oldState !== $stateId) {
-          $this->insertHistory($resumeId, $stateId, date('Y-m-d'));
-        }
-
-        $this->db->commit();
-        $response->getBody()->write(json_encode(['success' => true, 'resumeId' => $resumeId]));
-        return $response->withHeader('Content-Type', 'application/json');
+      } else {
+        // Insert
+        $sql = "INSERT INTO resumes (ref, position, link, comment, companyId, parentCompanyId, contactCompanyId, contactParentCompanyId, created)
+                         VALUES (:userid, :position, :link, :comment, :companyId, :recrutingCompanyId, :contactCompanyId, :contactRecrutingId, NOW())";
+        $st = $this->db->prepare($sql);
+        $st->execute([
+          'userid' => $userid,
+          'position' => $position,
+          'link' => $link,
+          'comment' => $comment,
+          'companyId' => $companyId,
+          'recrutingCompanyId' => $recrutingCompanyId,
+          'contactCompanyId' => $contactCompanyId,
+          'contactRecrutingId' => $contactRecrutingId,
+        ]);
+        $resumeId = (int) $this->db->lastInsertId();
       }
 
-      $sql = "INSERT INTO resumes
-                    (ref, position, stateid, link, comment, companyId, parentCompanyId, contactCompanyId, contactParentCompanyId)
-                    VALUES
-                    (:ref,:position,:stateid,:link,:comment,:companyId,:parentCompanyId,:contactCompanyId,:contactParentCompanyId)";
-      $st = $this->db->prepare($sql);
-      $st->execute([
-        'ref' => $userid,
-        'position' => $position,
-        'stateid' => $stateId,
-        'link' => $link,
-        'comment' => $comment,
-        'companyId' => $companyId,
-        'parentCompanyId' => $parentCompanyId,
-        'contactCompanyId' => $contactCompanyId,
-        'contactParentCompanyId' => $contactParentCompanyId,
-      ]);
-      $newId = (int) $this->db->lastInsertId();
-
-      $this->insertHistory($newId, $stateId, date('Y-m-d'));
+      // History nur speichern, wenn stateId gesetzt
+      if ($stateId > 0) {
+        $this->insertHistory($resumeId, $stateId, date('Y-m-d H:i:s'));
+      }
 
       $this->db->commit();
-      $response->getBody()->write(json_encode(['success' => true, 'resumeId' => $newId]));
+
+      $response->getBody()->write(json_encode([
+        'success' => true,
+        'resumeId' => $resumeId
+      ]));
       return $response->withHeader('Content-Type', 'application/json');
+
     } catch (PDOException $e) {
       $this->db->rollBack();
-      $response->getBody()->write(
-        json_encode([
-          'success' => false,
-          'error' => 'backend.error.server.serverError',
-          'details' => $e->getMessage(),
-        ]),
-      );
+      $response->getBody()->write(json_encode([
+        'success' => false,
+        'error' => $e->getMessage()
+      ]));
       return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
     }
   }

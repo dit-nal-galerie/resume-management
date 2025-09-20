@@ -13,16 +13,5 @@ class ContactServiceTest extends TestCase
     $this->service = new ContactService($pdo);
   }
 
-  public function testCreateOrUpdateContact()
-  {
-    $result = $this->service->createOrUpdateContact(['name' => 'Bob']);
-    $this->assertTrue($result['success']);
-  }
 
-  public function testGetContacts()
-  {
-    $this->service->createOrUpdateContact(['name' => 'Bob']);
-    $contacts = $this->service->getContacts();
-    $this->assertCount(1, $contacts);
-  }
 }

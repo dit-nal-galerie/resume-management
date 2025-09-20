@@ -197,12 +197,12 @@ export default function ResumeEditForm({
             {t('resumeEdit.backToList')}
           </button>
 
-          <button
+          {process.env.NODE_ENV !== 'production' && <button
             className="rounded-md bg-gray-500 px-4 py-2 text-white hover:bg-gray-700"
             onClick={onView}
           >
             {t('common.view')}
-          </button>
+          </button>}
 
           {resume.resumeId > 0 && onOpenHistory && (
             <button
