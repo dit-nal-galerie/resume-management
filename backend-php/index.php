@@ -26,6 +26,6 @@ $app->options('/{routes:.+}', function ($request, $response) {
 });
 
 // Routen einbinden
-require __DIR__ . ('/src/Routes/api.php')($app);
+    (require __DIR__ . '/src/Routes/api.php')($app);
 
 $app->run();

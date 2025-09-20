@@ -25,7 +25,9 @@
     "search": "suchen",
     "selectAll": "alle auswählen",
     "clear": "keine",
-    "noResults": "keine Ergebnisse gefunden"
+    "noResults": "keine Ergebnisse gefunden",
+    "vorname": "Vorname",
+    "additionalName": "Zusatzname"
   },
   "navigation": {
     "login": "Anmelden",
@@ -151,7 +153,7 @@
     "createNew": "Neue eInfügen"
   },
   "contact": {
-    "title": "Kontakte",
+    "title": "Titel",
     "position": "Position",
     "phone": "Telefon",
     "email": "E-Mail",
