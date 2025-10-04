@@ -1,0 +1,16 @@
+services:
+  test-db:
+    image: mysql:8.0
+    container_name: resume_test_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: resume_test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    ports:
+      - '3307:3306' # Port für PHPUnit-Tests
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-uroot', '-proot']
+      interval: 2s
+      retries: 10
+      timeout: 5s
