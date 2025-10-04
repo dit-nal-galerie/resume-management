@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { updateUserData, createOrUpdateUser, getUserProfile } from '../../services/api';
-import { User } from '../../../interfaces/User';
-import { getCachedAnrede } from '../../utils/storage';
 
 import ProfileForm from './ProfileForm';
-import LoginForm from 'components/login/LoginForm';
-import PageHeader from 'components/ui/PageHeader';
-import { PageId } from 'components/ui/PageId';
+import { getAnrede, getUserProfile, updateUserData } from '../../shared/api/queries';
+import LoginForm from '../login/LoginForm';
+import PageHeader from '../ui/PageHeader';
+import { PageId } from '../ui/PageId';
+import { User } from '../../../../interfaces';
 
 const Profile = () => {
   const checkIsNew = () => {
     const searchParams = new URLSearchParams(location.search);
     const isNew = searchParams.get('isNew');
+
     return isNew === 'true';
   };
   const { t } = useTranslation();
@@ -36,32 +36,34 @@ const Profile = () => {
     mobile: '',
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const anredeData = await getCachedAnrede();
+      const anredeData = await getAnrede();
+
       setAnredeOptions(anredeData);
-      const data = await getUserProfile();
-      setFormData(data);
+      if (!isNew) {
+        const data = await getUserProfile();
+
+        setFormData(data);
+      }
     };
 
     fetchProfile();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name) {
-      newErrors.name = t('validation.required');
+    if (!formData.password) {
+      newErrors.password = t('validation.required');
+    }
+    if (!formData.loginname) {
+      newErrors.loginname = t('validation.required');
     }
 
     if (!formData.email) {
@@ -70,25 +72,36 @@ const Profile = () => {
       newErrors.email = t('validation.email');
     }
 
-    if (!formData.city) {
-      newErrors.city = t('validation.required');
+    if (isNew) {
+      if (formData.password !== formData.password2) {
+        newErrors.password2 = t('profileEdit.passwordsNoMatch');
+      }
+      if (!formData.password2) {
+        newErrors.password2 = t('validation.required');
+      }
+    } else {
+      // if (!formData.name) {
+      //   newErrors.name = t('validation.required');
+      // }
+      // if (!formData.anrede) {
+      //   newErrors.anrede = t('validation.required');
+      // }
+      // if (!formData.city) {
+      //   newErrors.city = t('validation.required');
+      // }
+      // if (!formData.postalCode) {
+      //   newErrors.postalCode = t('validation.required');
+      // }
+      // if (!formData.street) {
+      //   newErrors.street = t('validation.required');
+      // }
+      // if (!formData.houseNumber) {
+      //   newErrors.houseNumber = t('validation.required');
+      // }
     }
 
-    if (!formData.postalCode) {
-      newErrors.postalCode = t('validation.required');
-    }
+    setFormErrors(newErrors); // Fehler speichern!
 
-    if (!formData.street) {
-      newErrors.street = t('validation.required');
-    }
-
-    if (!formData.houseNumber) {
-      newErrors.houseNumber = t('validation.required');
-    }
-    if (!formData.password) {
-      newErrors.password = t('validation.required');
-    }
-    setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -103,16 +116,10 @@ const Profile = () => {
 
     try {
       setIsLoading(true);
-      if (!isNew) {
-        await updateUserData(formData);
-      } else {
-        await createOrUpdateUser(formData);
-      }
+      // console.log('formData', JSON.stringify(formData));
+      formData.isNew = isNew;
+      await updateUserData(formData);
 
-      setIsLoading(true);
-      const result = await updateUserData(formData);
-      console.log('Profile updated:', result);
-      setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
         if (!isNew) {
@@ -123,6 +130,7 @@ const Profile = () => {
       }, 3000);
     } catch (error) {
       setServerError(t('common.serverError'));
+      console.error('Error saving profile:', error);
     } finally {
       setIsLoading(false);
     }
@@ -138,6 +146,7 @@ const Profile = () => {
   const pageTitle = !isNew
     ? `${t('profile.title')} ${t('common.edit')}`
     : t('profileEdit.create_profile');
+
   return (
     <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
       <PageHeader pageTitle={pageTitle} pageId={PageId.Profile} />
@@ -162,11 +171,13 @@ const Profile = () => {
             onChange={handleFieldChange}
             readonlyLoginname={!isNew}
             showPassword2={isNew}
+            errors={formErrors}
           />
           <ProfileForm
             formData={formData}
             anredeOptions={anredeOptions}
             onChange={handleFieldChange}
+            errors={formErrors}
           />
 
           <div className="mt-6 flex justify-between">
@@ -181,8 +192,9 @@ const Profile = () => {
 
             <button
               type="submit"
-              className={`rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${isLoading ? 'cursor-not-allowed opacity-70' : ''
-                }`}
+              className={`rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                isLoading ? 'cursor-not-allowed opacity-70' : ''
+              }`}
               disabled={isLoading}
             >
               {isLoading ? t('common.loading') : t('common.save')}

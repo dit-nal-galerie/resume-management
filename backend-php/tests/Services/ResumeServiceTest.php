@@ -6,22 +6,9 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class ResumeServiceTest extends TestCase
 {
-<<<<<<< HEAD
-    private $service;
-=======
   private $dbMock;
   private $resumeService;
->>>>>>> stash
 
-<<<<<<< HEAD
-    protected function setUp(): void
-    {
-        $pdo = new PDO('sqlite::memory:');
-        $pdo->exec("CREATE TABLE resumes (resumeId INTEGER PRIMARY KEY, title TEXT)");
-        $pdo->exec("INSERT INTO resumes (resumeId,title) VALUES (1,'Test Resume')");
-        $this->service = new ResumeService($pdo);
-    }
-=======
   protected function setUp(): void
   {
     // Erstellen Sie einen Mock für das PDO-Objekt
@@ -30,15 +17,7 @@ class ResumeServiceTest extends TestCase
     // Erstellen Sie eine Instanz des Service mit dem Mock
     $this->resumeService = new ResumeService($this->dbMock);
   }
->>>>>>> stash
 
-<<<<<<< HEAD
-    public function testGetResumes()
-    {
-        $resumes = $this->service->getResumesWithUsers();
-        $this->assertCount(1, $resumes);
-    }
-=======
   public function testUpdateOrCreateResume_insertsNewRecordSuccessfully()
   {
     // Mocking der auth-Funktion
@@ -51,17 +30,7 @@ class ResumeServiceTest extends TestCase
       ],
       'stateId' => 1
     ]);
->>>>>>> stash
 
-<<<<<<< HEAD
-    public function testCreateOrUpdateResume()
-    {
-        $data = ['resumeId' => 2, 'title' => 'New'];
-        $result = $this->service->updateOrCreateResume($data);
-        $this->assertTrue($result['success']);
-    }
-}
-=======
     // Mocking der resolveUserIds-Methode
     $stmtUserMock = $this->createMock(PDOStatement::class);
     $stmtUserMock->method('fetch')->willReturn([
@@ -111,4 +80,3 @@ class ResumeServiceTest extends TestCase
     $this->assertStringContainsString('{"success":true,"resumeId":10}', (string) $result->getBody());
   }
 }
->>>>>>> stash

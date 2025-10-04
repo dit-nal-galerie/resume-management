@@ -20,7 +20,14 @@
     "sending": "Senden…",
     "processing": "Wird verarbeitet…",
     "pleaseWait": "Bitte warten…",
-    "remove": "Löschen"
+    "remove": "Löschen",
+    "update": "Aktualisieren",
+    "search": "suchen",
+    "selectAll": "alle auswählen",
+    "clear": "keine",
+    "noResults": "keine Ergebnisse gefunden",
+    "vorname": "Vorname",
+    "additionalName": "Zusatzname"
   },
   "navigation": {
     "login": "Anmelden",
@@ -68,7 +75,8 @@
     "usernamePlaceholder": "Benutzername eingeben",
     "emailPlaceholder": "E-Mail-Adresse eingeben",
     "newPasswordPlaceholder": "Neues Passwort eingeben",
-    "confirmPasswordPlaceholder": "Passwort bestätigen"
+    "confirmPasswordPlaceholder": "Passwort bestätigen",
+    "passwordsDontMatch": "Die Passwörter sind nicht identisch."
   },
   "profile": {
     "title": "Profil",
@@ -83,7 +91,8 @@
     "street": "Straße",
     "houseNumber": "Hausnummer",
     "saveSuccess": "Profil erfolgreich gespeichert",
-    "saveError": "Fehler beim Speichern des Profils"
+    "saveError": "Fehler beim Speichern des Profils",
+    "emailRequired": "Bitte geben Sie Ihren Email ein"
   },
   "resume": {
     "list": {
@@ -144,7 +153,7 @@
     "createNew": "Neue eInfügen"
   },
   "contact": {
-    "title": "Kontakte",
+    "title": "Titel",
     "position": "Position",
     "phone": "Telefon",
     "email": "E-Mail",
@@ -200,7 +209,9 @@
     "viewEdit": "Anschauen/Ändern",
     "changeStatus": "Status ändern",
     "history": "Historie",
-    "loadError": "Fehler beim Laden der Bewerbungen"
+    "loadError": "Fehler beim Laden der Bewerbungen",
+    "filterHint": "Mehrfachauswahl",
+    "filterPlaceholder": "alle Statuse"
   },
   "statusModal": {
     "selectDate": "Bitte ein Datum wählen",

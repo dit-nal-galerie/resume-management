@@ -19,6 +19,7 @@ function loadConfig(): Config {
   try {
     const configFile = fs.readFileSync(configPath, 'utf-8');
     const config: Config = JSON.parse(configFile);
+
     return config;
   } catch (error) {
     console.error(`Ошибка загрузки конфигурации для окружения "${env}":`, error);
@@ -28,6 +29,7 @@ function loadConfig(): Config {
 
 // Экспорт конфигурации
 const config = loadConfig();
+
 console.log('Конфигурация загружена:', config);
 
 export default config;

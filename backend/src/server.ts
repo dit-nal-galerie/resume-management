@@ -2,10 +2,10 @@ import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors'; // Importiere CORS
 import ResumeManagementAPI from './resumeManagementAPI'; // Importiere die API-Klasse
-import { getUserAnredeAndName } from './services';
 import config from './config/config';
 import cookieParser from 'cookie-parser';
 import { logout } from './services/logoutService';
+
 export const app = express();
 
 app.use(cookieParser());
@@ -28,6 +28,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Erstelle eine Instanz der API-Klasse
 const api = new ResumeManagementAPI();
+
 app.get('/meanrede', (req, res) => api.getUserAnredeAndName(req, res));
 app.get('/me', (req, res) => api.getUserProfile(req, res));
 // Definiere die Routen

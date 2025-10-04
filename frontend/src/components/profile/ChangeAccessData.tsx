@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { User } from '../../../interfaces/User';
+
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-import { getUserProfile, updateAccessData } from 'services/api';
 import { FormField, inputClasses } from '../ui/FormField';
-import PageHeader from 'components/ui/PageHeader';
-import { PageId } from 'components/ui/PageId';
+import { getUserProfile, updateAccessData } from '../../shared/api/queries';
+import PageHeader from '../ui/PageHeader';
+import { PageId } from '../ui/PageId';
+import { User } from '../../../../interfaces';
 
 const ChangeAccessData: React.FC = () => {
   const { t } = useTranslation();
@@ -59,22 +59,26 @@ const ChangeAccessData: React.FC = () => {
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
+
     if (!formData.loginname) newErrors.loginname = t('login.usernameRequired');
     if (!formData.email) newErrors.email = t('profile.emailRequired');
     if (!formData.oldPassword) newErrors.oldPassword = t('login.passwordRequired');
     if (formData.changePassword) {
-      if (!formData.password) newErrors.password = t('passwordReset.newPasswordRequired');
+      if (!formData.password) newErrors.password = t('login.passwordRequired');
       if (!formData.password2) newErrors.password2 = t('passwordReset.confirmPasswordRequired');
-      if (formData.password !== formData.password2) newErrors.password2 = t('passwordReset.passwordsDontMatch');
+      if (formData.password !== formData.password2)
+        newErrors.password2 = t('passwordReset.passwordsDontMatch');
     }
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = async () => {
     if (!validate()) return;
     try {
-      const response = await updateAccessData({ ...formData, userId: 0 });
+      const response = await updateAccessData({ ...formData });
+
       if (response.success) {
         localStorage.setItem('user', JSON.stringify(response.user));
         alert(t('profile.saveSuccess'));
@@ -94,7 +98,14 @@ const ChangeAccessData: React.FC = () => {
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
           {/* Loginname */}
-          <FormField label={<>{t('login.username')} {requiredMark}</>} htmlFor="loginname">
+          <FormField
+            label={
+              <>
+                {t('login.username')} {requiredMark}
+              </>
+            }
+            htmlFor="loginname"
+          >
             <input
               id="loginname"
               type="text"
@@ -104,11 +115,18 @@ const ChangeAccessData: React.FC = () => {
               placeholder={t('login.usernamePlaceholder')}
               required
             />
-            {errors.loginname && <div className="text-red-600 text-sm">{errors.loginname}</div>}
+            {errors.loginname && <div className="text-sm text-red-600">{errors.loginname}</div>}
           </FormField>
 
           {/* E-Mail */}
-          <FormField label={<>{t('profile.email')} {requiredMark}</>} htmlFor="email">
+          <FormField
+            label={
+              <>
+                {t('profile.email')} {requiredMark}
+              </>
+            }
+            htmlFor="email"
+          >
             <input
               id="email"
               type="email"
@@ -118,9 +136,29 @@ const ChangeAccessData: React.FC = () => {
               placeholder={t('profile.email')}
               required
             />
-            {errors.email && <div className="text-red-600 text-sm">{errors.email}</div>}
+            {errors.email && <div className="text-sm text-red-600">{errors.email}</div>}
           </FormField>
-
+          {/* Altes Passwort / Passwort */}
+          <FormField
+            label={
+              <>
+                {t('login.password')}
+                {requiredMark}
+              </>
+            }
+            htmlFor="oldPassword"
+          >
+            <input
+              id="oldPassword"
+              type="password"
+              value={formData.oldPassword}
+              onChange={(e) => handleFieldChange('oldPassword', e.target.value)}
+              className={inputClasses + (errors.oldPassword ? ' border-red-500' : '')}
+              placeholder={t('login.passwordPlaceholder')}
+              required
+            />
+            {errors.oldPassword && <div className="text-sm text-red-600">{errors.oldPassword}</div>}
+          </FormField>
           {/* Checkbox Passwort ändern */}
           <div className="flex items-center space-x-2">
             <input
@@ -137,7 +175,14 @@ const ChangeAccessData: React.FC = () => {
           {/* Neue Passwörter nur wenn gecheckt */}
           {formData.changePassword && (
             <>
-              <FormField label={<>{t('passwordReset.newPassword')} {requiredMark}</>} htmlFor="password">
+              <FormField
+                label={
+                  <>
+                    {t('passwordReset.newPassword')} {requiredMark}
+                  </>
+                }
+                htmlFor="password"
+              >
                 <input
                   id="password"
                   type="password"
@@ -147,9 +192,16 @@ const ChangeAccessData: React.FC = () => {
                   placeholder={t('passwordReset.newPasswordPlaceholder')}
                   required
                 />
-                {errors.password && <div className="text-red-600 text-sm">{errors.password}</div>}
+                {errors.password && <div className="text-sm text-red-600">{errors.password}</div>}
               </FormField>
-              <FormField label={<>{t('passwordReset.confirmPassword')} {requiredMark}</>} htmlFor="password2">
+              <FormField
+                label={
+                  <>
+                    {t('passwordReset.confirmPassword')} {requiredMark}
+                  </>
+                }
+                htmlFor="password2"
+              >
                 <input
                   id="password2"
                   type="password"
@@ -159,39 +211,10 @@ const ChangeAccessData: React.FC = () => {
                   placeholder={t('passwordReset.confirmPasswordPlaceholder')}
                   required
                 />
-                {errors.password2 && <div className="text-red-600 text-sm">{errors.password2}</div>}
+                {errors.password2 && <div className="text-sm text-red-600">{errors.password2}</div>}
               </FormField>
             </>
           )}
-
-          {/* Altes Passwort / Passwort */}
-          <FormField
-            label={
-              <>
-                {formData.changePassword
-                  ? t('passwordReset.newPassword')
-                  : t('login.password')}
-                {' '}
-                {requiredMark}
-              </>
-            }
-            htmlFor="oldPassword"
-          >
-            <input
-              id="oldPassword"
-              type="password"
-              value={formData.oldPassword}
-              onChange={(e) => handleFieldChange('oldPassword', e.target.value)}
-              className={inputClasses + (errors.oldPassword ? ' border-red-500' : '')}
-              placeholder={
-                formData.changePassword
-                  ? t('passwordReset.newPasswordPlaceholder')
-                  : t('login.passwordPlaceholder')
-              }
-              required
-            />
-            {errors.oldPassword && <div className="text-red-600 text-sm">{errors.oldPassword}</div>}
-          </FormField>
 
           {/* Submit */}
           <div className="flex justify-between pt-4">
@@ -213,5 +236,6 @@ const ChangeAccessData: React.FC = () => {
       </div>
     </div>
   );
-}
+};
+
 export default ChangeAccessData;

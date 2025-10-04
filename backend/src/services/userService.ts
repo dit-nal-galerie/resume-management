@@ -7,9 +7,11 @@ import jwt from 'jsonwebtoken';
 // Middleware: User aus JWT holen (z.B. req.user.loginid)
 export const getUserIdFromToken = (req: Request): number | null => {
   const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+
   if (!token) return null;
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dein_geheimes_jwt_secret') as any;
+
     return decoded.loginid;
   } catch {
     return null;
@@ -21,6 +23,7 @@ export const getUserAnredeAndName = (db: Connection, req: Request, res: Response
 
   if (!loginid) {
     res.status(401).json({ message: 'backend.error.auth.unauthorized' });
+
     return;
   }
 
@@ -30,14 +33,18 @@ export const getUserAnredeAndName = (db: Connection, req: Request, res: Response
     LEFT JOIN anrede a ON u.anrede = a.id
     WHERE u.loginid = ?
   `;
+
   db.query(query, [loginid], (err, results) => {
     if (err) {
       res.status(500).json({ message: 'backend.error.server.serverError' });
+
       return;
     }
     const rowResults = results as RowDataPacket[];
+
     if (!rowResults.length) {
       res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
+
       return;
     }
     res.json(rowResults[0]);
@@ -45,21 +52,27 @@ export const getUserAnredeAndName = (db: Connection, req: Request, res: Response
 };
 export const getUserProfile = (db: Connection, req: Request, res: Response): void => {
   const loginid = getUserIdFromToken(req);
+
   if (!loginid) {
     res.status(401).json({ message: 'backend.error.auth.unauthorized' });
+
     return;
   }
 
   const query =
     ' SELECT u.*, a.loginname FROM users u JOIN authentification a ON u.loginid = a.id WHERE u.loginid = ?';
+
   db.query(query, [loginid], (err, results) => {
     if (err) {
       res.status(500).json({ message: 'backend.error.server.serverError' });
+
       return;
     }
     const rowResults = results as RowDataPacket[];
+
     if (!rowResults.length) {
       res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
+
       return;
     }
     res.json(rowResults[0]);
@@ -73,6 +86,7 @@ export const createAccount = async (
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const query = 'INSERT INTO authentification (loginname, password) VALUES (?, ?)';
+
     return new Promise((resolve, reject) => {
       db.query(query, [loginname, hashedPassword], (err, result) => {
         if (err) {
@@ -80,12 +94,14 @@ export const createAccount = async (
         } else {
           // Cast result to OkPacket to access insertId
           const okPacket = result as OkPacket;
+
           resolve(okPacket.insertId);
         }
       });
     });
   } catch (error) {
     console.error('Error hashing password:', error);
+
     return null;
   }
 };
@@ -98,6 +114,7 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
     if (err) {
       console.error('Fehler beim Abrufen der Login-Daten:', err);
       res.status(500).send('backend.error.server.serverError');
+
       return;
     }
 
@@ -105,6 +122,7 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
 
     if (authRows.length === 0) {
       res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
+
       return;
     }
 
@@ -113,6 +131,7 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
 
     if (!isPasswordValid) {
       res.status(401).json({ message: 'backend.error.auth.wrongPassword' });
+
       return;
     }
 
@@ -129,6 +148,7 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
       if (userErr) {
         console.error('Fehler beim Abrufen der Benutzerinformationen:', userErr);
         res.status(500).send('backend.error.server.loadingUserDataError');
+
         return;
       }
 
@@ -136,6 +156,7 @@ export const login = async (db: Connection, req: Request, res: Response): Promis
 
       if (userRows.length === 0) {
         res.status(404).json({ message: 'backend.error.notFound.userInfoNotFound' });
+
         return;
       }
 
@@ -175,6 +196,7 @@ export const getAnrede = (db: Connection, req: Request, res: Response): void => 
     if (err) {
       console.error('Fehler beim Abrufen der Anrede:', err);
       res.status(500).send('backend.error.server.serverError');
+
       return;
     }
 
@@ -187,13 +209,15 @@ export const changeAccessData = async (db: Pool, req: Request, res: Response): P
   const { userId, loginname, email, oldPassword, password, password2, changePassword } = req.body;
 
   if (!userId || !loginname || !email || !oldPassword) {
-    res.status(400).json({ message: 'backend.error.validation.missingFields' });
+    res.status(400).json({ error: 'backend.error.validation.missingFields' });
     console.log('Fehlende Pflichtfelder:', { userId, loginname, email, oldPassword });
+
     return;
   }
   if (changePassword && (!password || !password2)) {
-    res.status(400).json({ message: 'backend.error.validation.missingFields' });
+    res.status(400).json({ error: 'backend.error.validation.missingFields' });
     console.log('Fehlende Pflichtfelder:', { changePassword, password, password2, oldPassword });
+
     return;
   }
   try {
@@ -208,6 +232,7 @@ export const changeAccessData = async (db: Pool, req: Request, res: Response): P
 
     if (!userRows || userRows.length === 0) {
       res.status(404).json({ message: 'backend.error.notFound.userNotFound' });
+
       return;
     }
 
@@ -215,8 +240,10 @@ export const changeAccessData = async (db: Pool, req: Request, res: Response): P
 
     // 2. Altes Passwort prüfen
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+
     if (!passwordMatch) {
       res.status(401).json({ message: 'backend.error.auth.oldPasswordWrong' });
+
       return;
     }
 
@@ -225,16 +252,20 @@ export const changeAccessData = async (db: Pool, req: Request, res: Response): P
       email,
       userId,
     ]);
+
     if (emailRows.length > 0) {
       res.status(409).json({ message: 'backend.error.conflict.emailTaken' });
+
       return;
     }
 
     // 4. Neues Passwort hash vorbereiten (nur wenn gewünscht)
     let newPasswordHash = user.password;
+
     if (changePassword) {
       if (!password || !password2 || password !== password2) {
         res.status(400).json({ message: 'backend.error.validation.passwordMismatch' });
+
         return;
       }
       newPasswordHash = await bcrypt.hash(password, 10);
@@ -273,7 +304,7 @@ export async function getPasswordForLoginId(
   db: Connection,
   loginid: number
 ): Promise<string | null> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     db.query(
       'SELECT password FROM authentification WHERE id = ?',
       [loginid],
@@ -308,6 +339,7 @@ export async function createAuthEntry(
   password: string
 ): Promise<number> {
   const hash = await bcrypt.hash(password, 10);
+
   return new Promise((resolve, reject) => {
     db.query(
       `INSERT INTO authentification (loginname, password) VALUES (?, ?)`,
@@ -344,6 +376,7 @@ export const createOrUpdateUser = async (
   // Neu: Pflichtfelder
   if (!email || (!loginid && (!loginname || !password))) {
     res.status(400).send('backend.error.validation.missingRequiredFields');
+
     return;
   }
 
@@ -353,20 +386,26 @@ export const createOrUpdateUser = async (
 
       // 1. Passwort prüfen
       const hashed = await getPasswordForLoginId(db, loginid);
+
       if (!hashed) {
         res.status(404).send('backend.error.auth.authNotFound');
+
         return;
       }
       const match = await bcrypt.compare(password, hashed);
+
       if (!match) {
         res.status(401).send('backend.error.auth.wrongPassword');
+
         return;
       }
 
       // 2. Prüfen, ob E-Mail bei anderem Benutzer vergeben ist
       const emailInUse = await emailExistsForOtherUser(db, email, loginid);
+
       if (emailInUse) {
         res.status(409).send('backend.error.conflict.emailTaken');
+
         return;
       }
 
@@ -379,13 +418,13 @@ export const createOrUpdateUser = async (
         [name, email, anrede, city, street, houseNumber, postalCode, phone, mobile, loginid],
         (err) => {
           if (err) {
-            console.log(
-              `UPDATE users SET 
-          name = ?, email = ?, anrede = ?, city = ?, street = ?, 
-          houseNumber = ?, postalCode = ?, phone = ?, mobile = ?
-         WHERE loginid = ?`,
-              [name, email, anrede, city, street, houseNumber, postalCode, phone, mobile, loginid]
-            );
+            //     console.log(
+            //       `UPDATE users SET
+            //   name = ?, email = ?, anrede = ?, city = ?, street = ?,
+            //   houseNumber = ?, postalCode = ?, phone = ?, mobile = ?
+            //  WHERE loginid = ?`,
+            //       [name, email, anrede, city, street, houseNumber, postalCode, phone, mobile, loginid]
+            //     );
             return res.status(500).send('backend.error.server.updateError');
           }
           res.send('backend.success.user.dataUpdated');
@@ -409,6 +448,7 @@ export const createOrUpdateUser = async (
 
           try {
             const newLoginId = await createAuthEntry(db, loginname, password);
+
             db.query(
               `INSERT INTO users (loginid, name, email, anrede, city, street, houseNumber, postalCode, phone, mobile)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,

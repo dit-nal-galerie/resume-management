@@ -3,7 +3,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AboutModal } from '../AboutModal';
 import '@testing-library/jest-dom';
-import { Dialog } from '@headlessui/react';
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -19,6 +18,7 @@ describe('AboutModal', () => {
 
   it('rendered nicht wenn geschlossen', () => {
     const { container } = render(<AboutModal isOpen={false} onClose={() => {}} />);
+
     expect(container).toBeEmptyDOMElement();
   });
 });

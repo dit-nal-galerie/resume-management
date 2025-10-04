@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useTranslation } from 'react-i18next';
-import { FormField, inputClasses } from '../ui/FormField';
-import { requestPasswordReset } from 'services/api';
+import { FormField } from '../ui/FormField';
+import { requestPasswordReset } from '../../shared/api/queries';
 
 const RequestPasswordReset: React.FC = () => {
   const { t } = useTranslation();
@@ -37,12 +37,14 @@ const RequestPasswordReset: React.FC = () => {
     }
     if (hasErrors) {
       setErrors(newErrors);
+
       return;
     }
 
     try {
       setIsLoading(true);
-      const result = await requestPasswordReset(loginname, email);
+      const result = await requestPasswordReset(email, loginname);
+
       if (result.success) {
         setIsSuccess(true);
       } else {
@@ -50,6 +52,7 @@ const RequestPasswordReset: React.FC = () => {
       }
     } catch (error) {
       setServerError(t('common.serverError'));
+      console.error('Password reset request failed:', error);
     } finally {
       setIsLoading(false);
     }

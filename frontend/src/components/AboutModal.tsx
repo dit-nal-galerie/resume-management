@@ -13,6 +13,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
   // Hilfsfunktion für Array-Übersetzungen
   const getArray = (key: string) => {
     const arr = t(key, { returnObjects: true });
+
     return Array.isArray(arr) ? (arr as string[]) : [];
   };
 

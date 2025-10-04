@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import { Connection, Pool, OkPacket, RowDataPacket } from 'mysql2/promise';
+import { Pool, OkPacket, RowDataPacket } from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import config from '../config/config';
-// import { PasswordResetValidation, PasswordResetResponse } from '../../../interfaces/PasswordReset';
 
 // Конфигурация для токенов восстановления пароля
 const TOKEN_LENGTH = 32; // Длина токена
@@ -106,6 +105,7 @@ export const validateToken = async (pool: Pool, token: string): Promise<boolean>
     return rows.length > 0;
   } catch (error) {
     console.error('Ошибка при проверке токена:', error);
+
     return false;
   }
 };
@@ -159,6 +159,7 @@ export const sendPasswordResetEmail = async (to: string, token: string): Promise
       console.warn(
         'Email-Konfiguration fehlt. E-Mails zum Zurücksetzen des Passworts werden nicht gesendet.'
       );
+
       return false;
     }
 
@@ -194,6 +195,7 @@ export const sendPasswordResetEmail = async (to: string, token: string): Promise
 
     // Отправка email
     const info = await transporter.sendMail(mailOptions);
+
     console.log('Email gesendet:', info.messageId);
     // Для тестирования - выводим URL для просмотра письма
     if (EMAIL_CONFIG.host === 'smtp.ethereal.email') {
@@ -206,6 +208,7 @@ export const sendPasswordResetEmail = async (to: string, token: string): Promise
     return true;
   } catch (error) {
     console.error('Fehler beim Senden der E-Mail:', error);
+
     return false;
   }
 };
@@ -230,6 +233,7 @@ export const requestPasswordReset = async (
         success: false,
         error: 'backend.error.validation.missingFields',
       });
+
       return;
     }
 
@@ -250,6 +254,7 @@ export const requestPasswordReset = async (
         success: true,
         message: 'backend.success.passwordReset.emailSent',
       });
+
       return;
     }
 
@@ -262,6 +267,7 @@ export const requestPasswordReset = async (
     if (!emailSent) {
       console.warn('E-Mail konnte nicht gesendet werden, aber Token wurde erstellt');
       const resetLink = `${config.RESET_PASSWORD_URL}?token=${token}`;
+
       console.log('Ссылка для восстановления пароля:', resetLink);
     }
 
@@ -298,6 +304,7 @@ export const checkPasswordResetToken = async (
         success: false,
         error: 'backend.error.validation.missingToken',
       });
+
       return;
     }
 
@@ -309,6 +316,7 @@ export const checkPasswordResetToken = async (
         success: false,
         error: 'backend.error.validation.invalidToken',
       });
+
       return;
     }
 
@@ -342,6 +350,7 @@ export const resetPassword = async (pool: Pool, req: Request, res: Response): Pr
         success: false,
         error: 'backend.error.validation.missingTokenOrPassword',
       });
+
       return;
     }
 
@@ -351,6 +360,7 @@ export const resetPassword = async (pool: Pool, req: Request, res: Response): Pr
         success: false,
         error: 'backend.error.validation.passwordTooShort',
       });
+
       return;
     }
 
@@ -362,6 +372,7 @@ export const resetPassword = async (pool: Pool, req: Request, res: Response): Pr
         success: false,
         error: 'backend.error.validation.invalidToken',
       });
+
       return;
     }
 
@@ -373,11 +384,13 @@ export const resetPassword = async (pool: Pool, req: Request, res: Response): Pr
       'SELECT user_id FROM password_reset_tokens WHERE token = ?',
       [token]
     );
+
     if (!rows.length) {
       res.status(404).json({
         success: false,
         error: 'backend.error.notFound.userNotFound',
       });
+
       return;
     }
     const userId = rows[0].user_id;
@@ -393,6 +406,7 @@ export const resetPassword = async (pool: Pool, req: Request, res: Response): Pr
         success: false,
         error: 'backend.error.notFound.userNotFound',
       });
+
       return;
     }
 

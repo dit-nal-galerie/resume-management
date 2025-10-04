@@ -8,21 +8,21 @@ use App\Config\DB;
 
 class HistoryController
 {
-    private HistoryService $service;
+  private HistoryService $service;
 
-    public function __construct()
-    {
-        $pdo = DB::connect();
-        $this->service = new HistoryService($pdo);
-    }
+  public function __construct()
+  {
+    $pdo = DB::connect();
+    $this->service = new HistoryService($pdo);
+  }
 
-    public function addHistory(Request $request, Response $response): Response
-    {
-        return $this->service->addHistory($request, $response);
-    }
+  public function addHistory(Request $request, Response $response): Response
+  {
+    return $this->service->addHistory($request, $response);
+  }
 
-    public function getHistoryByResume(Request $request, Response $response): Response
-    {
-        return $this->service->getHistoryByResume($request, $response);
-    }
+  public function getHistoryByResume(Request $request, Response $response): Response
+  {
+    return $this->service->getHistoryByResume($request, $response);
+  }
 }

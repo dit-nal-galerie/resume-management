@@ -76,6 +76,7 @@ describe('resumeManagementAPI', () => {
           contactParentCompany_Id: null,
         },
       ];
+
       (db as Pool).getConnection = jest.fn().mockResolvedValue(connection);
       (connection.query as jest.Mock).mockResolvedValue([mockResult]);
 

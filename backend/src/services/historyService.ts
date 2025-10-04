@@ -9,14 +9,17 @@ export const addHistory = (db: Connection, req: Request, res: Response): void =>
 
   if (!resume_id || !description) {
     res.status(400).send('backend.error.validation.missingFields');
+
     return;
   }
 
   const query = 'INSERT INTO history (resume_id, description) VALUES (?, ?)';
+
   db.query(query, [resume_id, description], (err) => {
     if (err) {
       console.error('Fehler beim Hinzufügen der Historie:', err);
       res.status(500).send('backend.error.server.historyAddError');
+
       return;
     }
 
@@ -30,6 +33,7 @@ export const getHistoryByResumeId = (db: Connection, req: Request, res: Response
 
   if (!resumeId || !loginid) {
     res.status(400).json({ message: 'backend.error.validation.missingFields' });
+
     return;
   }
 
@@ -41,11 +45,13 @@ export const getHistoryByResumeId = (db: Connection, req: Request, res: Response
     if (err) {
       console.error('Fehler beim Prüfen der Bewerbung:', err);
       res.status(500).json({ message: 'backend.error.server.serverError' });
+
       return;
     }
 
     if (!Array.isArray(validationResult) || validationResult.length === 0) {
       res.status(403).json({ message: 'backend.error.auth.noPermission' });
+
       return;
     }
 
@@ -56,10 +62,12 @@ export const getHistoryByResumeId = (db: Connection, req: Request, res: Response
       WHERE h.resumeid = ?
       ORDER BY h.date ASC
     `;
+
     db.query(historyQuery, [resumeId], (err, results: RowDataPacket[]) => {
       if (err) {
         console.error('Fehler beim Abrufen der Historie:', err);
         res.status(500).json({ message: 'backend.error.server.serverError' });
+
         return;
       }
 

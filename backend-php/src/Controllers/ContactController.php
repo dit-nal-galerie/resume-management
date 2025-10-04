@@ -8,25 +8,25 @@ use App\Services\ContactService;
 
 class ContactController
 {
-    private $service;
+  private $service;
 
-    public function __construct()
-    {
-        $db = DB::connect();
-        $this->service = new ContactService($db);
-    }
+  public function __construct()
+  {
+    $db = DB::connect();
+    $this->service = new ContactService($db);
+  }
 
-    public function createOrUpdateContact(Request $request, Response $response): Response
-    {
-        $data = $request->getParsedBody();
-        $result = $this->service->createOrUpdateContact($data, $response);
-        $response->getBody()->write(json_encode($result));
-        return $response->withHeader('Content-Type', 'application/json');
-    }
+  public function createOrUpdateContact(Request $request, Response $response): Response
+  {
+    $data = $request->getParsedBody();
+    $result = $this->service->createOrUpdateContact($data, $response);
+    $response->getBody()->write(json_encode($result));
+    return $response->withHeader('Content-Type', 'application/json');
+  }
 
-    public function getContacts(Request $request, Response $response, array $args): Response
-    {
-        // WICHTIG: direkt das Response aus dem Service zurückgeben.
-        return $this->service->getContacts($request, $response);
-    }
+  public function getContacts(Request $request, Response $response, array $args): Response
+  {
+    // WICHTIG: direkt das Response aus dem Service zurückgeben.
+    return $this->service->getContacts($request, $response);
+  }
 }

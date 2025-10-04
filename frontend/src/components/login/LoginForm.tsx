@@ -1,7 +1,6 @@
 import React from 'react';
-import { User } from '../../../interfaces/User';
 import { useTranslation } from 'react-i18next';
-import { FormField, inputClasses } from 'components/ui/FormField';
+import { FormField, inputClasses } from '../ui/FormField';
 
 // Wiederverwendbare FormField-Komponente
 
@@ -12,6 +11,7 @@ interface LoginFormProps {
   onChange: (field: 'loginname' | 'password' | 'password2', value: string) => void;
   readonlyLoginname?: boolean;
   showPassword2?: boolean;
+  errors?: Record<string, string>;
 }
 
 // handleFieldChange = (field: keyof User, value: string | number)
@@ -22,11 +22,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onChange,
   readonlyLoginname = false,
   showPassword2 = false,
+  errors,
 }) => {
   const { t } = useTranslation();
+
   return (
     <div className="mx-auto max-w-3xl rounded-xl border border-gray-100 bg-white p-8 shadow-lg">
-      <FormField label={t('profileEdit.loginname')} htmlFor="loginname">
+      <FormField errors={errors} label={t('profileEdit.loginname')} htmlFor="loginname">
         <input
           type="text"
           id="loginname"
@@ -37,7 +39,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           placeholder={t('login.usernamePlaceholder')}
         />
       </FormField>
-      <FormField label={t('login.password')} htmlFor="password">
+      <FormField errors={errors} label={t('login.password')} htmlFor="password">
         <input
           type="password"
           id="password"
@@ -49,7 +51,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         />
       </FormField>
       {showPassword2 && (
-        <FormField label={t('profileEdit.password2')} htmlFor="password2">
+        <FormField errors={errors} label={t('profileEdit.password2')} htmlFor="password2">
           <input
             type="password"
             id="password2"

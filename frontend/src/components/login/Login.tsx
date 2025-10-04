@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../../interfaces/User';
+
 import { useTranslation } from 'react-i18next';
-import { getUserAnredeAndName, login } from 'services/api';
+
 import { FormField } from '../ui/FormField';
-import { PageId } from 'components/ui/PageId';
-import PageHeader from 'components/ui/PageHeader';
-import i18n from 'utils/i18n/i18n';
+import i18n from '../../utils/i18n/i18n';
+import PageHeader from '../ui/PageHeader';
+import { getUserAnredeAndName, login } from '../../shared/api/queries';
+import { PageId } from '../ui/PageId';
+import { User } from '../../../../interfaces';
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
@@ -16,6 +18,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ loginname?: string; password?: string }>({});
   const navigate = useNavigate();
   const loginInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     getUserAnredeAndName()
       .then(goToResume)
@@ -43,17 +46,17 @@ const Login: React.FC = () => {
         loginname: !loginname ? t('login.usernameRequired') : undefined,
         password: !password ? t('login.passwordRequired') : undefined,
       });
+
       return;
     }
 
     try {
-      const userData: User | null = await login(loginname, password);
+      const userData: User | null = await login({ loginname, password });
 
       if (userData) {
         console.log('Login response:', JSON.stringify(userData));
         goToResume();
       } else {
-
         setServerError(t('login.invalidCredentials'));
         setErrors({
           loginname: t('login.checkUsername'),
@@ -63,6 +66,7 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       setServerError(t('common.serverError'));
+      console.log('Login error:', error);
       // loginInputRef.current?.focus();
     }
   };
@@ -70,7 +74,8 @@ const Login: React.FC = () => {
   const handleBlur = () => {
     setErrors({});
   };
-  console.log(i18n)
+
+  console.log(i18n);
 
   return (
     <div className="mx-auto max-w-5xl rounded-lg bg-white p-6 shadow-md">
@@ -83,10 +88,11 @@ const Login: React.FC = () => {
               <input
                 id="loginname"
                 type="text"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.loginname
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
-                  }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                  errors.loginname
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder={t('login.usernamePlaceholder')}
                 value={loginname}
                 onChange={(e) => setLoginname(e.target.value)}
@@ -101,10 +107,11 @@ const Login: React.FC = () => {
               <input
                 id="password"
                 type="password"
-                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${errors.password
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
-                  }`}
+                className={`w-full rounded-md border p-2 focus:outline-none focus:ring-2 ${
+                  errors.password
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500'
+                }`}
                 placeholder={t('login.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

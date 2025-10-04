@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-import { Anrede, Contact } from '../../../../interfaces/Contact';
+import { Anrede, Contact } from '../../../../interfaces';
 import { useTranslation } from 'react-i18next';
 import { FormField, inputClasses } from '../ui/FormField';
-import { getCachedAnrede } from '../../utils/storage';
+import { getAnrede } from '../../shared/api/queries';
 
 type ContactFormModalProps = {
   isOpen: boolean;
   contact: Contact;
   onSave: (contact: Contact) => void;
   onClose: () => void;
-}
+};
 
 const ContactFormModal: React.FC<ContactFormModalProps> = ({
   isOpen,
@@ -25,12 +25,14 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
   useEffect(() => {
     const fetchAnreden = async () => {
       try {
-        const result = await getCachedAnrede();
+        const result = await getAnrede();
+
         setAnreden(result);
       } catch (error) {
         console.error(t('common.error'), error);
       }
     };
+
     fetchAnreden();
   }, []);
 
@@ -42,6 +44,7 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setContactData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -95,6 +98,30 @@ const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   value={contactData.title}
                   onChange={handleChange}
                   className={inputClasses}
+                />
+              </FormField>
+              <FormField label={t('common.additionalName')} htmlFor="zusatzname">
+                <input
+                  id="zusatzname"
+                  type="text"
+                  name="zusatzname"
+                  value={contactData.zusatzname}
+                  onChange={handleChange}
+                  className={inputClasses}
+                  placeholder={t('contact.namePlaceholder')}
+                  required
+                />
+              </FormField>
+              <FormField label={t('common.vorname')} htmlFor="vorname">
+                <input
+                  id="vorname"
+                  type="text"
+                  name="vorname"
+                  value={contactData.vorname}
+                  onChange={handleChange}
+                  className={inputClasses}
+                  placeholder={t('contact.namePlaceholder')}
+                  required
                 />
               </FormField>
 

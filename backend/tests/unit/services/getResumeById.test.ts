@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
+import { Pool, PoolConnection } from 'mysql2/promise';
 import { getResumeById } from '../../../src/services/getResume';
 
 // Mock the console.log and console.error to prevent clutter during tests
@@ -210,6 +210,7 @@ describe('getResumeById', () => {
   test('should return 500 on database error', async () => {
     mockRequest.params = { resumeId: '1' };
     const errorMessage = 'Database connection failed';
+
     (mockConnection.query as jest.Mock).mockRejectedValueOnce(new Error(errorMessage)); // Simulate a DB error
 
     await getResumeById(mockPool, mockRequest as Request, mockResponse as Response);

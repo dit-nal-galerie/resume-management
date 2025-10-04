@@ -22,9 +22,8 @@ export default function ContactSection({
   onRemove,
 }: Props) {
   const { t } = useTranslation();
-
-  const hasCompany = !!companyId;
   const hasContact = !!contact?.contactid;
+  const hasCompany = companyId !== undefined;
 
   return (
     <section className="mb-6 rounded-lg border border-gray-200 p-4">
@@ -85,9 +84,7 @@ export default function ContactSection({
           </div>
         ) : (
           <span className="text-gray-400">
-            {hasCompany
-              ? t('resumeEdit.noContactSelected')
-              : t('resumeEdit.selectCompanyFirst')}
+            {hasCompany ? t('resumeEdit.noContactSelected') : t('resumeEdit.selectCompanyFirst')}
           </span>
         )}
       </div>

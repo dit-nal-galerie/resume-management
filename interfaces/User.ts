@@ -1,4 +1,5 @@
 export interface User {
+  loginid?: number;
   loginname: string;
   password?: string;
   password2?: string;
@@ -11,4 +12,5 @@ export interface User {
   postalCode: string;
   phone?: string;
   mobile?: string;
+  isNew?: boolean;
 }

@@ -3,11 +3,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
-import { AboutModal } from 'components/AboutModal';
+
 import { useNavigate } from 'react-router-dom';
 import { PageId } from './PageId';
-
-import { getUserAnredeAndName, getUserProfile, logout } from '../../services/api';
+import { AboutModal } from '../AboutModal';
+import { getUserAnredeAndName, logout } from '../../shared/api/queries';
 
 interface PageHeaderProps {
   pageTitle: string;
@@ -35,6 +35,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
     if (!storedUser || pageId === PageId.Login) {
       return [];
     }
+
     return [
       pageId !== PageId.ResumeEdit && (
         <MenuItem>
@@ -94,6 +95,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ pageTitle, pageId }) => {
   };
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const dynamischenMenuItems = menuItems(pageId);
+
   return (
     <>
       <div className="sticky top-0 z-10 flex items-center justify-between rounded-lg bg-gray-800 p-4 text-white">

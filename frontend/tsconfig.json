@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext", "es2015"],
-
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -19,14 +18,9 @@
     "types": ["jest", "node"],
     "baseUrl": "src",
     "paths": {
-      "@interfaces/*": ["../../interfaces/*"]
+      "@/*": ["*"]
     }
   },
-
-  "include": [
-    "src",
-    "tests",
-    "../../interfaces/**/*.ts" // Behalten Sie dies, damit TypeScript die Dateien zur Typprüfung findet
-  ],
+  "include": ["src/**/*", "tests/**/*", "../../interfaces/**/*.ts"],
   "exclude": ["node_modules"]
 }
