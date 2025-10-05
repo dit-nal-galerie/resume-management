@@ -2,11 +2,12 @@ name: PHP Integration Tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop, add_test]
   pull_request:
+    branches: [main, develop, add_test]
 
 jobs:
-  php-tests:
+  test:
     runs-on: ubuntu-latest
 
     services:
@@ -23,39 +24,51 @@ jobs:
           --health-cmd="mysqladmin ping -h localhost -uroot -proot"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=3
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Set working directory to backend
+        run: cd backend-php
+
+      - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
-          coverage: none
-          tools: composer
+          php-version: '8.3'
+          extensions: pdo_mysql
+          tools: composer, phpunit
 
       - name: Install dependencies
+        working-directory: backend-php
         run: composer install --no-progress --no-interaction --prefer-dist
 
-      - name: Wait for MySQL
+      - name: Wait for MySQL to be ready
         run: |
-          for i in {1..30}; do
-            if mysql -h127.0.0.1 -P3306 -utest -ptest -e "SELECT 1;" resume_test; then
-              echo "MySQL is ready!"
-              break
-            fi
-            echo "Waiting for MySQL..."
+          echo "Waiting for MySQL..."
+          until mysqladmin ping -h 127.0.0.1 -u root -proot --silent; do
             sleep 2
           done
 
       - name: Run migrations
-        run: |
-          # Beispiel: falls du Phinx verwendest
-          vendor/bin/phinx migrate -e testing
-          # oder für Laravel:
-          # php artisan migrate --env=testing
+        working-directory: backend-php
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: resume_test
+          DB_USERNAME: test
+          DB_PASSWORD: test
+        run: vendor/bin/phinx migrate -e testing
 
-      - name: Run tests
+      - name: Run PHPUnit tests
+        working-directory: backend-php
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: resume_test
+          DB_USERNAME: test
+          DB_PASSWORD: test
         run: vendor/bin/phpunit --configuration phpunit.xml.dist
