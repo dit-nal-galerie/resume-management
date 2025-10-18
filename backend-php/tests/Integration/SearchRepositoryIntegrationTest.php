@@ -6,7 +6,7 @@ class SearchRepositoryIntegrationTest extends TestCase
     protected function setUp(): void
     {
         // Passe DSN an deine Test-DB an 
-        $this->pdo = new PDO('mysql:host=127.0.0.1;dbname=test_resume', 'test', 'test', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $this->pdo = new PDO('mysql:host=127.0.0.1;dbname=resume_test', 'test', 'test', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
         // Transaktion für saubere Tests
         $this->pdo->beginTransaction();
         // Seed-Beispiele 
