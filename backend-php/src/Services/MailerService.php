@@ -60,7 +60,7 @@ class MailerService
       $mail->SMTPAuth = true;
       $mail->Username = $user;
       $mail->Password = $pass;
-
+      $mail->CharSet = 'UTF-8';
       if ($secure === 'ssl') {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
       } elseif ($secure === 'tls' || $secure === 'true') {
