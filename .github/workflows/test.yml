@@ -52,10 +52,11 @@ jobs:
           done
 
       - name: Initialize database schema
+        working-directory: backend-php
         run: |
           echo "⚙️ Creating tables and inserting initial data..."
-          mysql -h127.0.0.1 -uroot -proot < ./backend-php/tests/schema.sql
-        working-directory: ./backend-php
+          # Pfad angepasst: schema.sql liegt direkt unter projekt-root/db/
+          mysql -h127.0.0.1 -uroot -proot < ../db/schema.sql
 
       - name: Run PHPUnit tests
         working-directory: backend-php
