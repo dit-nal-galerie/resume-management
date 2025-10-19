@@ -15,13 +15,11 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: resume_test
-          MYSQL_USER: test
-          MYSQL_PASSWORD: test
+          MYSQL_DATABASE: bewerbungs
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-cmd="mysqladmin ping -h localhost -proot"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
@@ -41,23 +39,23 @@ jobs:
         working-directory: backend-php
         run: composer install --no-progress --no-interaction --prefer-dist
 
-      - name: Wait for MySQL to be ready
+      - name: Wait for MySQL
         run: |
           echo "Waiting for MySQL..."
-          until mysqladmin ping -h 127.0.0.1 -u root -proot --silent; do
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -proot --silent; then
+              echo "✅ MySQL is ready"
+              break
+            fi
+            echo "⏳ Waiting..."
             sleep 2
           done
 
-      - name: Run migrations
-        working-directory: backend-php
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: resume_test
-          DB_USERNAME: test
-          DB_PASSWORD: test
-        run: vendor/bin/phinx migrate -e testing
+      - name: Initialize database schema
+        run: |
+          echo "⚙️ Creating tables and inserting initial data..."
+          mysql -h127.0.0.1 -uroot -proot < ./backend-php/tests/schema.sql
+        working-directory: ./backend-php
 
       - name: Run PHPUnit tests
         working-directory: backend-php
@@ -65,7 +63,7 @@ jobs:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
-          DB_DATABASE: resume_test
-          DB_USERNAME: test
-          DB_PASSWORD: test
+          DB_DATABASE: bewerbungs
+          DB_USERNAME: root
+          DB_PASSWORD: root
         run: vendor/bin/phpunit --configuration phpunit.xml.dist
