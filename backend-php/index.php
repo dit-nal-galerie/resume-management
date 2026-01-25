@@ -13,12 +13,23 @@ use App\Config;
 
 $app = AppFactory::create();
 
-$app->addRoutingMiddleware();
+// 1. Error Middleware: Muss als innerste Schicht (zuletzt hinzugefügt) sein,
+//    um Ausnahmen aller anderen Middlewares und Routen zu fangen.
 $app->addErrorMiddleware(true, true, true);
+
+// 2. Routing Middleware: Bestimmt, welche Route aufgerufen wird.
+$app->addRoutingMiddleware();
+
+// 3. Body Parsing: Liegt zwischen Routing und CORS (z.B. nach Routing) oder davor.
 $app->addBodyParsingMiddleware();
 
-// **NUR DIE EIGENE CORS-MIDDLEWARE EINBINDEN**
+// 4. Eigene CORS-Middleware: Sollte die äußerste Schicht sein (d.h. ZUERST HINZUFÜGEN),
+//    um Preflight-Anfragen (OPTIONS) abzufangen, bevor sie geroutet werden.
+//    Die letzte add()-Anweisung wird ZUERST ausgeführt (LIFO).
+
+// **WICHTIGSTE ÄNDERUNG: CORS ist die erste Middleware, die hinzugefügt wird**
 $app->add(new CorsMiddleware(['https://bewerbungs.itprofi-4u.de', 'http://localhost:3000']));
+
 
 // OPTIONS-Route für Preflight
 $app->options('/{routes:.+}', function ($request, $response) {
@@ -26,6 +37,6 @@ $app->options('/{routes:.+}', function ($request, $response) {
 });
 
 // Routen einbinden
-    (require __DIR__ . '/src/Routes/api.php')($app);
+(require __DIR__ . '/src/Routes/api.php')($app);
 
 $app->run();

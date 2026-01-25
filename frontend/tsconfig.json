@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext", "es2015"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -9,13 +8,14 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler", // <-- moderne Auflösung für Vite & ESM
+    "module": "ESNext", // falls noch "CommonJS" steht
+    "target": "ESNext", // optional: moderne Syntax erlauben
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["jest", "node"],
+    "types": ["jest", "node", "vite/client"],
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]

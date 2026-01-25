@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 type Props = {
   title: string;
   name: string | null;
+  hasContact: boolean;
   onEdit: () => void;
   onSelect: () => void;
   onCreate: () => void;
@@ -13,6 +14,7 @@ type Props = {
 export default function CompanySection({
   title,
   name,
+  hasContact,
   onEdit,
   onSelect,
   onCreate,
@@ -52,13 +54,13 @@ export default function CompanySection({
                 {t('common.edit')}
               </button>
 
-              <button
+              {!hasContact && (<button
                 type="button"
                 className="rounded-md bg-gray-500 px-3 py-1 text-white hover:bg-gray-700"
                 onClick={onRemove}
               >
                 {t('common.remove')}
-              </button>
+              </button>)}
             </>
           )}
         </div>

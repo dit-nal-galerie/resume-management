@@ -1,0 +1,70 @@
+name: PHP Integration Tests
+
+on:
+  push:
+    branches: [main, develop, add_test]
+  pull_request:
+    branches: [main, develop, add_test]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: bewerbungs
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql
+          tools: composer, phpunit
+
+      - name: Install dependencies
+        working-directory: backend-php
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Wait for MySQL
+        run: |
+          echo "Waiting for MySQL..."
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -proot --silent; then
+              echo "✅ MySQL is ready"
+              break
+            fi
+            echo "⏳ Waiting..."
+            sleep 2
+          done
+
+      - name: Initialize database schema
+        working-directory: backend-php
+        run: |
+          echo "⚙️ Creating tables and inserting initial data..."
+          # Pfad angepasst: schema.sql liegt direkt unter projekt-root/db/
+          mysql -h127.0.0.1 -uroot -proot < ../db/schema.sql
+
+      - name: Run PHPUnit tests
+        working-directory: backend-php
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: bewerbungs
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: vendor/bin/phpunit --configuration phpunit.xml.dist

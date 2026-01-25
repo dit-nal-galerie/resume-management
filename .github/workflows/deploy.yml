@@ -1,0 +1,63 @@
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: resume_test
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_mysql
+
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist
+        working-directory: ./backend-php
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -proot --silent; then
+              echo "✅ MySQL is ready"
+              break
+            fi
+            echo "⏳ Waiting for MySQL..."
+            sleep 2
+          done
+
+      - name: Create test user manually
+        run: |
+          mysql -h127.0.0.1 -uroot -proot -e "CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY 'test';"
+          mysql -h127.0.0.1 -uroot -proot -e "GRANT ALL PRIVILEGES ON resume_test.* TO 'test'@'%'; FLUSH PRIVILEGES;"
+
+      - name: Run migrations
+        run: vendor/bin/phinx migrate -e testing
+        working-directory: ./backend-php
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: resume_test
+          DB_USER: root
+          DB_PASS: root
+
+      - name: Run tests
+        run: composer test
+        working-directory: ./backend-php
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: resume_test
+          DB_USER: root
+          DB_PASS: root

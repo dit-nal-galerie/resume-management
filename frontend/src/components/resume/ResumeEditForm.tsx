@@ -142,6 +142,7 @@ export default function ResumeEditForm({
         <CompanySection
           title={t('resumeEdit.recruiter')}
           name={resume.recrutingCompany?.name || null}
+          hasContact={!!resume.contactRecrutingCompany}
           onEdit={() => onOpenEditCompany('recrutingCompany')}
           onSelect={() => onOpenSelectCompany('recrutingCompany')}
           onRemove={() => onRemoveCompany('recrutingCompany')}
@@ -163,6 +164,7 @@ export default function ResumeEditForm({
         <CompanySection
           title={t('resumeEdit.company')}
           name={resume.company?.name || null}
+          hasContact={!!resume.contactCompany}
           onEdit={() => onOpenEditCompany('company')}
           onSelect={() => onOpenSelectCompany('company')}
           onRemove={() => onRemoveCompany('company')}

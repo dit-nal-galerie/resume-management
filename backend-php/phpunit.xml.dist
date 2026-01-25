@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    stopOnFailure="false"
+    verbose="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Standard-Environment-Variablen für Tests -->
+    <php>
+        <!-- App -->
+        <env name="APP_ENV" value="testing"/>
+
+        <!-- Datenbank (gleiche Werte wie in GitHub Actions MySQL-Service) -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="3306"/>
+        <env name="DB_DATABASE" value="resume_test"/>
+        <env name="DB_USERNAME" value="test"/>
+        <env name="DB_PASSWORD" value="test"/>
+
+        <!-- Optional: falls du Phinx nutzt -->
+        <env name="PHINX_ENV" value="testing"/>
+
+        <!-- Optional: Debug -->
+        <env name="LOG_LEVEL" value="debug"/>
+    </php>
+
+    <!-- Coverage optional, kannst du bei Bedarf aktivieren -->
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
+</phpunit>
