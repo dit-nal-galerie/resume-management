@@ -1,5 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
+use App\Repositories\SearchRepository;
+
 class SearchRepositoryIntegrationTest extends TestCase
 {
     private $pdo;
