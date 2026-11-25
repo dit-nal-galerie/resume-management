@@ -2,6 +2,7 @@
 import { addCompany } from '../../../src/services/companyService';
 import { Request, Response } from 'express';
 import { Connection } from 'mysql2';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
 
 describe('companyService', () => {
   let mockReq: Partial<Request>;
@@ -24,7 +25,8 @@ describe('companyService', () => {
 
   describe('addCompany', () => {
     it('should return 400 if required fields are missing', () => {
-      mockReq = { body: {} };
+      // Kein Token → loginid fehlt → Validierung greift
+      mockReq = { body: {}, ...noAuthReq() };
       addCompany(mockDb as Connection, mockReq as Request, mockRes as Response);
       expect(statusMock).toHaveBeenCalledWith(400);
       expect(sendMock).toHaveBeenCalledWith('backend.error.validation.missingFields');
@@ -33,6 +35,7 @@ describe('companyService', () => {
     it('should return 201 on successful insert', () => {
       mockReq = {
         body: { name: 'Test GmbH', adress: 'Berlin', ref: 'XYZ' },
+        headers: authHeaders(42),
       };
       (mockDb.query as jest.Mock).mockImplementation((_query, _values, callback) => callback(null));
       addCompany(mockDb as Connection, mockReq as Request, mockRes as Response);
@@ -43,6 +46,7 @@ describe('companyService', () => {
     it('should return 500 on DB error', () => {
       mockReq = {
         body: { name: 'Test GmbH', adress: 'Berlin', ref: 'XYZ' },
+        headers: authHeaders(42),
       };
       (mockDb.query as jest.Mock).mockImplementation((_query, _values, callback) =>
         callback(new Error('DB Fehler'))

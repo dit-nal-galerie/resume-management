@@ -14,4 +14,11 @@ export default defineConfig({
   },
   reporter: [['list'], ['html', { open: 'never' }]],
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  // Dev-Server selbst starten (wird wiederverwendet, wenn bereits aktiv)
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 60_000,
+  },
 });

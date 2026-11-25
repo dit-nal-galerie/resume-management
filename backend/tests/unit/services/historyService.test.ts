@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { addHistory, getHistoryByResumeId } from '../../../src/services/historyService';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
 
 describe('historyService', () => {
   let mockDb: any;
@@ -43,8 +44,9 @@ describe('historyService', () => {
   });
 
   describe('getHistoryByResumeId', () => {
-    it('should return 400 if resumeId or refId is missing', () => {
-      mockReq = { query: {} };
+    it('should return 400 if resumeId or loginid is missing', () => {
+      // Ohne Token → loginid fehlt (refId kommt nicht mehr aus der Query)
+      mockReq = { query: {}, ...noAuthReq() };
       getHistoryByResumeId(mockDb, mockReq as Request, mockRes as Response);
       expect(mockRes.status).toHaveBeenCalledWith(400);
       expect(mockRes.json).toHaveBeenCalledWith({
@@ -53,7 +55,7 @@ describe('historyService', () => {
     });
 
     it('should return 500 if db error occurs during validation', () => {
-      mockReq = { query: { resumeId: '1', refId: '2' } };
+      mockReq = { query: { resumeId: '1', refId: '2' }, headers: authHeaders(2) };
       mockDb.query.mockImplementationOnce((_q: any, _p: any, cb: any) => cb(new Error('DB error')));
       getHistoryByResumeId(mockDb, mockReq as Request, mockRes as Response);
       expect(mockRes.status).toHaveBeenCalledWith(500);
@@ -61,7 +63,7 @@ describe('historyService', () => {
     });
 
     it('should return 403 if validation fails', () => {
-      mockReq = { query: { resumeId: '1', refId: '2' } };
+      mockReq = { query: { resumeId: '1', refId: '2' }, headers: authHeaders(2) };
       mockDb.query.mockImplementationOnce((_q: any, _p: any, cb: any) => cb(null, []));
       getHistoryByResumeId(mockDb, mockReq as Request, mockRes as Response);
       expect(mockRes.status).toHaveBeenCalledWith(403);
@@ -69,7 +71,7 @@ describe('historyService', () => {
     });
 
     it('should return 500 if db error occurs during history query', () => {
-      mockReq = { query: { resumeId: '1', refId: '2' } };
+      mockReq = { query: { resumeId: '1', refId: '2' }, headers: authHeaders(2) };
       // First call: validation ok
       mockDb.query
         .mockImplementationOnce((_q: any, _p: any, cb: any) => cb(null, [{}]))
@@ -80,7 +82,7 @@ describe('historyService', () => {
     });
 
     it('should return history entries if everything is ok', () => {
-      mockReq = { query: { resumeId: '1', refId: '2' } };
+      mockReq = { query: { resumeId: '1', refId: '2' }, headers: authHeaders(2) };
       const dbRows = [{ date: '2024-01-01', status: 'Gesendet' }];
 
       // First call: validation ok, Second call: history ok

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { updateOrCreateResume } from '../../../src/services/saveResume';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
 
 describe('updateOrCreateResume', () => {
   let mockDbPool: any;
@@ -18,7 +19,7 @@ describe('updateOrCreateResume', () => {
     mockDbPool = {
       getConnection: jest.fn().mockResolvedValue(mockConnection),
     };
-    mockReq = { body: {} };
+    mockReq = { body: {}, ...noAuthReq() };
     mockRes = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -54,6 +55,7 @@ describe('updateOrCreateResume', () => {
       contactCompany: null,
       contactRecrutingCompany: null,
     };
+    mockReq.headers = authHeaders(1); // userId aus dem Token
     // Firmen-Insert
     mockConnection.query
       .mockResolvedValueOnce([{ insertId: 5 }]) // handleCompany (company)
@@ -95,6 +97,7 @@ describe('updateOrCreateResume', () => {
       contactCompany: null,
       contactRecrutingCompany: null,
     };
+    mockReq.headers = authHeaders(1); // userId aus dem Token
     // Firmen-Update
     mockConnection.query
       .mockResolvedValueOnce([{ affectedRows: 1 }]) // handleCompany (company)
@@ -136,6 +139,7 @@ describe('updateOrCreateResume', () => {
       contactCompany: null,
       contactRecrutingCompany: null,
     };
+    mockReq.headers = authHeaders(1); // userId aus dem Token
     mockConnection.query.mockRejectedValueOnce(new Error('DB error'));
     await updateOrCreateResume(mockDbPool, mockReq as Request, mockRes as Response);
     expect(mockConnection.rollback).toHaveBeenCalled();

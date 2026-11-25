@@ -118,6 +118,7 @@ export default [
       '**/postcss.config.{js,cjs,mjs,ts}',
       '**/vite.config.{js,cjs,mjs,ts}',
       '**/*.config.{js,cjs,mjs,ts}',
+      '**/jest.*.{js,cjs,mjs,ts}', // z. B. jest.styleMock.cjs
     ],
     languageOptions: {
       globals: {
@@ -125,6 +126,23 @@ export default [
         require: 'readonly',
         __dirname: 'readonly',
         process: 'readonly',
+      },
+    },
+  },
+
+  // 7b) OpenAI-Scripts (liegen lokal außerhalb des Git-Repositories, Node-Globals nötig)
+  {
+    files: ['openai/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        exports: 'writable',
       },
     },
   },

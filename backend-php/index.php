@@ -9,7 +9,6 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 use App\Middleware\CorsMiddleware;
-use App\Config;
 
 $app = AppFactory::create();
 
@@ -30,13 +29,13 @@ $app->addBodyParsingMiddleware();
 // **WICHTIGSTE ÄNDERUNG: CORS ist die erste Middleware, die hinzugefügt wird**
 $app->add(new CorsMiddleware(['https://bewerbungs.itprofi-4u.de', 'http://localhost:3000']));
 
-
 // OPTIONS-Route für Preflight
 $app->options('/{routes:.+}', function ($request, $response) {
   return $response;
 });
 
-// Routen einbinden
-(require __DIR__ . '/src/Routes/api.php')($app);
+// Routen einbinden: erst require (liefert die Closure), dann aufrufen.
+$routes = require __DIR__ . '/src/Routes/api.php';
+$routes($app);
 
 $app->run();

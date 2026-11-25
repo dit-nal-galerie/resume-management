@@ -1,6 +1,7 @@
 import { createOrUpdateContact, getContacts } from '../../../src/services/contactService'; // Pfad ggf. anpassen
 import { Request, Response } from 'express';
 import { Connection } from 'mysql2';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
 
 describe('contactService', () => {
   let req: Partial<Request>;
@@ -28,7 +29,7 @@ describe('contactService', () => {
 
   describe('createOrUpdateContact', () => {
     it('should return 400 if required fields are missing', async () => {
-      req = { body: { name: 'Mustermann' } };
+      req = { body: { name: 'Mustermann' }, ...noAuthReq() }; // kein Token → loginid fehlt
       await createOrUpdateContact(db as Connection, req as Request, res as Response);
       expect(statusMock).toHaveBeenCalledWith(400);
       expect(jsonMock).toHaveBeenCalledWith({
@@ -38,6 +39,7 @@ describe('contactService', () => {
 
     it('should insert contact and return 201 on success', async () => {
       req = {
+        headers: authHeaders(7),
         body: {
           contactid: 0,
           vorname: 'Max',
@@ -63,6 +65,7 @@ describe('contactService', () => {
 
     it('should update contact and return 200 on success', async () => {
       req = {
+        headers: authHeaders(7),
         body: {
           contactid: 5,
           vorname: 'Max',
@@ -88,6 +91,7 @@ describe('contactService', () => {
 
     it('should return 500 on DB error (insert)', async () => {
       req = {
+        headers: authHeaders(7),
         body: {
           contactid: 0,
           vorname: 'Max',
@@ -113,14 +117,14 @@ describe('contactService', () => {
 
   describe('getContacts', () => {
     it('should return 400 if ref or company is missing', () => {
-      req = { query: {} };
+      req = { query: {}, ...noAuthReq() }; // kein Token → loginid fehlt
       getContacts(db as Connection, req as Request, res as Response);
       expect(statusMock).toHaveBeenCalledWith(400);
       expect(sendMock).toHaveBeenCalledWith('backend.error.validation.missingRefOrCompany');
     });
 
     it('should return 500 on DB error', () => {
-      req = { query: { ref: 'abc', company: '1' } };
+      req = { query: { ref: 'abc', company: '1' }, headers: authHeaders(7) };
       (db.query as jest.Mock).mockImplementation((_q, _v, cb) => cb(new Error('Fehler')));
       getContacts(db as Connection, req as Request, res as Response);
       expect(statusMock).toHaveBeenCalledWith(500);
@@ -128,7 +132,7 @@ describe('contactService', () => {
     });
 
     it('should return contacts on success', () => {
-      req = { query: { ref: 'abc', company: '1' } };
+      req = { query: { ref: 'abc', company: '1' }, headers: authHeaders(7) };
       const mockResults = [
         {
           contactid: 1,

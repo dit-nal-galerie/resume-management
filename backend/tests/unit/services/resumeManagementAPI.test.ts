@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Pool, PoolConnection } from 'mysql2/promise';
 import { changeResumeStatus, getResumeById } from '../../../src/services/getResume';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
 
 describe('resumeManagementAPI', () => {
   let req: Partial<Request>;
@@ -104,7 +105,7 @@ describe('resumeManagementAPI', () => {
 
   describe('changeResumeStatus', () => {
     it('should return 400 if required data is missing', async () => {
-      req = { body: {} };
+      req = { body: {}, ...noAuthReq() }; // kein Token → userId fehlt
       await changeResumeStatus(db as Pool, req as Request, res as Response);
       expect(statusMock).toHaveBeenCalledWith(400);
       expect(sendMock).toHaveBeenCalledWith('backend.error.validation.missingData');
@@ -113,6 +114,7 @@ describe('resumeManagementAPI', () => {
     it('should return 404 if resume not found', async () => {
       req = {
         body: { resumeId: 1, userId: 2, stateId: 3, date: '2024-01-01' },
+        headers: authHeaders(2),
       };
       (db.query as jest.Mock).mockResolvedValue([[]]);
 
@@ -124,6 +126,7 @@ describe('resumeManagementAPI', () => {
     it('should return 403 if userId does not match ref', async () => {
       req = {
         body: { resumeId: 1, userId: 999, stateId: 3, date: '2024-01-01' },
+        headers: authHeaders(999), // Token-User 999 ≠ ref 5 → 403
       };
       (db.query as jest.Mock).mockResolvedValue([[{ ref: 5, stateid: 1 }]]);
 
@@ -135,6 +138,7 @@ describe('resumeManagementAPI', () => {
     it('should return 400 if stateId is already set', async () => {
       req = {
         body: { resumeId: 1, userId: 5, stateId: 3, date: '2024-01-01' },
+        headers: authHeaders(5),
       };
       (db.query as jest.Mock).mockResolvedValue([[{ ref: 5, stateid: 3 }]]);
 
@@ -146,6 +150,7 @@ describe('resumeManagementAPI', () => {
     it('should update status and insert history successfully', async () => {
       req = {
         body: { resumeId: 1, userId: 5, stateId: 4, date: '2024-01-01' },
+        headers: authHeaders(5),
       };
       (db.query as jest.Mock)
         .mockResolvedValueOnce([[{ ref: 5, stateid: 1 }]]) // SELECT
@@ -160,6 +165,7 @@ describe('resumeManagementAPI', () => {
     it('should return 500 on DB error', async () => {
       req = {
         body: { resumeId: 1, userId: 5, stateId: 4, date: '2024-01-01' },
+        headers: authHeaders(5),
       };
       (db.query as jest.Mock).mockRejectedValue(new Error('DB Error'));
 

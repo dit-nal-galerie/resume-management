@@ -4,7 +4,6 @@
     bootstrap="tests/bootstrap.php"
     colors="true"
     stopOnFailure="false"
-    verbose="true"
 >
     <testsuites>
         <testsuite name="Unit">
@@ -12,6 +11,9 @@
         </testsuite>
         <testsuite name="Integration">
             <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Services">
+            <directory>tests/Services</directory>
         </testsuite>
     </testsuites>
 
@@ -35,10 +37,10 @@
         <env name="LOG_LEVEL" value="debug"/>
     </php>
 
-    <!-- Coverage optional, kannst du bei Bedarf aktivieren -->
-    <coverage>
+    <!-- Coverage-Quelle (PHPUnit 10: <source> statt <coverage><include>) -->
+    <source>
         <include>
             <directory suffix=".php">src</directory>
         </include>
-    </coverage>
+    </source>
 </phpunit>
