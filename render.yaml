@@ -1,19 +1,27 @@
+# Demo-Pipeline: deployet backend-php (Slim) auf Render free,
+# sobald auf add_test gepusht wird.
+#
+# Hinweise:
+# - dockerfilePath ist RELATIV zu rootDir (siehe Render Blueprint Spec),
+#   also "./Dockerfile" und NICHT "./backend-php/Dockerfile".
+# - Prod (api.itprofi-4u.de) laeuft separat und wird spaeter angebunden.
+# - DB-/Mail-Credentials landen NIE in dieser Datei, sondern werden beim
+#   Blueprint-Sync im Render-Dashboard nachgetragen (sync: false).
 services:
   - type: web
-    name: resume-backend-php
-    env: docker
+    runtime: docker
+    name: resume-backend-php-demo
     plan: free
-    branch: deploy # oder main, je nach Workflow
+    region: frankfurt # bei Erstellung festgelegbar, spaeter nicht mehr aenderbar
+    branch: add_test # Demo-Versionen: jede Zwischenstaendige auf add_test
     rootDir: backend-php
-    dockerfilePath: ./backend-php/Dockerfile
-    autoDeploy: true
+    dockerfilePath: ./Dockerfile # relativ zu rootDir!
+    autoDeployTrigger: commit # frueher: autoDeploy: true
+    healthCheckPath: /health
     envVars:
       - key: APP_ENV
         value: production
-      - key: APP_KEY
-        sync: false
-      - key: DB_CONNECTION
-        value: mysql
+      # --- MySQL (extern, z. B. Aiven free; wird im Dashboard eingetragen) ---
       - key: DB_HOST
         sync: false
       - key: DB_PORT
@@ -24,5 +32,22 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
-      - key: LOG_CHANNEL
-        value: stderr
+      # --- CORS: erlaubte Frontend-Origin (komma-getrennt), z. B.
+      #     https://<projekt>.vercel.app,https://bewerbungs.itprofi-4u.de ---
+      - key: CORS_ORIGINS
+        sync: false
+      # --- Passwort-Reset-Links + SMTP fuer Demo-Mails ---
+      - key: RESET_PASSWORD_URL
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_PORT
+        value: '465'
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: EMAIL_SECURE
+        value: 'true'
