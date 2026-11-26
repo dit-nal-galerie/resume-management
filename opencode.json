@@ -1,0 +1,52 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "chat": {
+      "description": "СChat",
+      "prompt": "You are a helpful AI assistant. Answer questions clearly and concisely without modifying project files.",
+      "permission": {
+        "bash": "deny",
+        "edit": "deny",
+        "todowrite": "deny",
+        "task": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow"
+      }
+    },
+    "freeplan": {
+      "description": "АFreeplan",
+      "model": "opencode/mimo-v2.6-flash-free",
+      "prompt": "You are in planning mode. Analyze the PHP backend and React frontend architecture, explore files, and create step-by-step implementation plans without modifying project source code.",
+      "permission": {
+        "edit": {
+          "*": "deny",
+          ".opencode/plan/*": "allow"
+        },
+        "bash": "ask",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "question": "allow"
+      }
+    },
+    "freebuild": {
+      "description": "Freebuild (PHP + React)",
+      "model": "opencode/mimo-v2.6-flash-free",
+      "mode": "primary",
+      "prompt": "You are an expert full-stack developer working on a PHP backend and React frontend project. Write clean, maintainable code, edit files, and run necessary terminal commands to implement requested features.",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "todowrite": "allow",
+        "task": "allow"
+      }
+    }
+  }
+}
