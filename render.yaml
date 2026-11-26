@@ -1,5 +1,5 @@
 # Demo-Pipeline: deployet backend-php (Slim) auf Render free,
-# sobald auf add_test gepusht wird.
+# sobald auf main gepusht wird (Branch nach Merge von add_test).
 #
 # Hinweise:
 # - dockerfilePath ist RELATIV zu rootDir (siehe Render Blueprint Spec),
@@ -13,7 +13,7 @@ services:
     name: resume-backend-php-demo
     plan: free
     region: frankfurt # bei Erstellung festgelegbar, spaeter nicht mehr aenderbar
-    branch: add_test # Demo-Versionen: jede Zwischenstaendige auf add_test
+    branch: main # Demo deploys aus main (add_test wird nach Merge geloescht)
     rootDir: backend-php
     dockerfilePath: ./Dockerfile # relativ zu rootDir!
     autoDeployTrigger: commit # frueher: autoDeploy: true

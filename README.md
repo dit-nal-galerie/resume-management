@@ -105,7 +105,7 @@ const Component = () => {
 **Aktueller Stand (Demo-Pipeline):**
 
 * **Frontend:** Vercel — native Git-Integration (Root Directory `frontend`, Build `npm run build`)
-* **Backend (Demo):** Render free, Blueprint `render.yaml`, Branch `add_test`
+* **Backend (Demo):** Render free, Blueprint `render.yaml`, Branch `main`
   (Docker, `backend-php/Dockerfile`, Health-Check `/health`)
 * **Datenbank (Demo):** externes MySQL (z. B. Aiven free), Schema aus `db/schema.sql`
 * **Produktion:** `api.itprofi-4u.de` läuft separat und wird später angebunden

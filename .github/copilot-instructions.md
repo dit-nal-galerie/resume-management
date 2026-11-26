@@ -25,7 +25,7 @@
 - The legacy PHP backend is a separate application in `backend-php/`.
   - It has its own `composer.json` and `tests/` folder.
   - CI runs PHPUnit via `.github/workflows/test.yml` (MySQL service + `db/schema.sql`).
-  - Deploys: Render (blueprint `render.yaml`, branch `add_test`, auto-deploy on push)
+  - Deploys: Render (blueprint `render.yaml`, branch `main`, auto-deploy on push)
     for the demo backend; frontend deploys via Vercel's native Git integration.
 
 - Shared domain types live at the repo root in `interfaces/`.
