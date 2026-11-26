@@ -21,6 +21,11 @@ services:
     envVars:
       - key: APP_ENV
         value: production
+      # --- JWT-Secret: OHNE diesen Wert faellt der Code auf den unsicheren
+      #     Default 'default_jwt_secret' zurueck -> Value hier niemals in git,
+      #     sondern nur im Render-Dashboard eintragen (sync: false) ---
+      - key: JWT_SECRET
+        sync: false
       # --- MySQL (extern, z. B. Aiven free; wird im Dashboard eingetragen) ---
       - key: DB_HOST
         sync: false
