@@ -16,6 +16,8 @@
 /backend/build
 /backend/dist
 /test-results
+/frontend/test-results/
+/frontend/playwright-report/
 production.json
 # misc
 .DS_Store
@@ -29,3 +31,6 @@ yarn-debug.log*
 yarn-error.log*
 .vercel
 /openai/
+
+# php-cs-fixer cache
+.php-cs-fixer.cache

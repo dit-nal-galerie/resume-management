@@ -22,11 +22,16 @@
   "i18n-ally.keystyle": "nested",
 
   "typescript.preferences.importModuleSpecifier": "relative",
-  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "typescript.tsserver.log": "off",
   "typescript.suggest.autoImports": true,
+  "eslint.useFlatConfig": true,
   "files.exclude": {
-    "**/node_modules": true
+    "**/node_modules": true,
+    "**/.metadata": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.metadata": true
   },
   "[php]": {
     "editor.defaultFormatter": "DEVSENSE.phptools-vscode"
