@@ -100,11 +100,21 @@ const Component = () => {
 }
 ```
 
-## 🛎️ Deployment-Vorschlag
+## 🛎️ Deployment
 
-* **Frontend:** Vercel
-* **Backend:** Railway oder Render
-* **Datenbank:** PlanetScale oder externes MySQL
+**Aktueller Stand (Demo-Pipeline):**
+
+* **Frontend:** Vercel — native Git-Integration (Root Directory `frontend`, Build `npm run build`)
+* **Backend (Demo):** Render free, Blueprint `render.yaml`, Branch `add_test`
+  (Docker, `backend-php/Dockerfile`, Health-Check `/health`)
+* **Datenbank (Demo):** externes MySQL (z. B. Aiven free), Schema aus `db/schema.sql`
+* **Produktion:** `api.itprofi-4u.de` läuft separat und wird später angebunden
+
+**Lokale Entwicklung:**
+
+* Backend: Docroot `backend-php/` (Root-`index.php` leitet auf `public/index.php` weiter),
+  DB-Konfig aus `config/dev.json`, Env-Variablen haben Vorrang
+* Frontend: `npm run dev` (siehe `frontend/.env.development`)
 
 ## ⚠️ Hinweise für Entwicklung
 
@@ -118,7 +128,7 @@ const Component = () => {
 * [ ] Alle Texte mit `t('key')` ersetzen
 * [ ] Spracheinstellungen im UI auswählbar machen
 * [ ] Tests für Passwort-Validierung einfügen
-* [ ] Deployment vorbereiten (Frontend & Backend)
+* [x] Deployment vorbereiten (Frontend & Backend) — Demo-Pipeline Render + Vercel steht
 
 ---
 
