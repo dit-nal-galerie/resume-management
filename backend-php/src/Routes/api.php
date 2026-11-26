@@ -15,6 +15,15 @@ use App\Config\DB;
 
 return function (App $app) {
   //
+  // 0. Health-Check (Render / Load Balancer, healthCheckPath)
+  //    Absichtlich ohne DB-Zugriff: schnell und stabil.
+  //
+  $app->get('/health', function (Request $request, Response $response): Response {
+    $response->getBody()->write(json_encode(['status' => 'ok']));
+    return $response->withHeader('Content-Type', 'application/json');
+  });
+
+  //
   // 1. User / Auth
   //
   $app->post('/createOrUpdateUser', [UserController::class, 'createOrUpdateUser']);
@@ -48,6 +57,7 @@ return function (App $app) {
   //
   $app->post('/addContact', [ContactController::class, 'createOrUpdateContact']);
   $app->post('/contact', [ContactController::class, 'createOrUpdateContact']); // Alias
+  $app->post('/createOrUpdateContact', [ContactController::class, 'createOrUpdateContact']); // Alias (Frontend)
   $app->get('/contacts', [ContactController::class, 'getContacts']);
 
   //
@@ -74,7 +84,7 @@ return function (App $app) {
   $app->get('/states', [ResumeController::class, 'getStates']); // Alias
 
   //
-  // 8. DB-Check (Diagnose)
+  // 9. DB-Check (Diagnose)
   //
   $app->map(['GET', 'POST'], '/db-check', function (
     Request $request,

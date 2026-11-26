@@ -481,22 +481,26 @@ class ResumeService
   {
     $loginid = AuthService::getUserIdFromToken($request);
     if ($loginid === null) {
-      $response->getBody()->write(json_encode([
-        'success' => false,
-        'error' => 'backend.error.auth.unauthorized'
-      ]));
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => 'backend.error.auth.unauthorized',
+        ]),
+      );
       return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
     $ids = $this->resolveUserIds((int) $loginid);
     if (!$ids) {
-      $response->getBody()->write(json_encode([
-        'success' => false,
-        'error' => 'backend.error.auth.unauthorized'
-      ]));
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => 'backend.error.auth.unauthorized',
+        ]),
+      );
       return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
     }
-    $userid = $ids['userid'];   // resumes.ref
-    $loginid = $ids['loginid'];  // companies.ref / contacts.ref
+    $userid = $ids['userid']; // resumes.ref
+    $loginid = $ids['loginid']; // companies.ref / contacts.ref
 
     $data = (array) $request->getParsedBody();
 
@@ -519,12 +523,17 @@ class ResumeService
       $recrutingCompanyId = $this->upsertCompany($recrutingCompany, $loginid);
 
       $contactCompanyId = $this->upsertContact($contactCompany, $companyId, $loginid);
-      $contactRecrutingId = $this->upsertContact($contactRecrutingCompany, $recrutingCompanyId, $loginid);
+      $contactRecrutingId = $this->upsertContact(
+        $contactRecrutingCompany,
+        $recrutingCompanyId,
+        $loginid,
+      );
 
       if ($resumeId > 0) {
         // Update
         $sql = "UPDATE resumes
                        SET position=:position,
+                           stateId=:stateId,
                            link=:link,
                            comment=:comment,
                            companyId=:companyId,
@@ -535,6 +544,7 @@ class ResumeService
         $st = $this->db->prepare($sql);
         $st->execute([
           'position' => $position,
+          'stateId' => $stateId,
           'link' => $link,
           'comment' => $comment,
           'companyId' => $companyId,
@@ -546,18 +556,20 @@ class ResumeService
         ]);
       } else {
         // Insert
-        $sql = "INSERT INTO resumes (ref, position, link, comment, companyId, parentCompanyId, contactCompanyId, contactParentCompanyId, created)
-                         VALUES (:userid, :position, :link, :comment, :companyId, :recrutingCompanyId, :contactCompanyId, :contactRecrutingId, NOW())";
+        $sql = "INSERT INTO resumes (ref, position, stateId, link, comment, companyId, parentCompanyId, contactCompanyId, contactParentCompanyId, created)
+                         VALUES (:userid, :position, :stateId, :link, :comment, :companyId, :recrutingCompanyId, :contactCompanyId, :contactRecrutingId, :created)";
         $st = $this->db->prepare($sql);
         $st->execute([
           'userid' => $userid,
           'position' => $position,
+          'stateId' => $stateId,
           'link' => $link,
           'comment' => $comment,
           'companyId' => $companyId,
           'recrutingCompanyId' => $recrutingCompanyId,
           'contactCompanyId' => $contactCompanyId,
           'contactRecrutingId' => $contactRecrutingId,
+          'created' => date('Y-m-d H:i:s'),
         ]);
         $resumeId = (int) $this->db->lastInsertId();
       }
@@ -569,18 +581,21 @@ class ResumeService
 
       $this->db->commit();
 
-      $response->getBody()->write(json_encode([
-        'success' => true,
-        'resumeId' => $resumeId
-      ]));
+      $response->getBody()->write(
+        json_encode([
+          'success' => true,
+          'resumeId' => $resumeId,
+        ]),
+      );
       return $response->withHeader('Content-Type', 'application/json');
-
     } catch (PDOException $e) {
       $this->db->rollBack();
-      $response->getBody()->write(json_encode([
-        'success' => false,
-        'error' => $e->getMessage()
-      ]));
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => $e->getMessage(),
+        ]),
+      );
       return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
     }
   }
@@ -620,7 +635,10 @@ class ResumeService
       $response->getBody()->write('backend.error.auth.noPermission');
       return $response->withStatus(403)->withHeader('Content-Type', 'text/plain');
     }
-    if ((int) $resume['stateid'] === (int) $stateId) {
+    // SQLite liefert den Spaltennamen wie deklariert ('stateId'), MySQL wie
+    // im SELECT geschrieben ('stateid') → Zugriff fallunabhängig auf beide.
+    $currentStatus = (int) ($resume['stateid'] ?? ($resume['stateId'] ?? 0));
+    if ($currentStatus === (int) $stateId) {
       $response->getBody()->write('backend.error.conflict.statusAlreadySet');
       return $response->withStatus(400)->withHeader('Content-Type', 'text/plain');
     }

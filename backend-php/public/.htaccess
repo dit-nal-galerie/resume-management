@@ -1,0 +1,11 @@
+# Front Controller fuer Apache (Docroot = public/)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Bestehende Dateien/Ordner direkt ausliefern
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Alles andere an index.php weiterleiten
+  RewriteRule ^ index.php [QSA,L]
+</IfModule>

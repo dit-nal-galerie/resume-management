@@ -72,4 +72,56 @@ class CompanyService
     $response->getBody()->write(json_encode($rows));
     return $response->withHeader('Content-Type', 'application/json');
   }
+
+  /**
+   * POST /addCompany|/company – neue Firma anlegen (ref = loginid aus JWT).
+   */
+  public function addCompany(Request $request, Response $response): Response
+  {
+    $loginid = AuthService::getUserIdFromToken($request);
+    if ($loginid === null) {
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => 'backend.error.auth.unauthorized',
+        ]),
+      );
+      return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+    }
+
+    $data = (array) $request->getParsedBody();
+    $name = trim((string) ($data['name'] ?? ''));
+    if ($name === '') {
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => 'backend.error.validation.missingFields',
+        ]),
+      );
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
+
+    $st = $this->db->prepare(
+      'INSERT INTO companies (name, city, street, houseNumber, postalCode, isrecruter, ref)
+       VALUES (:name, :city, :street, :houseNumber, :postalCode, :isrecruter, :ref)',
+    );
+    $st->execute([
+      'name' => $name,
+      'city' => $data['city'] ?? null,
+      'street' => $data['street'] ?? null,
+      'houseNumber' => $data['houseNumber'] ?? null,
+      'postalCode' => $data['postalCode'] ?? null,
+      'isrecruter' => isset($data['isRecruter']) ? (int) !!$data['isRecruter'] : 0,
+      'ref' => (int) $loginid,
+    ]);
+    $companyId = (int) $this->db->lastInsertId();
+
+    $response->getBody()->write(
+      json_encode([
+        'success' => true,
+        'companyId' => $companyId,
+      ]),
+    );
+    return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
+  }
 }

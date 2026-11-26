@@ -13,6 +13,7 @@
     "start:all": "concurrently \"npm run start --workspace=frontend\" \"npm run start --workspace=backend\"",
     "build:all": "npm run build --workspace=frontend && npm run build --workspace=backend",
     "test:all": "npm test --workspace=frontend && npm test --workspace=backend",
+    "test:e2e": "npm run test:e2e --workspace=frontend",
     "install:all": "npm install",
     "format": "npm run format:frontend && npm run format:backend && npm run format:php",
     "format:frontend": "prettier --write \"frontend/**/*.{js,jsx,ts,tsx,json,css,md}\"",
@@ -23,7 +24,7 @@
     "lint:fix": "eslint . --fix",
     "lint:frontend": "eslint frontend --fix",
     "lint:backend": "eslint backend --fix",
-    "lint:php": "php ./backend-php/vendor/bin/php-cs-fixer fix backend-php --dry-run --diff"
+    "lint:php": "prettier --plugin=@prettier/plugin-php --parser=php --check \"backend-php/**/*.php\""
   },
   "devDependencies": {
     "@prettier/plugin-php": "^0.24.0",

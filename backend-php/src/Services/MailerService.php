@@ -12,7 +12,7 @@ class MailerService
   public function __construct(?string $env = null)
   {
     // Fallback: APP_ENV aus Umgebung oder production
-    $env = $env ?? (getenv('APP_ENV') ?? 'production');
+    $env = $env ?? (getenv('APP_ENV') ?: 'production');
     $this->config = ConfigLoader::load($env);
   }
 

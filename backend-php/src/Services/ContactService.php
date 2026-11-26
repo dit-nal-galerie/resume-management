@@ -81,4 +81,94 @@ class ContactService
     $response->getBody()->write(json_encode($rows));
     return $response->withHeader('Content-Type', 'application/json');
   }
+
+  /**
+   * POST /addContact|/contact|/createOrUpdateContact
+   * Legt einen Kontakt an (contactid = 0/fehlt) oder aktualisiert ihn.
+   * ref = loginid aus JWT (über users aufgelöst).
+   */
+  public function createOrUpdateContact(Request $request, Response $response): Response
+  {
+    $loginid = \App\Services\AuthService::getUserIdFromToken($request);
+    if ($loginid === null) {
+      $response
+        ->getBody()
+        ->write(json_encode(['success' => false, 'error' => 'backend.error.auth.unauthorized']));
+      return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+    }
+    $ids = $this->resolveUserIds((int) $loginid);
+    if (!$ids) {
+      $response
+        ->getBody()
+        ->write(json_encode(['success' => false, 'error' => 'backend.error.auth.unauthorized']));
+      return $response->withStatus(401)->withHeader('Content-Type', 'application/json');
+    }
+    $ref = $ids['loginid']; // contacts.ref = loginid
+
+    $data = (array) $request->getParsedBody();
+    $contactid = isset($data['contactid']) ? (int) $data['contactid'] : 0;
+    $vorname = $data['vorname'] ?? null;
+    $name = $data['name'] ?? null;
+    $email = $data['email'] ?? null;
+    $company = isset($data['company']) ? (int) $data['company'] : 0;
+
+    if (!$vorname || !$name || !$email || !isset($data['anrede']) || !$company) {
+      $response
+        ->getBody()
+        ->write(
+          json_encode(['success' => false, 'error' => 'backend.error.validation.missingFields']),
+        );
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
+
+    $fields = [
+      'vorname' => $vorname,
+      'name' => $name,
+      'email' => $email,
+      'anrede' => (int) $data['anrede'],
+      'title' => $data['title'] ?? null,
+      'zusatzname' => $data['zusatzname'] ?? null,
+      'phone' => $data['phone'] ?? null,
+      'mobile' => $data['mobile'] ?? null,
+      'company' => $company,
+      'ref' => $ref,
+    ];
+
+    if ($contactid > 0) {
+      $st = $this->db->prepare(
+        'UPDATE contacts
+            SET vorname=:vorname, name=:name, email=:email, anrede=:anrede,
+                title=:title, zusatzname=:zusatzname, phone=:phone, mobile=:mobile,
+                company=:company, ref=:ref
+          WHERE contactid=:contactid',
+      );
+      $fields['contactid'] = $contactid;
+      $st->execute($fields);
+
+      $response->getBody()->write(
+        json_encode([
+          'success' => true,
+          'message' => 'backend.success.contact.updated',
+          'contactid' => $contactid,
+        ]),
+      );
+      return $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+    }
+
+    $st = $this->db->prepare(
+      'INSERT INTO contacts (vorname, name, email, anrede, title, zusatzname, phone, mobile, company, ref)
+       VALUES (:vorname, :name, :email, :anrede, :title, :zusatzname, :phone, :mobile, :company, :ref)',
+    );
+    $st->execute($fields);
+    $contactid = (int) $this->db->lastInsertId();
+
+    $response->getBody()->write(
+      json_encode([
+        'success' => true,
+        'message' => 'backend.success.contact.added',
+        'contactid' => $contactid,
+      ]),
+    );
+    return $response->withStatus(201)->withHeader('Content-Type', 'application/json');
+  }
 }
