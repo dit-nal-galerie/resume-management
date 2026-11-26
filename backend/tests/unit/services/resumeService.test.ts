@@ -1,6 +1,7 @@
 import { getResumesWithUsers, getStates } from '../../../src/services/resumeService'; // Pfad anpassen
 import { Request, Response } from 'express';
 import { Connection } from 'mysql2';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
 
 describe('resumeService', () => {
   let req: Partial<Request>;
@@ -27,15 +28,16 @@ describe('resumeService', () => {
   });
 
   describe('getResumesWithUsers', () => {
-    it('should return 400 if userid is missing', () => {
-      req = { query: {} };
+    it('should return 401 if no token is present', () => {
+      // userId kommt nur noch aus dem JWT → ohne Token → 401
+      req = { query: {}, ...noAuthReq() };
       getResumesWithUsers(db as Connection, req as Request, res as Response);
-      expect(statusMock).toHaveBeenCalledWith(400);
-      expect(sendMock).toHaveBeenCalledWith('backend.error.validation.missingUserId');
+      expect(statusMock).toHaveBeenCalledWith(401);
+      expect(sendMock).toHaveBeenCalledWith('backend.error.auth.unauthorized');
     });
 
     it('should return 500 on DB error', () => {
-      req = { query: { userid: 'testUser' } };
+      req = { query: { userid: 'testUser' }, headers: authHeaders(123) };
       (db.query as jest.Mock).mockImplementation((_q, _v, cb) => cb(new Error('DB-Fehler')));
       getResumesWithUsers(db as Connection, req as Request, res as Response);
       expect(statusMock).toHaveBeenCalledWith(500);
@@ -43,7 +45,7 @@ describe('resumeService', () => {
     });
 
     it('should return resumes correctly mapped', () => {
-      req = { query: { userid: '123' } };
+      req = { query: { userid: '123' }, headers: authHeaders(123) };
       const mockResults = [
         {
           resumeId: 1,

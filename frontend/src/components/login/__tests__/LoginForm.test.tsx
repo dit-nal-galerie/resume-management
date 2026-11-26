@@ -10,10 +10,20 @@ describe('LoginForm', () => {
 
     render(<LoginForm loginname="" password="" onChange={onChange} />);
 
-    await userEvent.type(screen.getByLabelText(/Loginname/i), 'dt'); // ⬅️ ohne setup()
-    expect(onChange).toHaveBeenCalledWith('loginname', 'demo');
+    // Label kommt aus i18n ("Login name" / "Loginname") -> Regex auf beide Sprachen
+    await userEvent.type(screen.getByLabelText(/login\s?name/i), 'demo');
+    expect(onChange).toHaveBeenCalledWith('loginname', 'd');
 
-    await userEvent.type(screen.getByLabelText(/Passwort/i), 'dt'); // ⬅️ ohne setup()
+    await userEvent.type(screen.getByLabelText(/password|passwort/i), 'x');
     expect(onChange).toHaveBeenCalledWith('password', 'x');
+  });
+
+  it('rendert beide Felder mit value-Verbindung', () => {
+    const onChange = jest.fn();
+
+    render(<LoginForm loginname="john" password="secret" onChange={onChange} />);
+
+    expect(screen.getByLabelText(/login\s?name/i)).toHaveValue('john');
+    expect(screen.getByLabelText(/password|passwort/i)).toHaveValue('secret');
   });
 });
