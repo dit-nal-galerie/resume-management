@@ -57,6 +57,7 @@ return function (App $app) {
   //
   $app->post('/addContact', [ContactController::class, 'createOrUpdateContact']);
   $app->post('/contact', [ContactController::class, 'createOrUpdateContact']); // Alias
+  $app->post('/createOrUpdateContact', [ContactController::class, 'createOrUpdateContact']); // Alias (Frontend)
   $app->get('/contacts', [ContactController::class, 'getContacts']);
 
   //

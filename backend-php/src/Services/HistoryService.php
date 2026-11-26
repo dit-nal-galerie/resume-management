@@ -35,13 +35,14 @@ class HistoryService
       return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
     }
 
-    $sql = 'INSERT INTO history (resumeid, stateid) VALUES (:resumeid, :stateid)';
+    $sql = 'INSERT INTO history (resumeid, stateid, date) VALUES (:resumeid, :stateid, :date)';
     $stmt = $this->db->prepare($sql);
 
     try {
       $stmt->execute([
         'resumeid' => $resumeId,
         'stateid' => $description,
+        'date' => date('Y-m-d'),
       ]);
       $response->getBody()->write(
         json_encode([
@@ -73,10 +74,10 @@ class HistoryService
     $userId = AuthService::getUserIdFromToken($request);
 
     if ($resumeId <= 0 || $userId === null) {
-      return $response
-        ->withStatus(400)
-        ->withHeader('Content-Type', 'application/json')
+      $response
+        ->getBody()
         ->write(json_encode(['error' => 'backend.error.validation.missingFields']));
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
     }
 
     // 1) Permission-Check: nicht mehr "ref", sondern resume.userid
@@ -91,11 +92,11 @@ class HistoryService
       'resumeid' => $resumeId,
       'userid' => $userId,
     ]);
-    if ($stmt->rowCount() === 0) {
-      return $response
-        ->withStatus(403)
-        ->withHeader('Content-Type', 'application/json')
-        ->write(json_encode(['error' => 'backend.error.auth.noPermission']));
+    // Portable: rowCount() ist bei SELECT auf SQLite unzuverlässig -> fetch()
+    $owned = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$owned) {
+      $response->getBody()->write(json_encode(['error' => 'backend.error.auth.noPermission']));
+      return $response->withStatus(403)->withHeader('Content-Type', 'application/json');
     }
 
     // 2) History-Daten holen

@@ -21,6 +21,6 @@
       "@/*": ["*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*", "../../interfaces/**/*.ts"],
+  "include": ["src/**/*", "tests/**/*", "../interfaces/**/*.ts"],
   "exclude": ["node_modules"]
 }

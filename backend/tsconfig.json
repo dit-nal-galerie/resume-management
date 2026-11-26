@@ -13,6 +13,6 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx"
   },
-  "include": ["tests", "src/**/*.ts", "../../interfaces/**/*.ts"],
+  "include": ["tests", "src/**/*.ts", "../interfaces/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
