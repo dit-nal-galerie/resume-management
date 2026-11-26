@@ -9,7 +9,9 @@ class DB
 {
   public static function connect(): PDO
   {
-    $env = getenv('APP_ENV') ?? 'production';
+    // getenv() gibt false zurueck, wenn die Variable fehlt -> '?'-Operator
+    // greift hier nicht, deshalb ':' (falsy-Check).
+    $env = getenv('APP_ENV') ?: 'production';
     $config = ConfigLoader::load($env);
 
     try {

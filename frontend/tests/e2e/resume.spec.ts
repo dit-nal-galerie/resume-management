@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { apiPath, gotoPage } from './support';
 
 test.describe('Resume anlegen & editieren', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/getStates', (r) =>
+    await page.route(apiPath('/getStates'), (r) =>
       r.fulfill({
         status: 200,
         body: JSON.stringify([
@@ -11,43 +12,63 @@ test.describe('Resume anlegen & editieren', () => {
         ]),
       })
     );
-    await page.route('**/companies**', (r) => r.fulfill({ status: 200, body: JSON.stringify([]) }));
-    await page.route('**/contacts**', (r) => r.fulfill({ status: 200, body: JSON.stringify([]) }));
-    await page.route('**/updateOrCreateResume', (r) =>
+    await page.route(apiPath('/companies'), (r) =>
+      r.fulfill({ status: 200, body: JSON.stringify([]) })
+    );
+    await page.route(apiPath('/contacts'), (r) =>
+      r.fulfill({ status: 200, body: JSON.stringify([]) })
+    );
+    await page.route(apiPath('/updateOrCreateResume'), (r) =>
       r.fulfill({ status: 200, body: JSON.stringify({ resumeId: 123 }) })
     );
   });
 
   test('Neues Resume inkl. neuer Firma & neuem Kontakt', async ({ page }) => {
-    await page.goto('/resume/0');
-    await page.getByLabel(/Position/i).fill('Frontend Entwickler');
-    // "Status auswählen" könnte Label- oder Placeholdertext sein
-    const statusSelect = page.getByLabel(/Status auswählen|Status/i).or(page.getByRole('combobox'));
+    await gotoPage(page, '/resume/0');
 
-    await statusSelect.selectOption({ label: 'Eingetragen' });
-    await page.getByLabel(/Link/i).fill('https://example.com/jobs/123');
-    await page.getByLabel(/Kommentar/i).fill('Klingt spannend');
+    await page.getByLabel(/^Position$/i).fill('Frontend Entwickler');
+    // Zweites #status-Element gibt es nicht – der Sprachumschalter heißt anders
+    await page.locator('#status').selectOption({ label: 'Eingetragen' });
+    await page.getByLabel(/^Link$/i).fill('https://example.com/jobs/123');
+    await page.getByLabel(/^Kommentar$/i).fill('Klingt spannend');
 
-    // Firma
-    await page.getByRole('button', { name: /firma auswählen/i }).click();
-    await page.getByRole('button', { name: /neue firma/i }).click();
-    await page.getByLabel(/Firmenname/i).fill('Neue GmbH');
-    await page.getByLabel(/Stadt/i).fill('Stuttgart');
-    await page.getByLabel(/Straße/i).fill('Königstraße');
-    await page.getByLabel(/Hausnummer/i).fill('1');
-    await page.getByRole('button', { name: /speichern/i }).click();
-    await expect(page.getByText(/Neue GmbH/)).toBeVisible();
+    // Es gibt zwei Firmen-Sektionen ("Recruiter" und "Firma") – gezielt die
+    // "Firma"-Sektion nehmen, sonst ist der Button-locator nicht eindeutig.
+    const companySection = page
+      .locator('section')
+      .filter({ has: page.getByRole('heading', { name: 'Firma', exact: true }) });
 
-    // Kontakt
-    await page.getByRole('button', { name: /kontakt auswählen/i }).click();
-    await page.getByRole('button', { name: /neuer kontakt/i }).click();
-    await page.getByLabel(/Name/i).fill('Frau Beispiel');
-    await page.getByLabel(/E-?Mail/i).fill('frau@example.com');
-    await page.getByRole('button', { name: /speichern/i }).click();
-    await expect(page.getByText(/Frau Beispiel/)).toBeVisible();
+    await companySection.getByRole('button', { name: /neue firma/i }).click();
 
-    // Speichern
-    await page.getByRole('button', { name: /speichern|save/i }).click();
-    await expect(page).toHaveURL(/\/resume\/123/);
+    // Modal "Neues Unternehmen" (Speichern nur innerhalb des Modals, weil
+    // hinter dem Overlay ebenfalls ein "Speichern"-Button liegt)
+    const companyModal = page.locator('div.fixed.inset-0');
+
+    await companyModal.getByLabel(/^Name$/i).fill('Neue GmbH');
+    await companyModal.getByLabel(/^Stadt$/i).fill('Stuttgart');
+    await companyModal.getByLabel(/^Straße$/i).fill('Königstraße');
+    await companyModal.getByLabel(/^Hausnummer$/i).fill('1');
+    await companyModal.getByRole('button', { name: /^Speichern$/i }).click();
+    await expect(companySection.getByText('Neue GmbH')).toBeVisible();
+
+    // Kontakt-Buttons erscheinen erst, wenn eine Firma gesetzt ist
+    const contactSection = page
+      .locator('section')
+      .filter({ has: page.getByRole('heading', { name: 'Firmenkontakt', exact: true }) });
+
+    await contactSection.getByRole('button', { name: /neuer kontakt/i }).click();
+
+    const contactModal = page.locator('div.fixed.inset-0');
+
+    await contactModal.getByLabel(/^Name$/i).fill('Frau Beispiel');
+    await contactModal.getByLabel(/^E-?Mail$/i).fill('frau@example.com');
+    await contactModal.getByRole('button', { name: /^Speichern$/i }).click();
+
+    // Modal schließt sich wieder (lokaler Speicher der App)
+    await expect(contactModal).toBeHidden();
+
+    // Resume speichern: Erfolgs-Alert (auto-dismiss) + Redirect zur Liste
+    await page.getByRole('button', { name: /^Speichern$/i }).click();
+    await expect(page).toHaveURL(/\/resumes/);
   });
 });

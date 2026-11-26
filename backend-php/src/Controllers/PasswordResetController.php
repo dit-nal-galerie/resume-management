@@ -39,11 +39,64 @@ class PasswordResetController
     return $response->withHeader('Content-Type', 'application/json');
   }
 
+  /**
+   * GET /validate-token?token=…
+   */
+  public function checkPasswordResetToken(Request $request, Response $response): Response
+  {
+    $params = $request->getQueryParams();
+    $token = isset($params['token']) ? trim((string) $params['token']) : '';
+
+    if ($token === '') {
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => 'backend.error.validation.missingToken',
+        ]),
+      );
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
+
+    if (!$this->service->validateToken($token)) {
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => 'backend.error.validation.invalidToken',
+        ]),
+      );
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
+
+    $response->getBody()->write(
+      json_encode([
+        'success' => true,
+        'message' => 'backend.success.passwordReset.validToken',
+      ]),
+    );
+    return $response->withHeader('Content-Type', 'application/json');
+  }
+
+  /**
+   * POST /reset-password (Token im Body) und /password-reset/{token} (Token in der URL).
+   * Der Frontend-Client sendet { token, password }.
+   */
   public function resetPassword(Request $request, Response $response, array $args): Response
   {
-    $data = $request->getParsedBody();
-    $token = $args['token'];
-    $result = $this->service->resetPassword($token, $data['newPassword']);
+    $data = (array) $request->getParsedBody();
+    $token = $args['token'] ?? ($data['token'] ?? null);
+    $password = $data['password'] ?? ($data['newPassword'] ?? null);
+
+    if (!$token || !$password) {
+      $response->getBody()->write(
+        json_encode([
+          'success' => false,
+          'error' => 'backend.error.validation.missingTokenOrPassword',
+        ]),
+      );
+      return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+    }
+
+    $result = $this->service->resetPassword((string) $token, (string) $password);
     $response->getBody()->write(json_encode($result));
     return $response->withHeader('Content-Type', 'application/json');
   }

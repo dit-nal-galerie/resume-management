@@ -338,6 +338,9 @@
         "missingTokenOrPassword": "Token und neues Passwort sind erforderlich",
         "passwordTooShort": "Das Passwort muss mindestens 2 Zeichen lang sein"
       },
+      "token": {
+        "invalid": "Ungültiger oder abgelaufener Token"
+      },
       "auth": {
         "wrongPassword": "Falsches Passwort",
         "oldPasswordWrong": "Altes Passwort ist falsch",

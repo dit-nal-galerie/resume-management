@@ -25,13 +25,11 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Production-Install (ohne dev)
-RUN composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader \
- && php artisan config:clear || true \
- && php artisan route:clear || true \
- && php artisan view:clear || true
+RUN composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
 
-# Port für Render freigeben
-EXPOSE ${PORT}
-
-# Optional Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD curl -fsS http://localhost:${PORT}/health || exit 1
+# Hinweise zum Deploy auf Render:
+# - KEIN "EXPOSE ${PORT}": PORT ist zur Build-Zeit nicht definiert, und Render
+#   leitet Traffic selbst auf die zur Laufzeit gesetzte PORT-Variable um.
+#   (Apache hoert dank sed-Logschrift auf ${PORT} - siehe oben - das reicht.)
+# - KEIN Docker HEALTHCHECK: Render ignoriert ihn und nutzt eigene HTTP-Proben
+#   (render.yaml: healthCheckPath: /health). curl waere zudem nicht installiert.

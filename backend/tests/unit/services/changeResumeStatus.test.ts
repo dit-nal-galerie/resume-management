@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Pool } from 'mysql2/promise';
 import { changeResumeStatus } from '../../../src/services/getResume';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
 
 // Mock the console.error to prevent clutter during tests
 const originalConsoleError = console.error;
@@ -26,6 +27,7 @@ describe('changeResumeStatus', () => {
 
     mockRequest = {
       body: {},
+      ...noAuthReq(),
     };
 
     mockResponse = {
@@ -37,6 +39,7 @@ describe('changeResumeStatus', () => {
   // Test case 1: Missing required data
   test('should return 400 if required data is missing', async () => {
     mockRequest.body = { resumeId: 1, userId: 1 }; // stateId and date are missing
+    // userId kommt aus dem Token → hier bewusst ohne Token, damit userId fehlt
 
     await changeResumeStatus(mockDbPool, mockRequest as Request, mockResponse as Response);
 
@@ -48,6 +51,7 @@ describe('changeResumeStatus', () => {
   // Test case 2: Application not found
   test('should return 404 if resume is not found', async () => {
     mockRequest.body = { resumeId: 999, userId: 1, stateId: 2, date: '2025-06-07' };
+    mockRequest.headers = authHeaders(1); // userId wird aus dem Token gelesen
     (mockDbPool.query as jest.Mock).mockResolvedValueOnce([[]]); // Simulate no rows returned
 
     await changeResumeStatus(mockDbPool, mockRequest as Request, mockResponse as Response);
@@ -63,6 +67,7 @@ describe('changeResumeStatus', () => {
   // Test case 3: User ID mismatch (no permission)
   test('should return 403 if userId does not match resume ref', async () => {
     mockRequest.body = { resumeId: 1, userId: 100, stateId: 2, date: '2025-06-07' };
+    mockRequest.headers = authHeaders(100); // Token-User 100 ≠ resume.ref 1 → 403
     (mockDbPool.query as jest.Mock).mockResolvedValueOnce([[{ ref: 1, stateid: 1 }]]); // Resume exists, but ref is 1
 
     await changeResumeStatus(mockDbPool, mockRequest as Request, mockResponse as Response);
@@ -78,6 +83,7 @@ describe('changeResumeStatus', () => {
   // Test case 4: Status already set
   test('should return 400 if the status is already the same', async () => {
     mockRequest.body = { resumeId: 1, userId: 1, stateId: 1, date: '2025-06-07' };
+    mockRequest.headers = authHeaders(1);
     (mockDbPool.query as jest.Mock).mockResolvedValueOnce([[{ ref: 1, stateid: 1 }]]); // Current state is 1
 
     await changeResumeStatus(mockDbPool, mockRequest as Request, mockResponse as Response);
@@ -93,6 +99,7 @@ describe('changeResumeStatus', () => {
   // Test case 5: Successful status change and history entry
   test('should return 200 on successful status change', async () => {
     mockRequest.body = { resumeId: 1, userId: 1, stateId: 2, date: '2025-06-07' };
+    mockRequest.headers = authHeaders(1);
     (mockDbPool.query as jest.Mock)
       .mockResolvedValueOnce([[{ ref: 1, stateid: 1 }]]) // Initial state
       .mockResolvedValueOnce([{}]) // Simulate successful update
@@ -119,6 +126,7 @@ describe('changeResumeStatus', () => {
   // Test case 6: Database error during update or insert
   test('should return 500 on database error during update/insert', async () => {
     mockRequest.body = { resumeId: 1, userId: 1, stateId: 2, date: '2025-06-07' };
+    mockRequest.headers = authHeaders(1);
     const errorMessage = 'Database write error';
 
     (mockDbPool.query as jest.Mock)

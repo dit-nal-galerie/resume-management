@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { FormField } from '../ui/FormField';
 import PageHeader from '../ui/PageHeader';
 import { PageId } from '../ui/PageId';
+import { validateToken, resetPassword } from '../../shared/api/queries';
 
 const ResetPassword: React.FC = () => {
   const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [token, setToken] = useState<string | null>(null);
+  const [isTokenValid, setIsTokenValid] = useState(false);
   const [errors, setErrors] = useState<{ newPassword?: string; confirmPassword?: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -24,18 +26,33 @@ const ResetPassword: React.FC = () => {
 
     if (!tokenFromUrl) {
       setServerError(t('passwordReset.invalidToken'));
-    } else {
-      setToken(tokenFromUrl);
-    }
-  }, [location, t]);
 
-  const resetPassword = async () => {
-    return new Promise<boolean>((resolve) => {
-      setTimeout(() => {
-        resolve(true);
-      }, 1000);
-    });
-  };
+      return;
+    }
+
+    setToken(tokenFromUrl);
+
+    // Token gegen die API prüfen (Ablauf/Verwendung)
+    let cancelled = false;
+
+    validateToken(tokenFromUrl)
+      .then((result) => {
+        if (cancelled) return;
+        if (result.success) {
+          setIsTokenValid(true);
+        } else {
+          setServerError(t('passwordReset.invalidToken'));
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setServerError(t('passwordReset.invalidToken'));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location, t]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -61,22 +78,22 @@ const ResetPassword: React.FC = () => {
 
       return;
     }
-    if (!token) {
+    if (!token || !isTokenValid) {
       setServerError(t('passwordReset.invalidToken'));
 
       return;
     }
     try {
       setIsLoading(true);
-      const result = await resetPassword();
+      const result = await resetPassword({ token, password: newPassword });
 
-      if (result) {
+      if (result.success) {
         setIsSuccess(true);
         setTimeout(() => {
           navigate('/login');
         }, 3000);
       } else {
-        setServerError(t('common.error'));
+        setServerError(result.error ? t(result.error) : t('common.error'));
       }
     } catch (error) {
       setServerError(t('common.serverError'));
@@ -170,7 +187,7 @@ const ResetPassword: React.FC = () => {
                   className={`w-full rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
                     isLoading ? 'cursor-not-allowed opacity-70' : ''
                   }`}
-                  disabled={isLoading || !token}
+                  disabled={isLoading || !token || !isTokenValid}
                 >
                   {isLoading ? t('common.loading') : t('passwordReset.resetPassword')}
                 </button>

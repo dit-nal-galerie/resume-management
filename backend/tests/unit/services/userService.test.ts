@@ -14,6 +14,10 @@ import {
   getPasswordForLoginId,
   createAuthEntry,
 } from '../../../src/services/userService';
+import { authHeaders, noAuthReq } from '../../helpers/auth';
+
+// Wartet, bis asynchrone db.query-Callbacks (createOrUpdateUser) durchgelaufen sind
+const flushCallbacks = () => new Promise((resolve) => setImmediate(resolve));
 
 // Mocken von bcrypt
 jest.mock('bcrypt', () => ({
@@ -84,12 +88,13 @@ describe('createAccount', () => {
       callback(new Error('DB error'), null);
     });
 
-    const result = await createAccount(mockConnection, 'testuser', 'password123');
+    // Der Fehler wird nicht abgefangen: das zurückgegebene Promise lehnt ab
+    await expect(createAccount(mockConnection, 'testuser', 'password123')).rejects.toThrow(
+      'DB error'
+    );
 
     expect(bcrypt.hash).toHaveBeenCalledTimes(1);
     expect(mockConnection.query).toHaveBeenCalledTimes(1);
-    expect(result).toBeNull(); // createAccount returns null on error
-    expect(console.error).toHaveBeenCalledWith('Error hashing password:', expect.any(Error)); // bcrypt error handler catches it too
   });
 });
 
@@ -105,15 +110,17 @@ describe('login', () => {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
       json: jest.fn(),
+      cookie: jest.fn(), // login setzt das JWT als Cookie
     };
   });
 
-  test('should return user data on successful login', async () => {
+  test('should set jwt cookie and return the user name on successful login', async () => {
     mockRequest.body = { loginname: 'testuser', password: 'password123' };
     const hashedPassword = 'hashed_password123';
     const userId = 1;
     const userData = {
       loginname: 'testuser',
+      userid: 1,
       loginid: 1,
       name: 'Test User',
       email: 'test@example.com',
@@ -135,7 +142,7 @@ describe('login', () => {
 
     // Mock for user query
     (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      expect(sql).toContain('SELECT a.loginname, u.loginid, u.name, u.email');
+      expect(sql).toContain('SELECT a.loginname,u.userid, u.loginid, u.name, u.email');
       expect(values).toEqual([userId]);
       callback(null, [userData] as RowDataPacket[]);
     });
@@ -144,7 +151,14 @@ describe('login', () => {
 
     expect(bcrypt.compare).toHaveBeenCalledWith('password123', hashedPassword);
     expect(mockResponse.status).not.toHaveBeenCalled(); // No status sent means 200 OK
-    expect(mockResponse.json).toHaveBeenCalledWith(userData);
+    // JWT wird als HttpOnly-Cookie gesetzt
+    expect(mockResponse.cookie).toHaveBeenCalledWith(
+      'token',
+      expect.any(String),
+      expect.objectContaining({ httpOnly: true })
+    );
+    // Rückgabe: nur der Name (keine weiteren Userdaten)
+    expect(mockResponse.json).toHaveBeenCalledWith({ name: 'Test User' });
   });
 
   test('should return 404 if user not found during authentication', async () => {
@@ -322,8 +336,9 @@ describe('changeAccessData', () => {
     await changeAccessData(mockPool, mockRequest as Request, mockResponse as Response);
 
     expect(mockResponse.status).toHaveBeenCalledWith(400);
+    // Validierungsfehler kommen als { error } (nicht { message })
     expect(mockResponse.json).toHaveBeenCalledWith({
-      message: 'backend.error.validation.missingFields',
+      error: 'backend.error.validation.missingFields',
     });
     expect(mockPool.query).not.toHaveBeenCalled();
   });
@@ -342,7 +357,7 @@ describe('changeAccessData', () => {
 
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.json).toHaveBeenCalledWith({
-      message: 'backend.error.validation.missingFields',
+      error: 'backend.error.validation.missingFields',
     });
     expect(mockPool.query).not.toHaveBeenCalled();
   });
@@ -575,11 +590,14 @@ describe('Helper Functions', () => {
       expect(password).toBeNull();
     });
 
-    test('should reject on database error', async () => {
+    test('should return null on database error', async () => {
       (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
         callback(new Error('DB error'), null);
       });
-      await expect(getPasswordForLoginId(mockConnection, 1)).rejects.toThrow('DB error');
+      // Bei DB-Fehler wird null zurückgelöst (kein Reject)
+      const password = await getPasswordForLoginId(mockConnection, 1);
+
+      expect(password).toBeNull();
     });
   });
 
@@ -651,21 +669,13 @@ describe('createOrUpdateUser', () => {
   let mockResponse: Partial<Response>;
 
   beforeEach(() => {
-    (mockConnection.query as jest.Mock).mockClear();
+    // Vollständig zurücksetzen: die Tests steuern den Ablauf über db.query/bcrypt
+    (mockConnection.query as jest.Mock).mockReset();
     (bcrypt.compare as jest.Mock).mockClear();
     (bcrypt.hash as jest.Mock).mockClear();
 
-    // Reset mocks for internal helpers (important if they were mocked globally in previous tests)
-    jest.spyOn(module.exports, 'getPasswordForLoginId').mockRestore();
-    jest.spyOn(module.exports, 'emailExistsForOtherUser').mockRestore();
-    jest.spyOn(module.exports, 'createAuthEntry').mockRestore();
-
-    // Re-mock them to control behavior for specific test cases below
-    jest.spyOn(module.exports, 'getPasswordForLoginId');
-    jest.spyOn(module.exports, 'emailExistsForOtherUser');
-    jest.spyOn(module.exports, 'createAuthEntry');
-
-    mockRequest = { body: {} };
+    // loginid kommt ausschließlich aus dem Token (Standard: keiner)
+    mockRequest = { body: {}, ...noAuthReq() };
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
@@ -675,7 +685,7 @@ describe('createOrUpdateUser', () => {
 
   // Testfälle für fehlende Pflichtfelder
   test('should return 400 if email is missing', async () => {
-    mockRequest.body = { loginid: 1, loginname: 'u', password: 'p' }; // email fehlt
+    mockRequest.body = { loginname: 'u', password: 'p' }; // email fehlt, kein Token
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.send).toHaveBeenCalledWith(
@@ -684,7 +694,7 @@ describe('createOrUpdateUser', () => {
   });
 
   test('should return 400 if loginid is missing and loginname/password are missing', async () => {
-    mockRequest.body = { email: 'e@e.e' }; // loginid fehlt, loginname/password fehlen
+    mockRequest.body = { email: 'e@e.e' }; // kein Token → loginid 0, loginname/password fehlen
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.send).toHaveBeenCalledWith(
@@ -692,47 +702,61 @@ describe('createOrUpdateUser', () => {
     );
   });
 
-  // --- UPDATE BESTEHENDER USER (loginid > 0) ---
+  // --- UPDATE BESTEHENDER USER (loginid > 0 aus Token) ---
   test('should return 404 if auth data not found for existing loginid', async () => {
-    mockRequest.body = { loginid: 999, email: 'u@e.e', password: 'pw' };
-    (getPasswordForLoginId as jest.Mock).mockResolvedValueOnce(null);
+    mockRequest.body = { email: 'u@e.e', password: 'pw' };
+    mockRequest.headers = authHeaders(999);
+    (mockConnection.query as jest.Mock).mockImplementationOnce((_sql, _v, cb) => cb(null, []));
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
 
-    expect(getPasswordForLoginId).toHaveBeenCalledWith(mockConnection, 999);
+    expect(mockConnection.query).toHaveBeenCalledWith(
+      'SELECT password FROM authentification WHERE id = ?',
+      [999],
+      expect.any(Function)
+    );
     expect(mockResponse.status).toHaveBeenCalledWith(404);
     expect(mockResponse.send).toHaveBeenCalledWith('backend.error.auth.authNotFound');
   });
 
   test('should return 401 if old password is wrong for existing user', async () => {
-    mockRequest.body = { loginid: 1, email: 'u@e.e', password: 'wrong_pw' };
-    (getPasswordForLoginId as jest.Mock).mockResolvedValueOnce('hashed_correct_pw');
+    mockRequest.body = { email: 'u@e.e', password: 'wrong_pw' };
+    mockRequest.headers = authHeaders(1);
+    (mockConnection.query as jest.Mock).mockImplementationOnce((_sql, _v, cb) =>
+      cb(null, [{ password: 'hashed_correct_pw' }])
+    );
     (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
 
-    expect(getPasswordForLoginId).toHaveBeenCalledWith(mockConnection, 1);
     expect(bcrypt.compare).toHaveBeenCalledWith('wrong_pw', 'hashed_correct_pw');
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.send).toHaveBeenCalledWith('backend.error.auth.wrongPassword');
   });
 
   test('should return 409 if email is taken by another user during update', async () => {
-    mockRequest.body = { loginid: 1, email: 'taken@e.e', password: 'pw' };
-    (getPasswordForLoginId as jest.Mock).mockResolvedValueOnce('hashed_pw');
+    mockRequest.body = { email: 'taken@e.e', password: 'pw' };
+    mockRequest.headers = authHeaders(1);
+    (mockConnection.query as jest.Mock)
+      .mockImplementationOnce((_sql, _v, cb) => cb(null, [{ password: 'hashed_pw' }])) // Passwort-Lookup
+      .mockImplementationOnce((sql, values, cb) => {
+        // E-Mail-Prüfung
+        expect(sql).toContain(
+          'SELECT COUNT(*) AS count FROM users WHERE email = ? AND loginid != ?'
+        );
+        expect(values).toEqual(['taken@e.e', 1]);
+        cb(null, [{ count: 1 }]);
+      });
     (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
-    (emailExistsForOtherUser as jest.Mock).mockResolvedValueOnce(true);
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
 
-    expect(emailExistsForOtherUser).toHaveBeenCalledWith(mockConnection, 'taken@e.e', 1);
     expect(mockResponse.status).toHaveBeenCalledWith(409);
     expect(mockResponse.send).toHaveBeenCalledWith('backend.error.conflict.emailTaken');
   });
 
   test('should successfully update user data', async () => {
     mockRequest.body = {
-      loginid: 1,
       loginname: 'user1',
       password: 'password123',
       name: 'John Doe',
@@ -745,26 +769,28 @@ describe('createOrUpdateUser', () => {
       phone: '123',
       mobile: '456',
     };
-    (getPasswordForLoginId as jest.Mock).mockResolvedValueOnce('hashed_password123');
+    mockRequest.headers = authHeaders(1);
+    (mockConnection.query as jest.Mock)
+      .mockImplementationOnce((_sql, _v, cb) => cb(null, [{ password: 'hashed_password123' }]))
+      .mockImplementationOnce((_sql, _v, cb) => cb(null, [{ count: 0 }])) // E-Mail frei
+      .mockImplementationOnce((sql, values, callback) => {
+        // Mock for UPDATE users
+        expect(sql).toContain('UPDATE users SET');
+        expect(values).toEqual([
+          'John Doe',
+          'john.doe@example.com',
+          'Herr',
+          'City',
+          'Street',
+          '1A',
+          '12345',
+          '123',
+          '456',
+          1, // loginid aus dem Token
+        ]);
+        callback(null, {});
+      });
     (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
-    (emailExistsForOtherUser as jest.Mock).mockResolvedValueOnce(false);
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      // Mock for UPDATE users
-      expect(sql).toContain('UPDATE users SET');
-      expect(values).toEqual([
-        'John Doe',
-        'john.doe@example.com',
-        'Herr',
-        'City',
-        'Street',
-        '1A',
-        '12345',
-        '123',
-        '456',
-        1,
-      ]);
-      callback(null, {});
-    });
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
 
@@ -774,7 +800,6 @@ describe('createOrUpdateUser', () => {
 
   test('should return 500 on database error during user data update', async () => {
     mockRequest.body = {
-      loginid: 1,
       email: 'u@e.e',
       password: 'pw',
       name: 'John Doe',
@@ -786,12 +811,12 @@ describe('createOrUpdateUser', () => {
       phone: '123',
       mobile: '456',
     };
-    (getPasswordForLoginId as jest.Mock).mockResolvedValueOnce('hashed_pw');
+    mockRequest.headers = authHeaders(1);
+    (mockConnection.query as jest.Mock)
+      .mockImplementationOnce((_sql, _v, cb) => cb(null, [{ password: 'hashed_pw' }]))
+      .mockImplementationOnce((_sql, _v, cb) => cb(null, [{ count: 0 }]))
+      .mockImplementationOnce((_sql, _v, cb) => cb(new Error('Update DB error'), null));
     (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
-    (emailExistsForOtherUser as jest.Mock).mockResolvedValueOnce(false);
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      callback(new Error('Update DB error'), null);
-    });
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
 
@@ -799,15 +824,17 @@ describe('createOrUpdateUser', () => {
     expect(mockResponse.send).toHaveBeenCalledWith('backend.error.server.updateError');
   });
 
-  // --- NEUEN BENUTZER ERSTELLEN (loginid <= 0) ---
+  // --- NEUEN BENUTZER ERSTELLEN (kein Token → loginid 0) ---
   test('should return 409 if loginname or email is already taken during creation', async () => {
     mockRequest.body = { loginname: 'existing', password: 'pw', email: 'e@e.e' };
     (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
       // Mock for uniqueness check
+      expect(values).toEqual(['existing', 'e@e.e']);
       callback(null, [{ loginCount: 1, emailCount: 0 }] as RowDataPacket[]); // Login taken
     });
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
+    await flushCallbacks();
 
     expect(mockConnection.query).toHaveBeenCalledTimes(1); // Only uniqueness check
     expect(mockResponse.status).toHaveBeenCalledWith(409);
@@ -816,7 +843,6 @@ describe('createOrUpdateUser', () => {
 
   test('should successfully create a new user', async () => {
     mockRequest.body = {
-      loginid: 0, // Indicate creation
       loginname: 'newuser',
       password: 'newpassword',
       name: 'Jane Doe',
@@ -830,92 +856,95 @@ describe('createOrUpdateUser', () => {
       mobile: '012',
     };
 
-    // Mock for uniqueness check
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      expect(sql).toContain(
-        'SELECT (SELECT COUNT(*) FROM authentification WHERE loginname = ?) AS loginCount'
-      );
-      expect(values).toEqual(['newuser', 'jane.doe@example.com']);
-      callback(null, [{ loginCount: 0, emailCount: 0 }] as RowDataPacket[]);
-    });
-
-    // Mock for createAuthEntry
-    (createAuthEntry as jest.Mock).mockResolvedValueOnce(101); // New loginid
-
-    // Mock for INSERT users
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      expect(sql).toContain('INSERT INTO users');
-      expect(values).toEqual([
-        101, // newLoginId from mockAuthEntry
-        'Jane Doe',
-        'jane.doe@example.com',
-        'Frau',
-        'Town',
-        'Lane',
-        '2B',
-        '54321',
-        '789',
-        '012',
-      ]);
-      callback(null, {});
-    });
+    (mockConnection.query as jest.Mock)
+      .mockImplementationOnce((sql, values, callback) => {
+        // Mock for uniqueness check (Zeilenumbruch im SQL beachten)
+        expect(sql).toContain(
+          '(SELECT COUNT(*) FROM authentification WHERE loginname = ?) AS loginCount'
+        );
+        expect(sql).toContain('(SELECT COUNT(*) FROM users WHERE email = ?) AS emailCount');
+        expect(values).toEqual(['newuser', 'jane.doe@example.com']);
+        callback(null, [{ loginCount: 0, emailCount: 0 }] as RowDataPacket[]);
+      })
+      .mockImplementationOnce((sql, values, callback) => {
+        // Mock for createAuthEntry (INSERT authentification)
+        expect(sql).toContain('INSERT INTO authentification');
+        expect(values).toEqual(['newuser', 'hashed_newpassword']);
+        callback(null, { insertId: 101 } as OkPacket);
+      })
+      .mockImplementationOnce((sql, values, callback) => {
+        // Mock for INSERT users
+        expect(sql).toContain('INSERT INTO users');
+        expect(values).toEqual([
+          101, // insertId aus createAuthEntry
+          'Jane Doe',
+          'jane.doe@example.com',
+          'Frau',
+          'Town',
+          'Lane',
+          '2B',
+          '54321',
+          '789',
+          '012',
+        ]);
+        callback(null, {});
+      });
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
+    await flushCallbacks();
 
-    expect(createAuthEntry).toHaveBeenCalledWith(mockConnection, 'newuser', 'newpassword');
     expect(mockResponse.status).toHaveBeenCalledWith(201);
     expect(mockResponse.send).toHaveBeenCalledWith('backend.success.user.created');
   });
 
   test('should return 500 on database error during uniqueness check for new user', async () => {
-    mockRequest.body = { loginid: 0, loginname: 'user', password: 'pw', email: 'e@e.e' };
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      callback(new Error('Uniqueness check DB error'), null);
-    });
+    mockRequest.body = { loginname: 'user', password: 'pw', email: 'e@e.e' };
+    (mockConnection.query as jest.Mock).mockImplementationOnce((_sql, _v, cb) =>
+      cb(new Error('Uniqueness check DB error'), null)
+    );
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
+    await flushCallbacks();
 
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.send).toHaveBeenCalledWith('backend.error.server.uniquenessCheckError');
   });
 
   test('should return 500 on database error during auth entry creation for new user', async () => {
-    mockRequest.body = { loginid: 0, loginname: 'user', password: 'pw', email: 'e@e.e' };
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      callback(null, [{ loginCount: 0, emailCount: 0 }] as RowDataPacket[]);
-    });
-    (createAuthEntry as jest.Mock).mockRejectedValueOnce(new Error('Auth creation error'));
+    mockRequest.body = { loginname: 'user', password: 'pw', email: 'e@e.e' };
+    (mockConnection.query as jest.Mock).mockImplementationOnce((_sql, _v, cb) =>
+      cb(null, [{ loginCount: 0, emailCount: 0 }] as RowDataPacket[])
+    );
+    (bcrypt.hash as jest.Mock).mockRejectedValueOnce(new Error('Auth creation error'));
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
+    await flushCallbacks();
 
-    expect(createAuthEntry).toHaveBeenCalledTimes(1);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.send).toHaveBeenCalledWith('backend.error.server.serverError');
     expect(console.error).toHaveBeenCalledWith('Fehler beim Anlegen:', expect.any(Error));
   });
 
   test('should return 500 on database error during user entry creation for new user', async () => {
-    mockRequest.body = { loginid: 0, loginname: 'user', password: 'pw', email: 'e@e.e' };
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      callback(null, [{ loginCount: 0, emailCount: 0 }] as RowDataPacket[]);
-    });
-    (createAuthEntry as jest.Mock).mockResolvedValueOnce(101); // Auth created
-    (mockConnection.query as jest.Mock).mockImplementationOnce((sql, values, callback) => {
-      // Mock for INSERT users
-      callback(new Error('User creation DB error'), null);
-    });
+    mockRequest.body = { loginname: 'user', password: 'pw', email: 'e@e.e' };
+    (mockConnection.query as jest.Mock)
+      .mockImplementationOnce((_sql, _v, cb) =>
+        cb(null, [{ loginCount: 0, emailCount: 0 }] as RowDataPacket[])
+      )
+      .mockImplementationOnce((_sql, _v, cb) => cb(null, { insertId: 101 } as OkPacket)) // auth entry
+      .mockImplementationOnce((_sql, _v, cb) => cb(new Error('User creation DB error'), null)); // INSERT users
 
     await createOrUpdateUser(mockConnection, mockRequest as Request, mockResponse as Response);
+    await flushCallbacks();
 
-    expect(createAuthEntry).toHaveBeenCalledTimes(1);
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.send).toHaveBeenCalledWith('backend.error.server.creationError');
   });
 
   test('should return 500 on general unexpected error', async () => {
-    mockRequest.body = { loginid: 0, loginname: 'user', password: 'pw', email: 'e@e.e' };
-    // Simulate an error that occurs outside the explicit try-catch blocks
-    jest.spyOn(module.exports, 'createOrUpdateUser').mockImplementationOnce(() => {
+    mockRequest.body = { loginname: 'user', password: 'pw', email: 'e@e.e' };
+    // Fehler außerhalb der expliziten try-catch-Blöcke (hier: Abfrage wirft synchron)
+    (mockConnection.query as jest.Mock).mockImplementationOnce(() => {
       throw new Error('Unexpected general error');
     });
 

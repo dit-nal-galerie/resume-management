@@ -57,11 +57,36 @@ class PasswordResetService
     return ['success' => true];
   }
 
+  /**
+   * Prüft, ob ein Token gültig ist: vorhanden, nicht abgelaufen, noch nicht verwendet.
+   */
+  public function validateToken(string $token): bool
+  {
+    $stmt = $this->db->prepare(
+      'SELECT id FROM password_reset_tokens
+        WHERE token = :token
+          AND expires_at_timestamp > :now
+          AND is_used = FALSE
+        LIMIT 1',
+    );
+    $stmt->execute(['token' => $token, 'now' => time()]);
+
+    return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
   public function resetPassword(string $token, string $newPassword): array
   {
-    $sql = 'SELECT loginname FROM password_resets WHERE token = :token';
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute(['token' => $token]);
+    // Token validieren (password_reset_tokens, wie in sendResetEmail geschrieben)
+    $stmt = $this->db->prepare(
+      'SELECT a.loginname
+         FROM password_reset_tokens t
+         JOIN authentification a ON a.id = t.user_id
+        WHERE t.token = :token
+          AND t.expires_at_timestamp > :now
+          AND t.is_used = FALSE
+        LIMIT 1',
+    );
+    $stmt->execute(['token' => $token, 'now' => time()]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$row) {
@@ -75,6 +100,12 @@ class PasswordResetService
       'pw' => $hash,
       'loginname' => $row['loginname'],
     ]);
+
+    // Token single-use: als verwendet markieren
+    $stmt3 = $this->db->prepare(
+      'UPDATE password_reset_tokens SET is_used = TRUE WHERE token = :token',
+    );
+    $stmt3->execute(['token' => $token]);
 
     return ['success' => true];
   }
